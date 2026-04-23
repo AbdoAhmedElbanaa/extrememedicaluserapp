@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "2089029110",
+    "project_id": "extremecool-app",
+    "storage_bucket": "extremecool-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:2089029110:android:ee1f975aa1cb2614944bd7",
+        "android_client_info": {
+          "package_name": "com.extreme.user.app.extrememedicaluserapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxzHWNLtNaFBBKBiRI-FtK-bbLV5WKTIE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
