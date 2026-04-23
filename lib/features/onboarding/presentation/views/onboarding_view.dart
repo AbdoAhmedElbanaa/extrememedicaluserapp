@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -17,7 +18,7 @@ class OnboardingView extends GetView<OnboardingController> {
     return Scaffold(
       body: Stack(
         children: [
-          // Dynamic Background (Image or Gradient)
+          // 1. Dynamic Background & Floating Elements Layer
           PageView.builder(
             controller: controller.pageController,
             itemCount: controller.onboardingPages.length,
@@ -26,7 +27,7 @@ class OnboardingView extends GetView<OnboardingController> {
               final page = controller.onboardingPages[index];
               return Stack(
                 children: [
-                  // 1. Background Layer
+                  // Background
                   if (page.isImagePage)
                     Positioned.fill(
                       child: CachedNetworkImage(
@@ -58,204 +59,309 @@ class OnboardingView extends GetView<OnboardingController> {
                       ),
                     ),
 
-                  // 2. Professional Color Overlay (Gradient)
+                  // Floating Particles/Icons Layer
+                  const Positioned.fill(
+                    child: FloatingIconsOverlay(),
+                  ),
+
+                  // Professional Gradient Overlay
                   Positioned.fill(
                     child: Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
-                          stops: const [0.0, 0.4, 0.8, 1.0],
+                          stops: const [0.0, 0.3, 0.6, 1.0],
                           colors: [
-                            if (page.isImagePage) ...[
-                              Colors.black.withValues(alpha: 0.3),
-                              Colors.transparent,
-                              Colors.black.withValues(alpha: 0.7),
-                              Colors.black.withValues(alpha: 0.9),
-                            ] else ...[
-                              Colors.transparent,
-                              Colors.transparent,
-                              (isDark ? AppColors.backgroundDark : Colors.white).withValues(alpha: 0.6),
-                              (isDark ? AppColors.backgroundDark : Colors.white),
-                            ],
+                            Colors.black.withValues(alpha: page.isImagePage ? 0.4 : 0.0),
+                            Colors.transparent,
+                            Colors.black.withValues(alpha: 0.5),
+                            Colors.black.withValues(alpha: 0.9),
                           ],
                         ),
                       ),
                     ),
                   ),
 
-                  // 3. Content Layer
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Spacer(flex: 3),
-                        
-                        // Icon for non-image pages
-                        if (!page.isImagePage)
+                  // Non-Image Page Centered Icon
+                  if (!page.isImagePage)
+                    Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
                           Container(
-                            width: 160,
-                            height: 160,
+                            width: 180,
+                            height: 180,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               gradient: LinearGradient(colors: page.gradientColors),
                               boxShadow: [
                                 BoxShadow(
                                   color: page.gradientColors[0].withValues(alpha: 0.4),
-                                  blurRadius: 30,
+                                  blurRadius: 40,
                                   spreadRadius: 5,
                                 ),
                               ],
                             ),
-                            child: Icon(page.icon, size: 80, color: Colors.white),
-                          ).animate().scale(duration: 600.ms, curve: Curves.easeOutBack),
-
-                        const Spacer(flex: 1),
-
-                        // Title with glassmorphism container if it's an image page
-                        _buildTextContent(context, page, isDark),
-                        
-                        const Spacer(flex: 2),
-                      ],
+                            child: Icon(page.icon, size: 90, color: Colors.white),
+                          ).animate().scale(duration: const Duration(milliseconds: 800), curve: Curves.easeOutBack).shimmer(delay: const Duration(seconds: 1), duration: const Duration(seconds: 2)),
+                          const SizedBox(height: 150), // Space for bottom content
+                        ],
+                      ),
                     ),
-                  ),
                 ],
               );
             },
           ),
 
-          // 4. Fixed UI Elements (Skip, Indicators, Nav)
-          _buildFixedUI(context, theme),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTextContent(BuildContext context, dynamic page, bool isDark) {
-    return Container(
-      padding: page.isImagePage ? const EdgeInsets.all(24) : EdgeInsets.zero,
-      decoration: page.isImagePage ? BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 20,
-            spreadRadius: -5,
+          // 2. Bottom Content & Fixed UI
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.only(top: 40, bottom: 140, left: 30, right: 30),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.8),
+                  ],
+                ),
+              ),
+              child: Obx(() {
+                final page = controller.onboardingPages[controller.currentPage.value];
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      page.title,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                        letterSpacing: 1.5,
+                        fontSize: 32,
+                        shadows: [const Shadow(color: Colors.black, blurRadius: 15)],
+                      ),
+                    ).animate(key: ValueKey('title${controller.currentPage.value}'))
+                     .fadeIn(duration: const Duration(milliseconds: 600))
+                     .slideY(begin: 0.3, end: 0),
+                    
+                    const SizedBox(height: 20),
+                    
+                    Text(
+                      page.description,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: Colors.white.withValues(alpha: 0.85),
+                        height: 1.6,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ).animate(key: ValueKey('desc${controller.currentPage.value}'))
+                     .fadeIn(delay: const Duration(milliseconds: 200), duration: const Duration(milliseconds: 600))
+                     .slideY(begin: 0.3, end: 0),
+                  ],
+                );
+              }),
+            ),
           ),
-        ],
-      ) : null,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            page.title,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: page.isImagePage ? Colors.white : Theme.of(context).colorScheme.onSurface,
-              letterSpacing: 1.2,
-              shadows: page.isImagePage ? [const Shadow(color: Colors.black45, blurRadius: 10, offset: Offset(0, 4))] : null,
-            ),
-          ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.2, end: 0),
-          
-          const SizedBox(height: 16),
-          
-          Text(
-            page.description,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: page.isImagePage 
-                ? Colors.white.withValues(alpha: 0.9) 
-                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-              height: 1.5,
-              fontSize: 16,
-            ),
-          ).animate().fadeIn(delay: 200.ms, duration: 600.ms).slideY(begin: 0.2, end: 0),
+
+          // 3. Navigation Controls
+          _buildNavigationUI(context, theme),
         ],
       ),
     );
   }
 
-  Widget _buildFixedUI(BuildContext context, ThemeData theme) {
+  Widget _buildNavigationUI(BuildContext context, ThemeData theme) {
     return Stack(
       children: [
-        // Top Skip Button
+        // Top Skip
         Positioned(
           top: MediaQuery.of(context).padding.top + 10,
           right: 20,
-          child: TextButton(
-            onPressed: controller.skip,
-            child: Text(
-              'Skip',
-              style: TextStyle(
-                color: theme.colorScheme.primary,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+          child: Obx(() => AnimatedOpacity(
+            opacity: controller.isLastPage ? 0.0 : 1.0,
+            duration: const Duration(milliseconds: 400),
+            child: IgnorePointer(
+              ignoring: controller.isLastPage,
+              child: TextButton(
+                onPressed: controller.skip,
+                child: const Text(
+                  'SKIP',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 2,
+                    fontSize: 14,
+                  ),
+                ),
               ),
             ),
-          ),
-        ).animate().fadeIn(delay: 500.ms),
+          )),
+        ).animate().fadeIn(delay: const Duration(milliseconds: 500)),
 
-        // Bottom Navigation Area
+        // Bottom Bar Area
         Positioned(
           bottom: 50,
           left: 30,
           right: 30,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Back Button
-              Obx(() => AnimatedOpacity(
-                opacity: controller.currentPage.value > 0 ? 1.0 : 0.0,
-                duration: 300.ms,
-                child: IconButton(
-                  onPressed: controller.currentPage.value > 0 ? controller.previousPage : null,
-                  icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                  color: Colors.white.withValues(alpha: 0.8),
-                ),
-              )),
-
-              // Animated Indicators
-              Row(
-                children: List.generate(
-                  controller.onboardingPages.length,
-                  (index) => Obx(() {
-                    bool isSelected = controller.currentPage.value == index;
-                    return AnimatedContainer(
-                      duration: 300.ms,
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      height: 6,
-                      width: isSelected ? 24 : 6,
-                      decoration: BoxDecoration(
-                        color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.3),
-                        borderRadius: BorderRadius.circular(3),
+          child: SizedBox(
+            height: 65,
+            child: Obx(() {
+              bool isLast = controller.isLastPage;
+              bool showBack = controller.currentPage.value > 0;
+              return Stack(
+                alignment: Alignment.centerRight,
+                children: [
+                  // 1. Back Button (Always stays on the left)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: AnimatedOpacity(
+                      opacity: showBack ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 300),
+                      child: IconButton(
+                        onPressed: showBack ? controller.previousPage : null,
+                        icon: const Icon(Icons.keyboard_backspace_rounded, size: 30),
+                        color: Colors.white70,
                       ),
-                    );
-                  }),
-                ),
-              ),
+                    ),
+                  ),
 
-              // Next Button
-              Obx(() => ElevatedButton(
-                onPressed: controller.nextPage,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.colorScheme.primary,
-                  foregroundColor: Colors.white,
-                  shape: const CircleBorder(),
-                  padding: const EdgeInsets.all(18),
-                  elevation: 8,
-                ),
-                child: Icon(
-                  controller.isLastPage ? Icons.check_rounded : Icons.arrow_forward_ios_rounded,
-                ),
-              )),
-            ],
+                  // 2. Indicators (Fade out when last page)
+                  Align(
+                    alignment: Alignment.center,
+                    child: AnimatedOpacity(
+                      opacity: isLast ? 0.0 : 1.0,
+                      duration: const Duration(milliseconds: 400),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: List.generate(
+                          controller.onboardingPages.length,
+                          (index) => Obx(() {
+                            bool isSelected = controller.currentPage.value == index;
+                            return AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              margin: const EdgeInsets.symmetric(horizontal: 5),
+                              height: 5,
+                              width: isSelected ? 30 : 10,
+                              decoration: BoxDecoration(
+                                color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.3),
+                                borderRadius: BorderRadius.circular(5),
+                                boxShadow: isSelected ? [
+                                  BoxShadow(color: Colors.white.withValues(alpha: 0.5), blurRadius: 10)
+                                ] : null,
+                              ),
+                            );
+                          }),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // 3. Action Button (Expands from right to cover center)
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeInOutCubic,
+                    width: isLast ? Get.width - 120 : 65,
+                    height: 65,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(isLast ? 20 : 35),
+                      boxShadow: [
+                        BoxShadow(
+                          color: (isLast ? theme.colorScheme.primary : Colors.white)
+                              .withValues(alpha: 0.3),
+                          blurRadius: 20,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: ElevatedButton(
+                      onPressed: controller.nextPage,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isLast ? theme.colorScheme.primary : Colors.white,
+                        foregroundColor: isLast ? Colors.white : theme.colorScheme.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(isLast ? 20 : 35),
+                        ),
+                        padding: EdgeInsets.zero,
+                        elevation: 0,
+                      ),
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        child: isLast
+                            ? const Text(
+                                'GET STARTED',
+                                key: ValueKey('btn_text'),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 2,
+                                  fontSize: 16,
+                                ),
+                              ).animate().fadeIn(delay: const Duration(milliseconds: 200)).scale(begin: const Offset(0.8, 0.8))
+                            : const Icon(
+                                Icons.arrow_forward_ios_rounded,
+                                key: ValueKey('btn_icon'),
+                                size: 26,
+                              ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }),
           ),
         ),
       ],
+    );
+  }
+}
+
+class FloatingIconsOverlay extends StatelessWidget {
+  const FloatingIconsOverlay({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final icons = [
+      Icons.favorite_rounded,
+      Icons.add_circle_outline_rounded,
+      Icons.health_and_safety_rounded,
+      Icons.emergency_rounded,
+      Icons.biotech_rounded,
+    ];
+
+    return Stack(
+      children: List.generate(12, (index) {
+        final random = math.Random(index);
+        final size = 20.0 + random.nextDouble() * 30.0;
+        final startX = random.nextDouble() * 400;
+        final startY = random.nextDouble() * 800;
+        
+        return Positioned(
+          left: startX,
+          top: startY,
+          child: Opacity(
+            opacity: 0.15,
+            child: Icon(
+              icons[random.nextInt(icons.length)],
+              size: size,
+              color: Colors.white,
+            ),
+          )
+          .animate(onPlay: (c) => c.repeat(reverse: true))
+          .move(
+            duration: Duration(milliseconds: 4000 + random.nextInt(4000)),
+            begin: const Offset(0, 0),
+            end: Offset(random.nextDouble() * 40 - 20, random.nextDouble() * 40 - 20),
+            curve: Curves.easeInOut,
+          )
+          .rotate(duration: const Duration(seconds: 10), end: 1),
+        );
+      }),
     );
   }
 }
