@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:extrememedicaluserapp/core/services/firebase_service.dart';
 import 'package:extrememedicaluserapp/theme/app_theme.dart';
 import 'package:extrememedicaluserapp/features/splash/presentation/views/splash_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize GetStorage
+  await GetStorage.init();
   
   // Initialize Firebase Service
   await Get.putAsync(() => FirebaseService().init());
