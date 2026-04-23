@@ -19,6 +19,13 @@ class OnboardingController extends GetxController {
       gradientColors: [AppColors.primary, AppColors.secondary],
     ),
     OnboardingModel(
+      title: 'Visual Training Center',
+      description: 'Learn with high-quality visual content and interactive guides designed by medical professionals.',
+      imagePath: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=2070&auto=format&fit=crop', // Professional medical image
+      isImagePage: true,
+      gradientColors: [const Color(0xFF0EA5E9), const Color(0xFF2DD4BF)],
+    ),
+    OnboardingModel(
       title: 'Smart Diagnostics',
       description: 'Intelligent troubleshooting and step-by-step solutions at your fingertips, anytime, anywhere.',
       icon: Icons.psychology_rounded,
@@ -62,9 +69,6 @@ class OnboardingController extends GetxController {
 
   void completeOnboarding() {
     storage.write('onboarding_seen', true);
-    // Navigate to Login or Home
-    // Get.offAllNamed('/login'); 
-    // For now, let's just go to a placeholder or back to home
     Get.snackbar(
       "Welcome!", 
       "Onboarding Completed",
