@@ -26,6 +26,15 @@ class AppColors {
   static const Color accentDark = Color(0xFF2B2B2B);
   static const Color borderDark = Color(0xFF2B2B2B);
 
+  // Cinematic / Permission Colors
+  static const Color cinematicSurface = Color(0xFF161531);
+  static const Color surfaceDark = Color(0xFF0D0C21);
+  static const Color surfaceLight = Color(0xFFF1F5F9);
+  static const Color indigoDeep = Color(0xFF1A1640);
+  static const Color indigoAccent = Color(0xFF7C7EF1);
+  static const Color textMutedDark = Color(0xFF8E8EA9);
+  static const Color textMutedLight = Color(0xFF64748B);
+
   // Splash Specific (Gradients & Subtitles)
   static const List<Color> splashGradientDark = [
     Color(0xFF04030D),

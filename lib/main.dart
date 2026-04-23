@@ -1,17 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:extrememedicaluserapp/core/services/firebase_service.dart';
 import 'package:extrememedicaluserapp/theme/app_theme.dart';
 import 'package:extrememedicaluserapp/features/splash/presentation/views/splash_view.dart';
+import 'package:extrememedicaluserapp/features/onboarding/presentation/views/onboarding_view.dart';
+import 'package:extrememedicaluserapp/features/permissions/presentation/view/allow_permissions_view.dart';
+import 'package:extrememedicaluserapp/features/auth/presentation/views/login_view.dart';
+import 'package:extrememedicaluserapp/features/auth/presentation/views/register_view.dart';
+import 'package:extrememedicaluserapp/features/home/presentation/views/home_view.dart';
+import 'package:extrememedicaluserapp/features/home/presentation/controllers/home_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize GetStorage
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.light,
+    systemNavigationBarColor: Colors.transparent,
+    systemNavigationBarIconBrightness: Brightness.light,
+  ));
+
   await GetStorage.init();
-  
-  // Initialize Firebase Service
   await Get.putAsync(() => FirebaseService().init());
   
   runApp(const MyApp());
@@ -27,93 +38,91 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system, // Adapts to system settings
+      themeMode: ThemeMode.system,
+      initialRoute: '/',
+      getPages: [
+        GetPage(
+          name: '/', 
+          page: () => const SplashView(),
+          transition: Transition.fadeIn,
+        ),
+        GetPage(
+          name: '/onboarding', 
+          page: () => const OnboardingView(),
+          transition: Transition.cupertino,
+        ),
+        GetPage(
+          name: '/permissions', 
+          page: () => const AllowPermissionsView(),
+          transition: Transition.rightToLeftWithFade,
+        ),
+        GetPage(
+          name: '/login', 
+          page: () => const LoginView(),
+          transition: Transition.downToUp,
+        ),
+        GetPage(
+          name: '/register', 
+          page: () => const RegisterView(),
+          transition: Transition.rightToLeftWithFade,
+        ),
+        GetPage(
+          name: '/home', 
+          page: () => const HomeView(),
+          binding: BindingsBuilder(() {
+            Get.put(HomeController());
+          }),
+          transition: Transition.zoom,
+        ),
+      ],
       home: const SplashView(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
+class MyHomePage extends StatelessWidget {
   final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+  const MyHomePage({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: Text(title),
+        centerTitle: true,
+        elevation: 0,
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
+      body: Container(
+        width: double.infinity,
+        decoration: AppTheme.gradientBackground(context),
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('You have pushed the button this many times:'),
+            Icon(
+              Icons.medical_services_rounded,
+              size: 100,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(height: 24),
             Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+              'Main Dashboard',
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Welcome to Extreme Medical User App',
+              style: TextStyle(
+                fontSize: 16,
+                color: isDark ? Colors.white60 : Colors.black54,
+              ),
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }

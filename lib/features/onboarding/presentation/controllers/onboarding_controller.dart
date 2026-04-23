@@ -1,3 +1,4 @@
+import 'package:extrememedicaluserapp/features/permissions/presentation/view/allow_permissions_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -69,12 +70,6 @@ class OnboardingController extends GetxController {
 
   void completeOnboarding() {
     storage.write('onboarding_seen', true);
-    Get.snackbar(
-      "Welcome!", 
-      "Onboarding Completed",
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: AppColors.primary.withValues(alpha: 0.7),
-      colorText: Colors.white,
-    );
+    Get.off(() => const AllowPermissionsView());
   }
 }

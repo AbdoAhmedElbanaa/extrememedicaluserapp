@@ -1,6 +1,9 @@
+import 'package:extrememedicaluserapp/features/auth/presentation/views/login_view.dart';
+import 'package:extrememedicaluserapp/features/permissions/presentation/view/allow_permissions_view.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:extrememedicaluserapp/main.dart';
 import 'package:extrememedicaluserapp/features/onboarding/presentation/views/onboarding_view.dart';
 
@@ -20,15 +23,50 @@ class SplashController extends GetxController {
     version.value = packageInfo.version;
   }
 
+  Future<bool> _checkPermissions() async {
+    final permissions = [
+      Permission.notification,
+      Permission.camera,
+      Permission.storage,
+      Permission.nearbyWifiDevices,
+      Permission.ignoreBatteryOptimizations,
+    ];
+
+    for (var p in permissions) {
+      if (!(await p.isGranted)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   void _navigateToNext() async {
     await Future.delayed(const Duration(seconds: 3));
     
     bool onboardingSeen = storage.read('onboarding_seen') ?? false;
+    bool allPermissionsGranted = storage.read('all_permissions_granted') ?? false;
+    bool isLoggedIn = storage.read('is_logged_in') ?? false;
 
-    if (onboardingSeen) {
+    if (!onboardingSeen) {
+      Get.offAll(() => const OnboardingView());
+      return;
+    }
+
+    // Check if permissions were already granted or need checking
+    if (!allPermissionsGranted) {
+      bool permissionsReallyGranted = await _checkPermissions();
+      if (!permissionsReallyGranted) {
+        Get.offAll(() => const AllowPermissionsView());
+        return;
+      }
+      storage.write('all_permissions_granted', true);
+    }
+
+    // After permissions are confirmed, check login status
+    if (isLoggedIn) {
       Get.offAll(() => const MyHomePage(title: 'Extreme Medical Home'));
     } else {
-      Get.offAll(() => const OnboardingView());
+      Get.offAll(() => const LoginView());
     }
   }
 }

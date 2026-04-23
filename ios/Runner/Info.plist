@@ -66,5 +66,17 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+
+	<!-- Permissions -->
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs camera access to scan medical equipment barcodes and capture diagnostic images.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to your photo library to save and upload medical reports and guides.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>This app needs Bluetooth access to discover and connect to your smart medical devices.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>This app needs Bluetooth access to communicate with your medical equipment.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>This app needs local network access to find and manage smart devices on your network.</string>
 </dict>
 </plist>
