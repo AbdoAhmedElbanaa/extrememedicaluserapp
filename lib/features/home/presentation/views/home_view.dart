@@ -1,9 +1,12 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:extrememedicaluserapp/features/home/presentation/widgets/home_header.dart';
 import 'package:extrememedicaluserapp/features/home/presentation/widgets/custom_bottom_nav.dart';
+import 'package:extrememedicaluserapp/features/home/presentation/widgets/recent_activity_section.dart';
 import 'package:extrememedicaluserapp/features/home/presentation/widgets/quick_actions_section.dart';
 import 'package:extrememedicaluserapp/features/home/presentation/widgets/device_slider.dart';
 import '../controllers/home_controller.dart';
@@ -32,7 +35,7 @@ class HomeView extends GetView<HomeController> {
             ],
           ),
 
-          // Background Gradient for Cinematic Look (Behind fixed header)
+          // Background Gradient for Cinematic Look
           if (isDark)
             Positioned(
               top: -100,
@@ -52,7 +55,7 @@ class HomeView extends GetView<HomeController> {
               ),
             ),
 
-          // FIXED HEADER WITH BLUR
+          // FIXED HEADER
           Positioned(
             top: 0,
             left: 0,
@@ -67,31 +70,51 @@ class HomeView extends GetView<HomeController> {
   }
 
   Widget _buildHomeContent(BuildContext context, bool isDark) {
-    return CustomScrollView(
-      physics: const BouncingScrollPhysics(),
-      slivers: [
-        SliverToBoxAdapter(
-          child: Builder(
-            builder: (context) {
-              final topPadding = MediaQuery.of(context).padding.top;
-              return SizedBox(height: topPadding + 165); 
-            },
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                DeviceSlider(),
-                SizedBox(height: 30),
-                QuickActionsSection(),
-              ],
+    return SmartRefresher(
+      controller: controller.refreshController,
+      onRefresh: controller.onRefresh,
+      header: WaterDropMaterialHeader(
+        backgroundColor: AppColors.primary,
+        color: Colors.white,
+        offset: MediaQuery.of(context).padding.top + 100,
+      ),
+      child: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          SliverToBoxAdapter(
+            child: Builder(
+              builder: (context) {
+                final topPadding = MediaQuery.of(context).padding.top;
+                return SizedBox(height: topPadding + 165); 
+              },
             ),
           ),
-        ),
-      ],
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const DeviceSlider()
+                      .animate()
+                      .fadeIn(duration: 600.ms)
+                      .slideY(begin: 0.2, end: 0, curve: Curves.easeOutQuad),
+                  const SizedBox(height: 30),
+                  const QuickActionsSection()
+                      .animate()
+                      .fadeIn(delay: 200.ms, duration: 600.ms)
+                      .slideY(begin: 0.2, end: 0, curve: Curves.easeOutQuad),
+                  const SizedBox(height: 30),
+                  const RecentActivitySection()
+                      .animate()
+                      .fadeIn(delay: 400.ms, duration: 600.ms)
+                      .slideY(begin: 0.2, end: 0, curve: Curves.easeOutQuad),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

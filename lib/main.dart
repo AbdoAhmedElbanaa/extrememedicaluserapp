@@ -13,6 +13,7 @@ import 'package:extrememedicaluserapp/features/home/presentation/views/home_view
 import 'package:extrememedicaluserapp/features/home/presentation/controllers/home_controller.dart';
 
 import 'package:extrememedicaluserapp/core/services/theme_service.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,48 +36,58 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      title: 'Extreme Medical',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeService().theme,
-      initialRoute: '/',
-      getPages: [
-        GetPage(
-          name: '/', 
-          page: () => const SplashView(),
-          transition: Transition.fadeIn,
-        ),
-        GetPage(
-          name: '/onboarding', 
-          page: () => const OnboardingView(),
-          transition: Transition.cupertino,
-        ),
-        GetPage(
-          name: '/permissions', 
-          page: () => const AllowPermissionsView(),
-          transition: Transition.rightToLeftWithFade,
-        ),
-        GetPage(
-          name: '/login', 
-          page: () => const LoginView(),
-          transition: Transition.downToUp,
-        ),
-        GetPage(
-          name: '/register', 
-          page: () => const RegisterView(),
-          transition: Transition.rightToLeftWithFade,
-        ),
-        GetPage(
-          name: '/home', 
-          page: () => const HomeView(),
-          binding: BindingsBuilder(() {
-            Get.put(HomeController());
-          }),
-          transition: Transition.zoom,
-        ),
-      ],
+    return RefreshConfiguration(
+      headerBuilder: () => const WaterDropHeader(),
+      footerBuilder: () => const ClassicFooter(),
+      headerTriggerDistance: 80.0,
+      springDescription: const SpringDescription(stiffness: 170, damping: 16, mass: 1.9),
+      maxOverScrollExtent: 100,
+      maxUnderScrollExtent: 0,
+      enableScrollWhenRefreshCompleted: true,
+      enableLoadingWhenFailed: true,
+      child: GetMaterialApp(
+        title: 'Extreme Medical',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: ThemeService().theme,
+        initialRoute: '/',
+        getPages: [
+          GetPage(
+            name: '/', 
+            page: () => const SplashView(),
+            transition: Transition.fadeIn,
+          ),
+          GetPage(
+            name: '/onboarding', 
+            page: () => const OnboardingView(),
+            transition: Transition.cupertino,
+          ),
+          GetPage(
+            name: '/permissions', 
+            page: () => const AllowPermissionsView(),
+            transition: Transition.rightToLeftWithFade,
+          ),
+          GetPage(
+            name: '/login', 
+            page: () => const LoginView(),
+            transition: Transition.downToUp,
+          ),
+          GetPage(
+            name: '/register', 
+            page: () => const RegisterView(),
+            transition: Transition.rightToLeftWithFade,
+          ),
+          GetPage(
+            name: '/home', 
+            page: () => const HomeView(),
+            binding: BindingsBuilder(() {
+              Get.put(HomeController());
+            }),
+            transition: Transition.zoom,
+          ),
+        ],
+      ),
     );
   }
 }
