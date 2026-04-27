@@ -12,6 +12,8 @@ import 'package:extrememedicaluserapp/features/auth/presentation/views/register_
 import 'package:extrememedicaluserapp/features/home/presentation/views/home_view.dart';
 import 'package:extrememedicaluserapp/features/home/presentation/controllers/home_controller.dart';
 
+import 'package:extrememedicaluserapp/core/services/theme_service.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
@@ -25,11 +27,11 @@ void main() async {
   await GetStorage.init();
   await Get.putAsync(() => FirebaseService().init());
   
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +40,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
+      themeMode: ThemeService().theme,
       initialRoute: '/',
       getPages: [
         GetPage(
@@ -75,55 +77,6 @@ class MyApp extends StatelessWidget {
           transition: Transition.zoom,
         ),
       ],
-      home: const SplashView(),
-    );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  final String title;
-  const MyHomePage({super.key, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-        centerTitle: true,
-        elevation: 0,
-      ),
-      body: Container(
-        width: double.infinity,
-        decoration: AppTheme.gradientBackground(context),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.medical_services_rounded,
-              size: 100,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Main Dashboard',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Welcome to Extreme Medical User App',
-              style: TextStyle(
-                fontSize: 16,
-                color: isDark ? Colors.white60 : Colors.black54,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

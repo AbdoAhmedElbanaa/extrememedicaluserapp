@@ -4,7 +4,8 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:extrememedicaluserapp/main.dart';
+import 'package:extrememedicaluserapp/features/home/presentation/views/home_view.dart';
+import 'package:extrememedicaluserapp/features/home/presentation/controllers/home_controller.dart';
 import 'package:extrememedicaluserapp/features/onboarding/presentation/views/onboarding_view.dart';
 
 class SplashController extends GetxController {
@@ -64,7 +65,10 @@ class SplashController extends GetxController {
 
     // After permissions are confirmed, check login status
     if (isLoggedIn) {
-      Get.offAll(() => const MyHomePage(title: 'Extreme Medical Home'));
+      if (!Get.isRegistered<HomeController>()) {
+        Get.put(HomeController());
+      }
+      Get.offAll(() => const HomeView());
     } else {
       Get.offAll(() => const LoginView());
     }

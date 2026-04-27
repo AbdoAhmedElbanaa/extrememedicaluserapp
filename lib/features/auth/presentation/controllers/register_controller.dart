@@ -159,9 +159,10 @@ class RegisterController extends GetxController {
   }
 
   void register() {
+    Get.offAllNamed('/home');
     Get.snackbar(
       'Success',
-      'Account created successfully',
+      'Account created successfully ✨',
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.green.withOpacity(0.7),
       colorText: Colors.white,

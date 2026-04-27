@@ -13,21 +13,30 @@ class LoginController extends GetxController {
   }
 
   void login() async {
-    isLoading.value = true;
-    // Simulate login
-    await Future.delayed(const Duration(seconds: 2));
-    isLoading.value = false;
+    print("Login button pressed"); // Debug print
+    if (isLoading.value) return;
     
-    Get.snackbar(
-      'Success',
-      'Logged in successfully',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.green.withValues(alpha: 0.7),
-      colorText: Colors.white,
-    );
+    isLoading.value = true;
+    try {
+      // Simulate login
+      await Future.delayed(const Duration(seconds: 1));
+      print("Login simulation finished");
+      
+      Get.snackbar(
+        'Success',
+        'Logged in successfully',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green.withOpacity(0.7),
+        colorText: Colors.white,
+      );
 
-    // Navigate to Home
-    Get.offAllNamed('/home');
+      print("Navigating to home...");
+      Get.offAllNamed('/home');
+    } catch (e) {
+      print("Login error: $e");
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   @override
