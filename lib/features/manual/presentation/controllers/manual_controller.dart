@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../data/models/manual_model.dart';
+import '../../data/models/manual_step_model.dart';
 
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class ManualController extends GetxController {
   final RxList<ManualModel> manuals = <ManualModel>[].obs;
+  final RxList<ManualStepModel> manualSteps = <ManualStepModel>[].obs;
   final RxString searchQuery = ''.obs;
   final RefreshController refreshController = RefreshController(initialRefresh: false);
 
@@ -13,11 +15,13 @@ class ManualController extends GetxController {
   void onInit() {
     super.onInit();
     _loadManuals();
+    _loadSteps();
   }
 
   Future<void> onRefresh() async {
     await Future.delayed(const Duration(seconds: 1));
     _loadManuals();
+    _loadSteps();
     refreshController.refreshCompleted();
   }
 
@@ -39,21 +43,29 @@ class ManualController extends GetxController {
         icon: Icons.monitor_heart_rounded,
         color: const Color(0xFFF472B6),
       ),
-      ManualModel(
-        title: 'GlucoTrack X User Manual',
-        deviceName: 'Glucose Meter',
-        lastUpdated: 'Jan 20, 2024',
-        fileSize: '5.1 MB',
-        icon: Icons.bloodtype_rounded,
-        color: const Color(0xFF34D399),
+    ];
+  }
+
+  void _loadSteps() {
+    manualSteps.value = [
+      ManualStepModel(
+        stepNumber: 1,
+        title: 'Unbox & Inspect',
+        description: 'Remove the device from packaging. Check for visible damage. Verify all components: unit, power adapter, mounting bracket, and this manual are present.',
       ),
-      ManualModel(
-        title: 'OxyFlow Setup Guide',
-        deviceName: 'Pulse Oximeter',
-        lastUpdated: 'Dec 15, 2023',
-        fileSize: '1.5 MB',
-        icon: Icons.air_rounded,
-        color: const Color(0xFFFBBF24),
+      ManualStepModel(
+        stepNumber: 2,
+        title: 'Choose Installation Location',
+        description: 'Mount at least 1.5m from the floor. Avoid direct sunlight, heat sources, and moisture. Ensure 30cm clearance on all sides for proper airflow.',
+        noteText: 'Optimal range: 18–24°C ambient temperature.',
+        noteType: StepNoteType.info,
+      ),
+      ManualStepModel(
+        stepNumber: 3,
+        title: 'Mount the Bracket',
+        description: 'Use the provided 4 × M4 screws and wall anchors. Ensure the surface can support 2.5kg. Use a spirit level to align the bracket horizontally.',
+        noteText: 'Do not install near electrical panels or HVAC vents.',
+        noteType: StepNoteType.warning,
       ),
     ];
   }

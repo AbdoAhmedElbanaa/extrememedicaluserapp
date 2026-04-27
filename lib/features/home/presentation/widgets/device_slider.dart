@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:extrememedicaluserapp/features/home/presentation/widgets/active_device_card.dart';
+import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
 
 class DeviceSlider extends StatefulWidget {
   const DeviceSlider({super.key});
@@ -11,49 +12,100 @@ class DeviceSlider extends StatefulWidget {
 
 class _DeviceSliderState extends State<DeviceSlider> {
   int _currentIndex = 0;
+  // Use CarouselSliderController for version 5.0.0
+  final CarouselSliderController _carouselController = CarouselSliderController();
 
   @override
   Widget build(BuildContext context) {
+    final bool isWide = context.isDesktopLayout || context.isTabletLayout;
+    
+    final double viewportFraction = context.responsive(
+      0.9,      // Mobile
+      tablet: 0.5,   // Tablet
+      desktop: 0.5,  // Desktop
+    );
+
     return Column(
       children: [
-        CarouselSlider(
-          options: CarouselOptions(
-            height: 250, // Reduced to perfectly fit the card + shadow
-            viewportFraction: 0.9,
-            enlargeCenterPage: true,
-            enlargeFactor: 0.2,
-            autoPlay: false,
-            clipBehavior: Clip.none, // Allow shadows to bleed out without overflow
-            onPageChanged: (index, reason) {
-              setState(() {
-                _currentIndex = index;
-              });
-            },
-          ),
-          items: const [
-            ActiveDeviceCard(),
-            ActiveDeviceCard(),
-            ActiveDeviceCard(),
-          ],
+        LayoutBuilder(
+          builder: (context, constraints) {
+            return CarouselSlider.builder(
+              carouselController: _carouselController,
+              itemCount: 6,
+              options: CarouselOptions(
+                height: context.responsive(250, tablet: 280, desktop: 300),
+                viewportFraction: viewportFraction,
+                enlargeCenterPage: !isWide,
+                enlargeFactor: 0.2,
+                enableInfiniteScroll: true,
+                autoPlay: false,
+                padEnds: !isWide,
+                clipBehavior: Clip.none,
+                onPageChanged: (index, reason) {
+                  setState(() {
+                    _currentIndex = index;
+                  });
+                },
+              ),
+              itemBuilder: (context, index, realIndex) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.responsive(8, tablet: 12, desktop: 16),
+                  ),
+                  child: const ActiveDeviceCard(),
+                );
+              },
+            );
+          }
         ),
-        const SizedBox(height: 12),
-        // Custom Indicators
+        const SizedBox(height: 20),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(3, (index) {
-            return AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              width: _currentIndex == index ? 20 : 6,
-              height: 6,
-              margin: const EdgeInsets.symmetric(horizontal: 3),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(3),
-                color: const Color(0xFF6366F1).withOpacity(_currentIndex == index ? 1 : 0.2),
-              ),
-            );
-          }),
+          children: [
+            if (isWide) ...[
+              _buildNavButton(Icons.arrow_back_ios_rounded, () => _carouselController.previousPage()),
+              const SizedBox(width: 20),
+            ],
+            
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: List.generate(6, (index) {
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  width: _currentIndex == index ? 24 : 8,
+                  height: 8,
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(4),
+                    color: const Color(0xFF6366F1).withOpacity(_currentIndex == index ? 1 : 0.2),
+                  ),
+                );
+              }),
+            ),
+
+            if (isWide) ...[
+              const SizedBox(width: 20),
+              _buildNavButton(Icons.arrow_forward_ios_rounded, () => _carouselController.nextPage()),
+            ],
+          ],
         ),
       ],
+    );
+  }
+
+  Widget _buildNavButton(IconData icon, VoidCallback onTap) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(icon, size: 18, color: const Color(0xFF6366F1)),
+      ),
     );
   }
 }

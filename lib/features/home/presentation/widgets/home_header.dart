@@ -2,8 +2,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
-
 import 'package:extrememedicaluserapp/core/services/theme_service.dart';
+import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
 
 class HomeHeader extends StatelessWidget {
   final bool isDark;
@@ -19,8 +19,8 @@ class HomeHeader extends StatelessWidget {
           padding: EdgeInsets.only(
             top: MediaQuery.of(context).padding.top + 10,
             bottom: 20,
-            left: 20,
-            right: 20,
+            left: context.responsive(20, tablet: 50, desktop: 80),
+            right: context.responsive(20, tablet: 50, desktop: 80),
           ),
           decoration: BoxDecoration(
             color: isDark 
@@ -50,7 +50,7 @@ class HomeHeader extends StatelessWidget {
                             'Good Morning',
                             style: TextStyle(
                               color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
-                              fontSize: 14,
+                              fontSize: context.responsive(14, tablet: 16),
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -63,7 +63,7 @@ class HomeHeader extends StatelessWidget {
                         'Ahmed Hassan',
                         style: TextStyle(
                           color: isDark ? Colors.white : AppColors.foregroundLight,
-                          fontSize: 24,
+                          fontSize: context.responsive(24, tablet: 32),
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.5,
                         ),
@@ -74,6 +74,12 @@ class HomeHeader extends StatelessWidget {
                   // Action Buttons
                   Row(
                     children: [
+                      if (context.isDesktopLayout) ...[
+                         _buildTextButton('Dashboard', isDark),
+                         _buildTextButton('Devices', isDark),
+                         _buildTextButton('Analytics', isDark),
+                         const SizedBox(width: 20),
+                      ],
                       _buildIconButton(
                         icon: isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
                         isDark: isDark,
@@ -95,9 +101,33 @@ class HomeHeader extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 20),
-              _buildSearchBar(isDark),
+              // Search Bar Responsive Width
+              Center(
+                child: SizedBox(
+                  width: context.responsive(
+                    double.infinity,
+                    tablet: 500,
+                    desktop: 700,
+                  ),
+                  child: _buildSearchBar(isDark, context),
+                ),
+              ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextButton(String title, bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: Text(
+        title,
+        style: TextStyle(
+          color: isDark ? Colors.white70 : Colors.black87,
+          fontWeight: FontWeight.w600,
+          fontSize: 16,
         ),
       ),
     );
@@ -185,7 +215,7 @@ class HomeHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildSearchBar(bool isDark) {
+  Widget _buildSearchBar(bool isDark, BuildContext context) {
     return Container(
       height: 55,
       decoration: BoxDecoration(
@@ -194,14 +224,6 @@ class HomeHeader extends StatelessWidget {
         border: Border.all(
           color: isDark ? AppColors.primary.withOpacity(0.15) : AppColors.borderLight.withOpacity(0.5),
         ),
-        boxShadow: [
-          if (!isDark)
-            BoxShadow(
-              color: Colors.black.withOpacity(0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-        ],
       ),
       child: TextField(
         style: TextStyle(color: isDark ? Colors.white : Colors.black87),

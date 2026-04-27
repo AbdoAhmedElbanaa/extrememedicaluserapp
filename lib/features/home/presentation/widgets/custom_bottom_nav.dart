@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
+import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
 import '../controllers/home_controller.dart';
 
 class CustomBottomNav extends GetView<HomeController> {
@@ -10,25 +11,31 @@ class CustomBottomNav extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
+    // If it's desktop, we might want a different navigation or none at all at the bottom
+    if (context.isDesktopLayout) return const SizedBox.shrink();
+
     return Container(
-      // Padding from screen edges
-      padding: const EdgeInsets.only(bottom: 25, left: 16, right: 16),
+      // Responsive padding
+      padding: EdgeInsets.only(
+        bottom: context.responsive(25, tablet: 30),
+        left: context.responsive(16, tablet: 100),
+        right: context.responsive(16, tablet: 100),
+      ),
       child: LayoutBuilder(builder: (context, constraints) {
-        // Calculate dynamic width for the sliding effect
         double totalWidth = constraints.maxWidth;
         double itemWidth = totalWidth / 4;
-        double selectionWidth = itemWidth - 16; // Adjust selection box width
+        double selectionWidth = itemWidth - 16;
 
         return ClipRRect(
           borderRadius: BorderRadius.circular(28),
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30), // Much more blur for cinematic glass effect
+            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
             child: Container(
               height: 80,
               decoration: BoxDecoration(
                 color: isDark
-                    ? AppColors.surfaceDark.withOpacity(0.35) // Much more transparent than header
-                    : AppColors.surfaceLight.withOpacity(0.4), // Much more transparent than header
+                    ? AppColors.surfaceDark.withOpacity(0.35)
+                    : AppColors.surfaceLight.withOpacity(0.4),
                 borderRadius: BorderRadius.circular(28),
                 border: Border.all(
                   color: isDark
@@ -36,21 +43,13 @@ class CustomBottomNav extends GetView<HomeController> {
                       : AppColors.borderLight.withOpacity(0.1),
                   width: 1,
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
-                    blurRadius: 30,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
               ),
               child: Stack(
                 alignment: Alignment.centerLeft,
                 children: [
-                  // THE FLUID SLIDING BACKGROUND
                   Obx(() => AnimatedPositioned(
                     duration: const Duration(milliseconds: 600),
-                    curve: Curves.easeOutBack, // Fluid/Watery bounce effect
+                    curve: Curves.easeOutBack,
                     left: (controller.selectedIndex.value * itemWidth) + 8,
                     top: 10,
                     child: Container(
@@ -63,18 +62,10 @@ class CustomBottomNav extends GetView<HomeController> {
                           color: AppColors.primary.withOpacity(0.3),
                           width: 1.2,
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primary.withOpacity(0.1),
-                            blurRadius: 15,
-                            spreadRadius: 2,
-                          )
-                        ],
                       ),
                     ),
                   )),
 
-                  // NAVIGATION ITEMS
                   Row(
                     children: [
                       _buildNavItem(0, Icons.home_outlined, 'Home'),
@@ -99,52 +90,32 @@ class CustomBottomNav extends GetView<HomeController> {
         behavior: HitTestBehavior.opaque,
         child: Obx(() {
           final isSelected = controller.selectedIndex.value == index;
-          return SizedBox(
-            height: 80, // Matches container height for vertical centering
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Icon with subtle pop-up animation
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 400),
-                  transform: Matrix4.translationValues(0, isSelected ? -2 : 0, 0),
-                  child: Icon(
-                    icon,
-                    color: isSelected 
-                        ? AppColors.primary 
-                        : (isDark ? AppColors.textMutedDark : AppColors.textMutedLight),
-                    size: isSelected ? 26 : 24,
-                  ),
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 400),
+                transform: Matrix4.translationValues(0, isSelected ? -2 : 0, 0),
+                child: Icon(
+                  icon,
+                  color: isSelected 
+                      ? AppColors.primary 
+                      : (isDark ? AppColors.textMutedDark : AppColors.textMutedLight),
+                  size: isSelected ? 26 : 24,
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: isSelected 
-                        ? AppColors.primary 
-                        : (isDark ? AppColors.textMutedDark : AppColors.textMutedLight),
-                    fontSize: 10,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                  ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected 
+                      ? AppColors.primary 
+                      : (isDark ? AppColors.textMutedDark : AppColors.textMutedLight),
+                  fontSize: 10,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                 ),
-                // Indicator Dot
-                AnimatedOpacity(
-                  duration: const Duration(milliseconds: 300),
-                  opacity: isSelected ? 1 : 0,
-                  child: Container(
-                    margin: const EdgeInsets.only(top: 4),
-                    width: 4,
-                    height: 4,
-                    decoration: const BoxDecoration(
-                      color: AppColors.primary,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           );
         }),
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
+import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
 import '../controllers/login_controller.dart';
 
 class LoginView extends GetView<LoginController> {
@@ -30,69 +31,79 @@ class LoginView extends GetView<LoginController> {
                 : [AppColors.splashGradientLight[1], AppColors.backgroundLight],
           ),
         ),
-        child: SingleChildScrollView(
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
-                children: [
-                  const SizedBox(height: 20),
-                  _buildTopIcons(isDark),
-                  const SizedBox(height: 30),
-                  
-                  // Logo
-                  _buildLogo(isDark),
-                  
-                  const SizedBox(height: 30),
-                  
-                  // Welcome Text
-                  Text(
-                    'Welcome Back',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w900,
-                      color: isDark ? AppColors.foregroundDark : AppColors.foregroundLight,
-                      letterSpacing: 1,
-                    ),
-                  ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.2, end: 0),
-                  
-                  const SizedBox(height: 8),
-                  
-                  Text(
-                    'Sign in to your UserManual account',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
-                    ),
-                  ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.2, end: 0),
-                  
-                  const SizedBox(height: 40),
-                  
-                  // Login Form Card
-                  _buildLoginForm(isDark),
-                  
-                  const SizedBox(height: 24),
-                  
-                  // Main Sign In Button
-                  _buildSignInButton(),
-                  
-                  const SizedBox(height: 30),
-                  
-                  // OR Separator
-                  _buildSeparator(isDark),
-                  
-                  const SizedBox(height: 30),
-                  
-                  // Social Login Buttons
-                  _buildSocialLogins(isDark),
-                  
-                  const SizedBox(height: 50),
-                  
-                  // Bottom Link
-                  _buildBottomLink(isDark),
-                  
-                  const SizedBox(height: 20),
-                ],
+        child: Center(
+          child: SingleChildScrollView(
+            child: SafeArea(
+              child: Center(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 500),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.responsive(24, tablet: 40, desktop: 60),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 20),
+                      _buildTopIcons(isDark, context),
+                      const SizedBox(height: 30),
+                      
+                      // Logo
+                      _buildLogo(isDark),
+                      
+                      const SizedBox(height: 30),
+                      
+                      // Welcome Text
+                      Text(
+                        'Welcome Back',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: context.responsive(32, tablet: 40),
+                          fontWeight: FontWeight.w900,
+                          color: isDark ? AppColors.foregroundDark : AppColors.foregroundLight,
+                          letterSpacing: 1,
+                        ),
+                      ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.2, end: 0),
+                      
+                      const SizedBox(height: 8),
+                      
+                      Text(
+                        'Sign in to your UserManual account',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: context.responsive(15, tablet: 18),
+                          color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                        ),
+                      ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.2, end: 0),
+                      
+                      const SizedBox(height: 40),
+                      
+                      // Login Form Card
+                      _buildLoginForm(isDark),
+                      
+                      const SizedBox(height: 24),
+                      
+                      // Main Sign In Button
+                      _buildSignInButton(),
+                      
+                      const SizedBox(height: 30),
+                      
+                      // OR Separator
+                      _buildSeparator(isDark),
+                      
+                      const SizedBox(height: 30),
+                      
+                      // Social Login Buttons
+                      _buildSocialLogins(isDark, context),
+                      
+                      const SizedBox(height: 50),
+                      
+                      // Bottom Link
+                      _buildBottomLink(isDark),
+                      
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
@@ -101,13 +112,16 @@ class LoginView extends GetView<LoginController> {
     );
   }
 
-  Widget _buildTopIcons(bool isDark) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        _buildSmallIconBox(Icons.bolt_rounded, isDark),
-        _buildSmallIconBox(Icons.battery_std_rounded, isDark),
-      ],
+  Widget _buildTopIcons(bool isDark, BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildSmallIconBox(Icons.bolt_rounded, isDark),
+          _buildSmallIconBox(Icons.battery_std_rounded, isDark),
+        ],
+      ),
     ).animate().fadeIn(duration: 800.ms);
   }
 
@@ -153,6 +167,7 @@ class LoginView extends GetView<LoginController> {
 
   Widget _buildLoginForm(bool isDark) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark.withValues(alpha: 0.6) : AppColors.cardLight,
@@ -201,44 +216,9 @@ class LoginView extends GetView<LoginController> {
     required bool isDark,
     bool isPassword = false,
   }) {
-    if (isPassword) {
-      return Obx(() => TextField(
-        controller: controller,
-        obscureText: !this.controller.isPasswordVisible.value,
-        style: TextStyle(color: isDark ? Colors.white : Colors.black87),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: TextStyle(
-              color: isDark
-                  ? AppColors.textMutedDark.withValues(alpha: 0.5)
-                  : AppColors.textMutedLight.withValues(alpha: 0.5)),
-          prefixIcon: Icon(icon,
-              color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
-              size: 20),
-          suffixIcon: IconButton(
-            icon: Icon(
-              this.controller.isPasswordVisible.value
-                  ? Icons.visibility_off_outlined
-                  : Icons.visibility_outlined,
-              color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
-              size: 20,
-            ),
-            onPressed: this.controller.togglePasswordVisibility,
-          ),
-          filled: true,
-          fillColor: isDark
-              ? const Color(0xFF161531).withValues(alpha: 0.5)
-              : AppColors.inputBackgroundLight,
-          contentPadding: const EdgeInsets.symmetric(vertical: 20),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(18),
-            borderSide: BorderSide.none,
-          ),
-        ),
-      ));
-    }
     return TextField(
       controller: controller,
+      obscureText: isPassword && !this.controller.isPasswordVisible.value,
       style: TextStyle(color: isDark ? Colors.white : Colors.black87),
       decoration: InputDecoration(
         hintText: hint,
@@ -249,11 +229,21 @@ class LoginView extends GetView<LoginController> {
         prefixIcon: Icon(icon,
             color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
             size: 20),
+        suffixIcon: isPassword ? Obx(() => IconButton(
+          icon: Icon(
+            this.controller.isPasswordVisible.value
+                ? Icons.visibility_off_outlined
+                : Icons.visibility_outlined,
+            color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+            size: 20,
+          ),
+          onPressed: this.controller.togglePasswordVisibility,
+        )) : null,
         filled: true,
         fillColor: isDark
             ? const Color(0xFF161531).withValues(alpha: 0.5)
             : AppColors.inputBackgroundLight,
-        contentPadding: const EdgeInsets.symmetric(vertical: 20),
+        contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
           borderSide: BorderSide.none,
@@ -324,20 +314,26 @@ class LoginView extends GetView<LoginController> {
     );
   }
 
-  Widget _buildSocialLogins(bool isDark) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildSocialLogins(bool isDark, BuildContext context) {
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: 12,
+      runSpacing: 12,
       children: [
-        _buildSocialButton('G Google', isDark),
-        _buildSocialButton('🍎 Apple', isDark),
-        _buildSocialButton('📱 Phone', isDark),
+        _buildSocialButton('G Google', isDark, context),
+        _buildSocialButton('🍎 Apple', isDark, context),
+        _buildSocialButton('📱 Phone', isDark, context),
       ],
     ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.2, end: 0);
   }
 
-  Widget _buildSocialButton(String label, bool isDark) {
+  Widget _buildSocialButton(String label, bool isDark, BuildContext context) {
+    // Dynamic width based on screen size but with limits
+    double buttonWidth = (context.screenWidth - 72) / 3;
+    if (buttonWidth < 100) buttonWidth = 100;
+
     return Container(
-      width: Get.width * 0.28,
+      width: context.isMobileLayout ? buttonWidth : 140,
       height: 55,
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : AppColors.cardLight,
@@ -360,8 +356,8 @@ class LoginView extends GetView<LoginController> {
   Widget _buildBottomLink(bool isDark) {
     return GestureDetector(
       onTap: () => Get.toNamed('/register'),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Wrap(
+        alignment: WrapAlignment.center,
         children: [
           Text(
             "Don't have an account? ",

@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
+import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
 import '../controllers/manual_controller.dart';
-import '../../data/models/manual_model.dart';
+import '../../data/models/manual_step_model.dart';
+import '../widgets/manual_header.dart';
 
 class ManualView extends GetView<ManualController> {
   const ManualView({super.key});
@@ -14,10 +16,10 @@ class ManualView extends GetView<ManualController> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
+      backgroundColor: isDark ? const Color(0xFF0D0C21) : AppColors.backgroundLight,
       body: Stack(
         children: [
-          // Background Glow
+          // Background Glow for cinematic feel
           if (isDark)
             Positioned(
               top: -100,
@@ -30,59 +32,223 @@ class ManualView extends GetView<ManualController> {
                     height: 300,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: const Color(0xFF6366F1).withOpacity(0.1),
+                      color: const Color(0xFF6366F1).withOpacity(0.12),
                     ),
                   ),
                 ),
               ),
             ),
 
-          SmartRefresher(
-            controller: controller.refreshController,
-            onRefresh: controller.onRefresh,
-            header: WaterDropMaterialHeader(
-              backgroundColor: AppColors.primary,
-              color: Colors.white,
-              offset: MediaQuery.of(context).padding.top + 50,
-            ),
-            child: CustomScrollView(
-              physics: const BouncingScrollPhysics(),
-              slivers: [
-                _buildAppBar(context, isDark),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildSearchField(isDark),
-                        const SizedBox(height: 25),
-                        Text(
-                          'Device Manuals',
-                          style: TextStyle(
-                            color: isDark ? Colors.white : Colors.black,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+          Column(
+            children: [
+              const ManualHeader(),
+              Expanded(
+                child: SmartRefresher(
+                  controller: controller.refreshController,
+                  onRefresh: controller.onRefresh,
+                  header: WaterDropMaterialHeader(
+                    backgroundColor: AppColors.primary,
+                    color: Colors.white,
+                  ),
+                  child: Center(
+                    child: Container(
+                      constraints: const BoxConstraints(maxWidth: 1200),
+                      child: CustomScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        slivers: [
+                          Obx(() => SliverPadding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: context.responsive(20, tablet: 40, desktop: 60),
+                              vertical: 20,
+                            ),
+                            sliver: context.isMobileLayout
+                                ? _buildMobileList(context, isDark)
+                                : _buildWideGrid(context, isDark),
+                          )),
+                          SliverPadding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: context.responsive(20, tablet: 40, desktop: 60),
+                            ),
+                            sliver: SliverToBoxAdapter(
+                              child: _buildSupportCard(isDark),
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 15),
-                      ],
+                          const SliverToBoxAdapter(child: SizedBox(height: 120)),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-                Obx(() => SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        return _buildManualCard(controller.filteredManuals[index], isDark);
-                      },
-                      childCount: controller.filteredManuals.length,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMobileList(BuildContext context, bool isDark) {
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (context, index) {
+          return _buildStepCard(controller.manualSteps[index], isDark, context);
+        },
+        childCount: controller.manualSteps.length,
+      ),
+    );
+  }
+
+  Widget _buildWideGrid(BuildContext context, bool isDark) {
+    return SliverGrid(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 20,
+        crossAxisSpacing: 20,
+        // Make height dynamic based on content or use a reasonable fixed height
+        mainAxisExtent: context.responsive(320, tablet: 340, desktop: 360),
+      ),
+      delegate: SliverChildBuilderDelegate(
+        (context, index) {
+          return _buildStepCard(controller.manualSteps[index], isDark, context);
+        },
+        childCount: controller.manualSteps.length,
+      ),
+    );
+  }
+
+  Widget _buildStepCard(ManualStepModel step, bool isDark, BuildContext context) {
+    final bool isWide = !context.isMobileLayout;
+    
+    return Container(
+      margin: EdgeInsets.only(bottom: isWide ? 0 : 20),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF161531) : Colors.white,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(
+          color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
+          width: 1.2,
+        ),
+        boxShadow: [
+          if (!isDark)
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
+            ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header: Step Number + Title
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF6366F1).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Text(
+                    '${step.stepNumber}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
                     ),
                   ),
-                )),
-                const SliverToBoxAdapter(child: SizedBox(height: 100)),
-              ],
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  step.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // Description
+          Expanded(
+            flex: isWide ? 1 : 0,
+            child: Text(
+              step.description,
+              maxLines: isWide ? 4 : null,
+              overflow: isWide ? TextOverflow.ellipsis : TextOverflow.visible,
+              style: TextStyle(
+                color: (isDark ? Colors.white : Colors.black).withOpacity(0.6),
+                fontSize: 15,
+                height: 1.5,
+              ),
+            ),
+          ),
+          
+          // Optional Note (Info or Warning)
+          if (step.noteText != null) ...[
+            const SizedBox(height: 16),
+            _buildNoteBox(step.noteText!, step.noteType, isDark),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNoteBox(String text, StepNoteType type, bool isDark) {
+    final Color bgColor = type == StepNoteType.warning 
+        ? const Color(0xFFFEF3C7).withOpacity(isDark ? 0.05 : 0.5)
+        : const Color(0xFFE0E7FF).withOpacity(isDark ? 0.05 : 0.5);
+    
+    final Color borderColor = type == StepNoteType.warning
+        ? const Color(0xFFF59E0B).withOpacity(0.3)
+        : const Color(0xFF6366F1).withOpacity(0.3);
+
+    final Color iconColor = type == StepNoteType.warning ? const Color(0xFFF59E0B) : const Color(0xFF6366F1);
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderColor, width: 1),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            type == StepNoteType.warning ? Icons.warning_amber_rounded : Icons.info_outline_rounded,
+            color: iconColor,
+            size: 20,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              text,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: isDark ? Colors.white.withOpacity(0.8) : Colors.black.withOpacity(0.7),
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ],
@@ -90,108 +256,44 @@ class ManualView extends GetView<ManualController> {
     );
   }
 
-  Widget _buildAppBar(BuildContext context, bool isDark) {
-    return SliverAppBar(
-      expandedHeight: 120,
-      floating: false,
-      pinned: true,
-      backgroundColor: isDark ? AppColors.backgroundDark.withOpacity(0.8) : Colors.white.withOpacity(0.8),
-      flexibleSpace: FlexibleSpaceBar(
-        title: Text(
-          'User Manuals',
-          style: TextStyle(
-            color: isDark ? Colors.white : Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: false,
-        titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
-      ),
-      leading: IconButton(
-        icon: Icon(Icons.arrow_back_ios_new_rounded, color: isDark ? Colors.white : Colors.black),
-        onPressed: () => Get.back(),
-      ),
-    );
-  }
-
-  Widget _buildSearchField(bool isDark) {
+  Widget _buildSupportCard(bool isDark) {
     return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF161531) : Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
-        ),
-      ),
-      child: TextField(
-        onChanged: (v) => controller.searchQuery.value = v,
-        style: TextStyle(color: isDark ? Colors.white : Colors.black),
-        decoration: InputDecoration(
-          hintText: 'Search for manuals...',
-          hintStyle: TextStyle(color: (isDark ? Colors.white : Colors.black).withOpacity(0.3)),
-          prefixIcon: const Icon(Icons.search_rounded, color: AppColors.primary),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(vertical: 15),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildManualCard(ManualModel manual, bool isDark) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF161531) : Colors.white,
+        color: isDark ? const Color(0xFF161531).withOpacity(0.4) : Colors.white,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? manual.color.withOpacity(0.1) : Colors.black.withOpacity(0.05),
+          color: isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.05),
+          width: 1.5,
         ),
       ),
-      child: Row(
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          // Icon
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: manual.color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(manual.icon, color: manual.color, size: 26),
+          Icon(
+            Icons.menu_book_rounded,
+            color: (isDark ? Colors.white : Colors.black).withOpacity(0.3),
+            size: 20,
           ),
-          const SizedBox(width: 16),
-          // Info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  manual.title,
-                  style: TextStyle(
-                    color: isDark ? Colors.white : Colors.black,
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${manual.deviceName} • ${manual.fileSize}',
-                  style: TextStyle(
-                    color: (isDark ? Colors.white : Colors.black).withOpacity(0.4),
-                    fontSize: 12,
-                  ),
-                ),
-              ],
+          const SizedBox(width: 12),
+          Text(
+            'Need more help? ',
+            style: TextStyle(
+              color: (isDark ? Colors.white : Colors.black).withOpacity(0.4),
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
             ),
           ),
-          // Actions
-          IconButton(
-            icon: const Icon(Icons.file_download_outlined, color: AppColors.primary),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.visibility_outlined, color: Colors.grey),
-            onPressed: () {},
+          Text(
+            'Contact Support',
+            style: TextStyle(
+              color: const Color(0xFF6366F1).withOpacity(0.8),
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              decoration: TextDecoration.underline,
+            ),
           ),
         ],
       ),
