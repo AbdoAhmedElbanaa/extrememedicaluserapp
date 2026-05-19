@@ -38,6 +38,7 @@
         android:label="Extreme Medical"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
+        android:enableOnBackInvokedCallback="true"
         android:requestLegacyExternalStorage="true">
 
         <!-- Google Maps API Key -->

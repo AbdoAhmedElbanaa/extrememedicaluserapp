@@ -5,6 +5,8 @@ class AppColors {
   static const Color primary = Color(0xFF6366F1);
   static const Color secondary = Color(0xFFA855F7);
   static const Color destructive = Color(0xFFD4183D);
+  static const Color success = Color(0xFF10B981);
+  static const Color warning = Color(0xFFF59E0B);
   
   // Light Theme Colors
   static const Color backgroundLight = Color(0xFFF8F9FA);

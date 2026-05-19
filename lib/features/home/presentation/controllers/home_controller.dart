@@ -3,10 +3,14 @@ import 'package:get/get.dart';
 import 'package:extrememedicaluserapp/features/home/data/models/quick_action_model.dart';
 import 'package:extrememedicaluserapp/features/home/data/models/recent_activity_model.dart';
 
+import 'package:extrememedicaluserapp/features/diagnose/presentation/controllers/diagnose_controller.dart';
+import 'package:extrememedicaluserapp/features/diagnose/presentation/views/diagnose_view.dart';
 import 'package:extrememedicaluserapp/features/manual/presentation/views/manual_view.dart';
 import 'package:extrememedicaluserapp/features/manual/presentation/controllers/manual_controller.dart';
 
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+
+import 'package:extrememedicaluserapp/core/services/toast_service.dart';
 
 class HomeController extends GetxController {
   var selectedIndex = 0.obs;
@@ -39,7 +43,10 @@ class HomeController extends GetxController {
         title: 'Diagnose',
         icon: Icons.analytics_rounded,
         color: const Color(0xFF34D399),
-        onTap: () => _showComingSoon('Diagnose'),
+        onTap: () {
+          Get.put(DiagnoseController());
+          Get.to(() => const DiagnoseView(), transition: Transition.rightToLeftWithFade);
+        },
       ),
       QuickActionModel(
         title: 'Errors',
@@ -83,15 +90,10 @@ class HomeController extends GetxController {
   }
 
   void _showComingSoon(String feature) {
-    Get.snackbar(
-      feature,
-      'This feature is coming soon!',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: const Color(0xFF161531).withOpacity(0.9),
-      colorText: Colors.white,
-      margin: const EdgeInsets.all(15),
-      borderRadius: 15,
-      duration: const Duration(seconds: 2),
+    ToastService.show(
+      title: feature,
+      message: 'This feature is currently under development.',
+      type: ToastType.info,
     );
   }
 
@@ -102,13 +104,10 @@ class HomeController extends GetxController {
     update();
     refreshController.refreshCompleted();
     
-    Get.snackbar(
-      'Success',
-      'Data refreshed successfully',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.green.withOpacity(0.7),
-      colorText: Colors.white,
-      margin: const EdgeInsets.all(15),
+    ToastService.show(
+      title: 'Success',
+      message: 'Data refreshed successfully',
+      type: ToastType.success,
     );
   }
 

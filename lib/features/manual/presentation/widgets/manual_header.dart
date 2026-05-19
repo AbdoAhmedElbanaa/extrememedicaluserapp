@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
+import '../controllers/manual_controller.dart';
 
-class ManualHeader extends StatelessWidget {
+class ManualHeader extends GetView<ManualController> {
   const ManualHeader({super.key});
 
   @override
@@ -12,7 +13,7 @@ class ManualHeader extends StatelessWidget {
     final bool isWide = context.isDesktopLayout || context.isTabletLayout;
 
     return Container(
-      constraints: const BoxConstraints(maxWidth: 1400), // Prevent stretching on ultra-wide
+      constraints: const BoxConstraints(maxWidth: 1400),
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top + 10,
         left: context.responsive(20, tablet: 40, desktop: 60),
@@ -24,17 +25,14 @@ class ManualHeader extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Top Row: Back + Title/Subtitle + PDF Button
           Row(
             children: [
-              // Back Button
               _buildSquareButton(
                 icon: Icons.arrow_back_ios_new_rounded,
                 onTap: () => Get.back(),
                 isDark: isDark,
               ),
               const SizedBox(width: 16),
-              // Title & Subtitle
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,7 +56,6 @@ class ManualHeader extends StatelessWidget {
                   ],
                 ),
               ),
-              // PDF Button
               Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: context.responsive(14, tablet: 20),
@@ -91,7 +88,6 @@ class ManualHeader extends StatelessWidget {
           ),
           const SizedBox(height: 25),
           
-          // Layout Switcher for Device Card & Categories
           if (isWide)
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -180,17 +176,18 @@ class ManualHeader extends StatelessWidget {
   }
 
   Widget _buildCategoriesList(bool isDark, BuildContext context) {
-    return SingleChildScrollView(
+    return Obx(() => SingleChildScrollView(
       scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(),
       child: Row(
         children: [
-          _buildCategoryChip(Icons.flash_on_rounded, 'Installation', true, isDark),
-          _buildCategoryChip(Icons.settings_rounded, 'Setup', false, isDark),
-          _buildCategoryChip(Icons.build_rounded, 'Maintenance', false, isDark),
-          _buildCategoryChip(Icons.security_rounded, 'Safety', false, isDark),
+          _buildCategoryChip(Icons.flash_on_rounded, 'Installation', isDark),
+          _buildCategoryChip(Icons.settings_rounded, 'Setup', isDark),
+          _buildCategoryChip(Icons.build_rounded, 'Maintenance', isDark),
+          _buildCategoryChip(Icons.security_rounded, 'Safety', isDark),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildSquareButton({required IconData icon, required VoidCallback onTap, required bool isDark}) {
@@ -211,39 +208,45 @@ class ManualHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryChip(IconData icon, String label, bool isSelected, bool isDark) {
-    return Container(
-      margin: const EdgeInsets.only(right: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        color: isSelected 
-            ? const Color(0xFF6366F1).withOpacity(0.1) 
-            : Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
+  Widget _buildCategoryChip(IconData icon, String label, bool isDark) {
+    final bool isSelected = controller.selectedCategory.value == label;
+
+    return GestureDetector(
+      onTap: () => controller.changeCategory(label),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        margin: const EdgeInsets.only(right: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
           color: isSelected 
-              ? const Color(0xFF6366F1).withOpacity(0.4) 
-              : (isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05)),
-          width: 1.2,
+              ? const Color(0xFF6366F1).withOpacity(0.1) 
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected 
+                ? const Color(0xFF6366F1).withOpacity(0.4) 
+                : (isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05)),
+            width: 1.2,
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            icon, 
-            color: isSelected ? const Color(0xFF6366F1) : (isDark ? Colors.white38 : Colors.black38), 
-            size: 16,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: TextStyle(
-              color: isSelected ? const Color(0xFF6366F1) : (isDark ? Colors.white38 : Colors.black38),
-              fontSize: 14,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+        child: Row(
+          children: [
+            Icon(
+              icon, 
+              color: isSelected ? const Color(0xFF6366F1) : (isDark ? Colors.white38 : Colors.black38), 
+              size: 16,
             ),
-          ),
-        ],
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? const Color(0xFF6366F1) : (isDark ? Colors.white38 : Colors.black38),
+                fontSize: 14,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

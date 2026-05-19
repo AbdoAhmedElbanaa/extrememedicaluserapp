@@ -9,6 +9,9 @@ import 'package:extrememedicaluserapp/features/home/presentation/widgets/custom_
 import 'package:extrememedicaluserapp/features/home/presentation/widgets/recent_activity_section.dart';
 import 'package:extrememedicaluserapp/features/home/presentation/widgets/quick_actions_section.dart';
 import 'package:extrememedicaluserapp/features/home/presentation/widgets/device_slider.dart';
+import 'package:extrememedicaluserapp/features/devices/presentation/views/devices_view.dart';
+import 'package:extrememedicaluserapp/features/devices/presentation/controllers/devices_controller.dart';
+import 'package:extrememedicaluserapp/features/help/views/help_view.dart';
 import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
 import '../controllers/home_controller.dart';
 
@@ -29,18 +32,6 @@ class HomeView extends GetView<HomeController> {
           Expanded(
             child: Stack(
               children: [
-                PageView(
-                  controller: controller.pageController,
-                  onPageChanged: (index) => controller.selectedIndex.value = index,
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: [
-                    _buildHomeContent(context, isDark),
-                    _buildPlaceholderPage('Devices'),
-                    _buildPlaceholderPage('Help'),
-                    _buildPlaceholderPage('Profile'),
-                  ],
-                ),
-
                 if (isDark)
                   Positioned(
                     top: -100,
@@ -59,13 +50,37 @@ class HomeView extends GetView<HomeController> {
                       ),
                     ),
                   ),
-
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: HomeHeader(isDark: isDark),
+                
+                PageView(
+                  controller: controller.pageController,
+                  onPageChanged: (index) => controller.selectedIndex.value = index,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: [
+                    _buildHomeContent(context, isDark),
+                    const DevicesView(),
+                    const HelpView(),
+                    _buildPlaceholderPage('Profile'),
+                  ],
                 ),
+
+                Obx(() {
+                  final isHome = controller.selectedIndex.value == 0;
+                  return AnimatedPositioned(
+                    duration: 600.ms,
+                    curve: Curves.easeInOutQuart,
+                    top: isHome ? 0 : -120, // سلايد للأعلى عند الاختفاء
+                    left: 0,
+                    right: 0,
+                    child: AnimatedOpacity(
+                      duration: 400.ms,
+                      opacity: isHome ? 1.0 : 0.0,
+                      child: IgnorePointer(
+                        ignoring: !isHome,
+                        child: HomeHeader(isDark: isDark),
+                      ),
+                    ),
+                  );
+                }),
               ],
             ),
           ),

@@ -8,6 +8,7 @@ class ManualStepModel {
   final String description;
   final String? noteText;
   final StepNoteType noteType;
+  final String category;
 
   ManualStepModel({
     required this.stepNumber,
@@ -15,5 +16,6 @@ class ManualStepModel {
     required this.description,
     this.noteText,
     this.noteType = StepNoteType.none,
+    required this.category,
   });
 }

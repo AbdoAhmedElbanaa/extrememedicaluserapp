@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
 import '../controllers/manual_controller.dart';
@@ -56,15 +57,40 @@ class ManualView extends GetView<ManualController> {
                       child: CustomScrollView(
                         physics: const BouncingScrollPhysics(),
                         slivers: [
-                          Obx(() => SliverPadding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: context.responsive(20, tablet: 40, desktop: 60),
-                              vertical: 20,
-                            ),
-                            sliver: context.isMobileLayout
-                                ? _buildMobileList(context, isDark)
-                                : _buildWideGrid(context, isDark),
-                          )),
+                          Obx(() {
+                            final filteredSteps = controller.filteredSteps;
+                            final category = controller.selectedCategory.value;
+                            
+                            return SliverPadding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: context.responsive(20, tablet: 40, desktop: 60),
+                                vertical: 20,
+                              ),
+                              sliver: SliverToBoxAdapter(
+                                child: AnimatedSwitcher(
+                                  duration: 400.ms,
+                                  transitionBuilder: (Widget child, Animation<double> animation) {
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: SlideTransition(
+                                        position: Tween<Offset>(
+                                          begin: const Offset(0.05, 0),
+                                          end: Offset.zero,
+                                        ).animate(animation),
+                                        child: child,
+                                      ),
+                                    );
+                                  },
+                                  child: KeyedSubtree(
+                                    key: ValueKey(category),
+                                    child: context.isMobileLayout
+                                        ? _buildMobileList(filteredSteps, isDark, context)
+                                        : _buildWideGrid(filteredSteps, isDark, context),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
                           SliverPadding(
                             padding: EdgeInsets.symmetric(
                               horizontal: context.responsive(20, tablet: 40, desktop: 60),
@@ -87,36 +113,39 @@ class ManualView extends GetView<ManualController> {
     );
   }
 
-  Widget _buildMobileList(BuildContext context, bool isDark) {
-    return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          return _buildStepCard(controller.manualSteps[index], isDark, context);
-        },
-        childCount: controller.manualSteps.length,
-      ),
+  Widget _buildMobileList(List<ManualStepModel> steps, bool isDark, BuildContext context) {
+    if (steps.isEmpty) return const Center(child: Padding(padding: EdgeInsets.all(40), child: Text('No steps found.')));
+    
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: steps.length,
+      itemBuilder: (context, index) {
+        return _buildStepCard(steps[index], isDark, context, index);
+      },
     );
   }
 
-  Widget _buildWideGrid(BuildContext context, bool isDark) {
-    return SliverGrid(
+  Widget _buildWideGrid(List<ManualStepModel> steps, bool isDark, BuildContext context) {
+    if (steps.isEmpty) return const Center(child: Padding(padding: EdgeInsets.all(40), child: Text('No steps found.')));
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         mainAxisSpacing: 20,
         crossAxisSpacing: 20,
-        // Make height dynamic based on content or use a reasonable fixed height
         mainAxisExtent: context.responsive(320, tablet: 340, desktop: 360),
       ),
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          return _buildStepCard(controller.manualSteps[index], isDark, context);
-        },
-        childCount: controller.manualSteps.length,
-      ),
+      itemCount: steps.length,
+      itemBuilder: (context, index) {
+        return _buildStepCard(steps[index], isDark, context, index);
+      },
     );
   }
 
-  Widget _buildStepCard(ManualStepModel step, bool isDark, BuildContext context) {
+  Widget _buildStepCard(ManualStepModel step, bool isDark, BuildContext context, int index) {
     final bool isWide = !context.isMobileLayout;
     
     return Container(
@@ -141,7 +170,6 @@ class ManualView extends GetView<ManualController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header: Step Number + Title
           Row(
             children: [
               Container(
@@ -187,7 +215,6 @@ class ManualView extends GetView<ManualController> {
             ],
           ),
           const SizedBox(height: 16),
-          // Description
           Expanded(
             flex: isWide ? 1 : 0,
             child: Text(
@@ -201,15 +228,16 @@ class ManualView extends GetView<ManualController> {
               ),
             ),
           ),
-          
-          // Optional Note (Info or Warning)
           if (step.noteText != null) ...[
             const SizedBox(height: 16),
             _buildNoteBox(step.noteText!, step.noteType, isDark),
           ],
         ],
       ),
-    );
+    )
+    .animate(key: ValueKey('${step.category}_${step.stepNumber}'))
+    .fadeIn(duration: 400.ms, delay: (index * 100).ms)
+    .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
   }
 
   Widget _buildNoteBox(String text, StepNoteType type, bool isDark) {

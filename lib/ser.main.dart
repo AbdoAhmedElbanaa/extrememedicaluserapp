@@ -13,8 +13,11 @@ import 'package:extrememedicaluserapp/features/auth/presentation/views/login_vie
 import 'package:extrememedicaluserapp/features/auth/presentation/views/register_view.dart';
 import 'package:extrememedicaluserapp/features/home/presentation/views/home_view.dart';
 import 'package:extrememedicaluserapp/features/home/presentation/controllers/home_controller.dart';
+import 'package:extrememedicaluserapp/features/devices/presentation/views/devices_view.dart';
+import 'package:extrememedicaluserapp/features/devices/presentation/controllers/devices_controller.dart';
 import 'package:extrememedicaluserapp/core/services/theme_service.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:toastification/toastification.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,7 +35,7 @@ void main() async {
   runApp(
     DevicePreview(
       enabled: !kReleaseMode,
-      builder: (context) => MyApp(),
+      builder: (context) => const MyApp(),
     ),
   );
 }
@@ -51,51 +54,65 @@ class MyApp extends StatelessWidget {
       maxUnderScrollExtent: 0,
       enableScrollWhenRefreshCompleted: true,
       enableLoadingWhenFailed: true,
-      child: GetMaterialApp(
-        title: 'Extreme Medical - Preview',
-        useInheritedMediaQuery: true, // Required for DevicePreview
-        locale: DevicePreview.locale(context), // Required for DevicePreview
-        builder: DevicePreview.appBuilder, // Required for DevicePreview
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: ThemeService().theme,
-        initialRoute: '/',
-        getPages: [
-          GetPage(
-            name: '/', 
-            page: () => const SplashView(),
-            transition: Transition.fadeIn,
-          ),
-          GetPage(
-            name: '/onboarding', 
-            page: () => const OnboardingView(),
-            transition: Transition.cupertino,
-          ),
-          GetPage(
-            name: '/permissions', 
-            page: () => const AllowPermissionsView(),
-            transition: Transition.rightToLeftWithFade,
-          ),
-          GetPage(
-            name: '/login', 
-            page: () => const LoginView(),
-            transition: Transition.downToUp,
-          ),
-          GetPage(
-            name: '/register', 
-            page: () => const RegisterView(),
-            transition: Transition.rightToLeftWithFade,
-          ),
-          GetPage(
-            name: '/home', 
-            page: () => const HomeView(),
-            binding: BindingsBuilder(() {
-              Get.lazyPut(() => HomeController());
-            }),
-            transition: Transition.zoom,
-          ),
-        ],
+      child: ToastificationWrapper(
+        child: GetMaterialApp(
+          title: 'Extreme Medical - Preview',
+          useInheritedMediaQuery: true, // Required for DevicePreview
+          locale: DevicePreview.locale(context), // Required for DevicePreview
+          builder: (context, child) {
+            child = DevicePreview.appBuilder(context, child);
+            return child;
+          },
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: ThemeService().theme,
+          initialRoute: '/',
+          getPages: [
+            GetPage(
+              name: '/', 
+              page: () => const SplashView(),
+              transition: Transition.fadeIn,
+            ),
+            GetPage(
+              name: '/onboarding', 
+              page: () => const OnboardingView(),
+              transition: Transition.cupertino,
+            ),
+            GetPage(
+              name: '/permissions', 
+              page: () => const AllowPermissionsView(),
+              transition: Transition.rightToLeftWithFade,
+            ),
+            GetPage(
+              name: '/login', 
+              page: () => const LoginView(),
+              transition: Transition.downToUp,
+            ),
+            GetPage(
+              name: '/register', 
+              page: () => const RegisterView(),
+              transition: Transition.rightToLeftWithFade,
+            ),
+            GetPage(
+              name: '/home', 
+              page: () => const HomeView(),
+              binding: BindingsBuilder(() {
+                Get.lazyPut(() => HomeController());
+                Get.lazyPut(() => DevicesController());
+              }),
+              transition: Transition.zoom,
+            ),
+            GetPage(
+              name: '/devices', 
+              page: () => const DevicesView(),
+              binding: BindingsBuilder(() {
+                Get.put(DevicesController());
+              }),
+              transition: Transition.rightToLeftWithFade,
+            ),
+          ],
+        ),
       ),
     );
   }
