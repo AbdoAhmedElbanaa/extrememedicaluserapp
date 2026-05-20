@@ -1,8 +1,8 @@
-import 'dart:ui';
+import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
+import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:extrememedicaluserapp/theme/app_colors.dart';
-import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
+
 import '../controllers/home_controller.dart';
 
 class UserProfilePopup extends StatelessWidget {
@@ -10,9 +10,7 @@ class UserProfilePopup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme
-        .of(context)
-        .brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final homeController = Get.find<HomeController>();
 
     return Stack(
@@ -21,9 +19,7 @@ class UserProfilePopup extends StatelessWidget {
         Positioned.fill(
           child: GestureDetector(
             onTap: () => Get.back(),
-            child: Container(
-              color: Colors.black.withValues(alpha: 0.4),
-            ),
+            child: Container(color: Colors.black.withValues(alpha: 0.4)),
           ),
         ),
 
@@ -32,18 +28,20 @@ class UserProfilePopup extends StatelessWidget {
           child: Material(
             color: Colors.transparent,
             child: Container(
-              width: context.responsive(MediaQuery
-                  .of(context)
-                  .size
-                  .width * 0.9, tablet: 400, desktop: 400),
+              width: context.responsive(
+                MediaQuery.of(context).size.width * 0.9,
+                tablet: 400,
+                desktop: 400,
+              ),
               constraints: const BoxConstraints(maxHeight: 700),
               margin: const EdgeInsets.symmetric(vertical: 20),
               decoration: BoxDecoration(
                 color: isDark ? AppColors.cinematicSurface : Colors.white,
                 borderRadius: BorderRadius.circular(32),
                 border: Border.all(
-                  color: isDark ? AppColors.distinctBorderDark : AppColors
-                      .distinctBorderLight,
+                  color: isDark
+                      ? AppColors.distinctBorderDark
+                      : AppColors.distinctBorderLight,
                   width: 1.5,
                 ),
                 boxShadow: [
@@ -61,10 +59,11 @@ class UserProfilePopup extends StatelessWidget {
                   _buildHeader(isDark),
 
                   Divider(
-                      height: 1,
-                      thickness: 1,
-                      color: isDark ? Colors.white10 : Colors.black.withValues(
-                          alpha: 0.05)
+                    height: 1,
+                    thickness: 1,
+                    color: isDark
+                        ? Colors.white10
+                        : Colors.black.withValues(alpha: 0.05),
                   ),
 
                   // Menu Items
@@ -81,34 +80,52 @@ class UserProfilePopup extends StatelessWidget {
                             onTap: () {
                               Get.back(); // Close popup
                               homeController.changeIndex(
-                                  3); // Switch to Profile tab
+                                3,
+                              ); // Switch to Profile tab
                             },
                           ),
                           _buildMenuItem(
-                              Icons.settings_outlined, 'Account Settings',
-                              isDark),
-                          _buildMenuItem(
-                              Icons.layers_outlined, 'My Devices', isDark,
-                              onTap: () {
-                                Get.back();
-                                homeController.changeIndex(
-                                    1); // Switch to Devices tab
-                              }
+                            Icons.settings_outlined,
+                            'Account Settings',
+                            isDark,
                           ),
                           _buildMenuItem(
-                              Icons.notifications_none_rounded, 'Notifications',
-                              isDark, hasUpdate: true),
+                            Icons.layers_outlined,
+                            'My Devices',
+                            isDark,
+                            onTap: () {
+                              Get.back();
+                              homeController.changeIndex(
+                                1,
+                              ); // Switch to Devices tab
+                            },
+                          ),
                           _buildMenuItem(
-                              Icons.security_outlined, 'Security', isDark),
-                          _buildMenuItem(Icons.credit_card_outlined,
-                              'Billing & Subscription', isDark),
+                            Icons.notifications_none_rounded,
+                            'Notifications',
+                            isDark,
+                            hasUpdate: true,
+                          ),
                           _buildMenuItem(
-                              Icons.help_outline_rounded, 'Help Center', isDark,
-                              onTap: () {
-                                Get.back();
-                                homeController.changeIndex(
-                                    2); // Switch to Help tab
-                              }
+                            Icons.security_outlined,
+                            'Security',
+                            isDark,
+                          ),
+                          _buildMenuItem(
+                            Icons.credit_card_outlined,
+                            'Billing & Subscription',
+                            isDark,
+                          ),
+                          _buildMenuItem(
+                            Icons.help_outline_rounded,
+                            'Help Center',
+                            isDark,
+                            onTap: () {
+                              Get.back();
+                              homeController.changeIndex(
+                                2,
+                              ); // Switch to Help tab
+                            },
                           ),
                         ],
                       ),
@@ -151,9 +168,11 @@ class UserProfilePopup extends StatelessWidget {
             child: const Center(
               child: Text(
                 'AH',
-                style: TextStyle(color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -169,19 +188,19 @@ class UserProfilePopup extends StatelessWidget {
                     Text(
                       'Ahmed Hassan',
                       style: TextStyle(
-                          color: isDark ? Colors.white : Colors.black,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold
+                        color: isDark ? Colors.white : Colors.black,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                     GestureDetector(
                       onTap: () => Get.back(),
                       child: Icon(
-                          Icons.close_rounded,
-                          color: isDark
-                              ? Colors.white.withValues(alpha: 0.3)
-                              : Colors.black26,
-                          size: 20
+                        Icons.close_rounded,
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.3)
+                            : Colors.black26,
+                        size: 20,
                       ),
                     ),
                   ],
@@ -189,34 +208,41 @@ class UserProfilePopup extends StatelessWidget {
                 Text(
                   'ahmed@clinic.com',
                   style: TextStyle(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.4)
-                          : Colors.black45,
-                      fontSize: 14
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.4)
+                        : Colors.black45,
+                    fontSize: 14,
                   ),
                 ),
                 const SizedBox(height: 10),
                 // Premium Badge
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 4),
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.success.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                        color: AppColors.success.withValues(alpha: 0.2)),
+                      color: AppColors.success.withValues(alpha: 0.2),
+                    ),
                   ),
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       CircleAvatar(
-                          backgroundColor: AppColors.success, radius: 3),
+                        backgroundColor: AppColors.success,
+                        radius: 3,
+                      ),
                       SizedBox(width: 6),
                       Text(
                         'Premium Active',
-                        style: TextStyle(color: AppColors.success,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: AppColors.success,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
@@ -229,8 +255,13 @@ class UserProfilePopup extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem(IconData icon, String title, bool isDark,
-      {bool hasUpdate = false, VoidCallback? onTap}) {
+  Widget _buildMenuItem(
+    IconData icon,
+    String title,
+    bool isDark, {
+    bool hasUpdate = false,
+    VoidCallback? onTap,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: InkWell(
@@ -243,14 +274,15 @@ class UserProfilePopup extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.deepNavy : AppColors.primary
-                      .withValues(alpha: 0.05),
+                  color: isDark
+                      ? AppColors.deepNavy
+                      : AppColors.primary.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
-                    icon,
-                    color: isDark ? Colors.white70 : AppColors.primary,
-                    size: 20
+                  icon,
+                  color: isDark ? Colors.white70 : AppColors.primary,
+                  size: 20,
                 ),
               ),
               const SizedBox(width: 16),
@@ -258,8 +290,9 @@ class UserProfilePopup extends StatelessWidget {
                 child: Text(
                   title,
                   style: TextStyle(
-                    color: isDark ? Colors.white.withValues(alpha: 0.9) : Colors
-                        .black87,
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.9)
+                        : Colors.black87,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -270,14 +303,17 @@ class UserProfilePopup extends StatelessWidget {
                   width: 8,
                   height: 8,
                   decoration: const BoxDecoration(
-                      color: AppColors.warning, shape: BoxShape.circle),
+                    color: AppColors.warning,
+                    shape: BoxShape.circle,
+                  ),
                 ),
               const SizedBox(width: 8),
               Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors
-                      .black12,
-                  size: 14
+                Icons.arrow_forward_ios_rounded,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.2)
+                    : Colors.black12,
+                size: 14,
               ),
             ],
           ),
@@ -298,7 +334,8 @@ class UserProfilePopup extends StatelessWidget {
             color: AppColors.errorRed.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-                color: AppColors.errorRed.withValues(alpha: 0.1)),
+              color: AppColors.errorRed.withValues(alpha: 0.1),
+            ),
           ),
           child: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -307,9 +344,11 @@ class UserProfilePopup extends StatelessWidget {
               SizedBox(width: 12),
               Text(
                 'Sign Out',
-                style: TextStyle(color: AppColors.errorRed,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: AppColors.errorRed,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),

@@ -1,9 +1,9 @@
-import 'dart:ui';
+import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
+import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
+import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:extrememedicaluserapp/theme/app_colors.dart';
-import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
-import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
+
 import '../controllers/profile_controller.dart';
 
 class ProfileHeader extends GetView<ProfileController> {
@@ -25,41 +25,53 @@ class ProfileHeader extends GetView<ProfileController> {
         right: isWide ? 20 : context.responsive(20, tablet: 50, desktop: 80),
       ),
       decoration: BoxDecoration(
-        color: isDark 
-            ? AppColors.backgroundDark.withValues(alpha: isWide ? 1.0 : 0.7) 
+        color: isDark
+            ? AppColors.backgroundDark.withValues(alpha: isWide ? 1.0 : 0.7)
             : AppColors.backgroundLight.withValues(alpha: isWide ? 1.0 : 0.7),
         border: Border(
           bottom: BorderSide(
-            color: (isWide && !isDark) ? Colors.transparent : (isDark ? AppColors.distinctBorderDark : AppColors.distinctBorderLight),
+            color: (isWide && !isDark)
+                ? Colors.transparent
+                : (isDark
+                      ? AppColors.distinctBorderDark
+                      : AppColors.distinctBorderLight),
             width: isWide ? 0 : 1,
           ),
         ),
       ),
       child: Column(
-        mainAxisAlignment: isWide ? MainAxisAlignment.center : MainAxisAlignment.start,
+        mainAxisAlignment: isWide
+            ? MainAxisAlignment.center
+            : MainAxisAlignment.start,
         children: [
           _buildAvatar(isDark, isWide),
           const SizedBox(height: 16),
-          Obx(() => Text(
-            controller.userName.value,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: isDark ? Colors.white : AppColors.foregroundLight,
-              fontSize: isWide ? 28 : 24,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5,
+          Obx(
+            () => Text(
+              controller.userName.value,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: isDark ? Colors.white : AppColors.foregroundLight,
+                fontSize: isWide ? 28 : 24,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+              ),
             ),
-          )),
+          ),
           const SizedBox(height: 4),
-          Obx(() => Text(
-            controller.userEmail.value,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
+          Obx(
+            () => Text(
+              controller.userEmail.value,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: isDark
+                    ? AppColors.textMutedDark
+                    : AppColors.textMutedLight,
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+              ),
             ),
-          )),
+          ),
           const SizedBox(height: 24),
           Wrap(
             alignment: WrapAlignment.center,
@@ -80,10 +92,7 @@ class ProfileHeader extends GetView<ProfileController> {
               ),
             ],
           ),
-          if (isWide) ...[
-            const Spacer(),
-            _buildLogoutButton(isDark),
-          ]
+          if (isWide) ...[const Spacer(), _buildLogoutButton(isDark)],
         ],
       ),
     );
@@ -115,12 +124,14 @@ class ProfileHeader extends GetView<ProfileController> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: isDark 
-              ? Colors.white.withValues(alpha: 0.05) 
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.05)
               : AppColors.primary.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isDark ? AppColors.distinctBorderDark : AppColors.distinctBorderLight,
+            color: isDark
+                ? AppColors.distinctBorderDark
+                : AppColors.distinctBorderLight,
             width: 1,
           ),
         ),
@@ -136,7 +147,9 @@ class ProfileHeader extends GetView<ProfileController> {
             Text(
               label,
               style: TextStyle(
-                color: isDark ? Colors.white.withValues(alpha: 0.9) : AppColors.primary,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.9)
+                    : AppColors.primary,
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
               ),
