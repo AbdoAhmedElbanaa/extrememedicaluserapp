@@ -1,6 +1,7 @@
+import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:extrememedicaluserapp/theme/app_colors.dart';
+
 import '../controllers/profile_controller.dart';
 
 class PreferencesSection extends GetView<ProfileController> {
@@ -18,7 +19,9 @@ class PreferencesSection extends GetView<ProfileController> {
           child: Text(
             'PREFERENCES',
             style: TextStyle(
-              color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+              color: isDark
+                  ? AppColors.textMutedDark
+                  : AppColors.textMutedLight,
               fontSize: 12,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.2,
@@ -27,14 +30,14 @@ class PreferencesSection extends GetView<ProfileController> {
         ),
         Container(
           decoration: BoxDecoration(
-            color: isDark 
-                ? AppColors.cinematicSurface.withValues(alpha: 0.4) 
+            color: isDark
+                ? AppColors.cinematicSurface.withValues(alpha: 0.4)
                 : AppColors.surfaceLight.withValues(alpha: 0.6),
             borderRadius: BorderRadius.circular(28),
             border: Border.all(
-              color: isDark 
-                  ? Colors.white.withValues(alpha: 0.05) 
-                  : AppColors.borderLight.withValues(alpha: 0.5),
+              color: isDark
+                  ? AppColors.distinctBorderDark
+                  : AppColors.distinctBorderLight,
               width: 1,
             ),
           ),
@@ -42,14 +45,14 @@ class PreferencesSection extends GetView<ProfileController> {
             children: [
               _buildSwitchTile(
                 icon: Icons.notifications_none_rounded,
-                iconColor: const Color(0xFFFBBF24),
+                iconColor: AppColors.amberSoft,
                 title: 'Push Notifications',
                 isDark: isDark,
                 showDivider: true,
               ),
               _buildInfoTile(
                 icon: Icons.language_rounded,
-                iconColor: const Color(0xFF60A5FA),
+                iconColor: AppColors.blueSoft,
                 title: 'Language',
                 value: 'English',
                 isDark: isDark,
@@ -86,11 +89,7 @@ class PreferencesSection extends GetView<ProfileController> {
                     width: 1,
                   ),
                 ),
-                child: Icon(
-                  icon,
-                  color: iconColor,
-                  size: 22,
-                ),
+                child: Icon(icon, color: iconColor, size: 22),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -103,12 +102,14 @@ class PreferencesSection extends GetView<ProfileController> {
                   ),
                 ),
               ),
-              Obx(() => Switch.adaptive(
-                value: controller.notificationsEnabled.value,
-                onChanged: (val) => controller.toggleNotifications(val),
-                activeColor: Colors.white,
-                activeTrackColor: const Color(0xFFFBBF24),
-              )),
+              Obx(
+                () => Switch.adaptive(
+                  value: controller.notificationsEnabled.value,
+                  onChanged: (val) => controller.toggleNotifications(val),
+                  activeThumbColor: Colors.white,
+                  activeTrackColor: AppColors.amberSoft,
+                ),
+              ),
             ],
           ),
         ),
@@ -118,7 +119,9 @@ class PreferencesSection extends GetView<ProfileController> {
             thickness: 1,
             indent: 76,
             endIndent: 16,
-            color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.05),
+            color: isDark
+                ? AppColors.distinctBorderDark
+                : AppColors.distinctBorderLight,
           ),
       ],
     );
@@ -150,11 +153,7 @@ class PreferencesSection extends GetView<ProfileController> {
                   width: 1,
                 ),
               ),
-              child: Icon(
-                icon,
-                color: iconColor,
-                size: 22,
-              ),
+              child: Icon(icon, color: iconColor, size: 22),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -173,7 +172,9 @@ class PreferencesSection extends GetView<ProfileController> {
                   Text(
                     value,
                     style: TextStyle(
-                      color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                      color: isDark
+                          ? AppColors.textMutedDark
+                          : AppColors.textMutedLight,
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
@@ -183,7 +184,9 @@ class PreferencesSection extends GetView<ProfileController> {
             ),
             Icon(
               Icons.arrow_forward_ios_rounded,
-              color: isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.1),
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.15)
+                  : Colors.black.withValues(alpha: 0.1),
               size: 14,
             ),
           ],

@@ -14,10 +14,13 @@ class ManualView extends GetView<ManualController> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = Theme
+        .of(context)
+        .brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0D0C21) : AppColors.backgroundLight,
+      backgroundColor: isDark ? AppColors.surfaceDark : AppColors
+          .backgroundLight,
       body: Stack(
         children: [
           // Background Glow for cinematic feel
@@ -33,7 +36,7 @@ class ManualView extends GetView<ManualController> {
                     height: 300,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: const Color(0xFF6366F1).withOpacity(0.12),
+                      color: AppColors.primary.withValues(alpha: 0.12),
                     ),
                   ),
                 ),
@@ -60,16 +63,18 @@ class ManualView extends GetView<ManualController> {
                           Obx(() {
                             final filteredSteps = controller.filteredSteps;
                             final category = controller.selectedCategory.value;
-                            
+
                             return SliverPadding(
                               padding: EdgeInsets.symmetric(
-                                horizontal: context.responsive(20, tablet: 40, desktop: 60),
+                                horizontal: context.responsive(
+                                    20, tablet: 40, desktop: 60),
                                 vertical: 20,
                               ),
                               sliver: SliverToBoxAdapter(
                                 child: AnimatedSwitcher(
                                   duration: 400.ms,
-                                  transitionBuilder: (Widget child, Animation<double> animation) {
+                                  transitionBuilder: (Widget child,
+                                      Animation<double> animation) {
                                     return FadeTransition(
                                       opacity: animation,
                                       child: SlideTransition(
@@ -84,8 +89,10 @@ class ManualView extends GetView<ManualController> {
                                   child: KeyedSubtree(
                                     key: ValueKey(category),
                                     child: context.isMobileLayout
-                                        ? _buildMobileList(filteredSteps, isDark, context)
-                                        : _buildWideGrid(filteredSteps, isDark, context),
+                                        ? _buildMobileList(
+                                        filteredSteps, isDark, context)
+                                        : _buildWideGrid(
+                                        filteredSteps, isDark, context),
                                   ),
                                 ),
                               ),
@@ -93,13 +100,15 @@ class ManualView extends GetView<ManualController> {
                           }),
                           SliverPadding(
                             padding: EdgeInsets.symmetric(
-                              horizontal: context.responsive(20, tablet: 40, desktop: 60),
+                              horizontal: context.responsive(
+                                  20, tablet: 40, desktop: 60),
                             ),
                             sliver: SliverToBoxAdapter(
                               child: _buildSupportCard(isDark),
                             ),
                           ),
-                          const SliverToBoxAdapter(child: SizedBox(height: 120)),
+                          const SliverToBoxAdapter(child: SizedBox(
+                              height: 120)),
                         ],
                       ),
                     ),
@@ -113,9 +122,11 @@ class ManualView extends GetView<ManualController> {
     );
   }
 
-  Widget _buildMobileList(List<ManualStepModel> steps, bool isDark, BuildContext context) {
-    if (steps.isEmpty) return const Center(child: Padding(padding: EdgeInsets.all(40), child: Text('No steps found.')));
-    
+  Widget _buildMobileList(List<ManualStepModel> steps, bool isDark,
+      BuildContext context) {
+    if (steps.isEmpty) return const Center(child: Padding(
+        padding: EdgeInsets.all(40), child: Text('No steps found.')));
+
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -126,8 +137,10 @@ class ManualView extends GetView<ManualController> {
     );
   }
 
-  Widget _buildWideGrid(List<ManualStepModel> steps, bool isDark, BuildContext context) {
-    if (steps.isEmpty) return const Center(child: Padding(padding: EdgeInsets.all(40), child: Text('No steps found.')));
+  Widget _buildWideGrid(List<ManualStepModel> steps, bool isDark,
+      BuildContext context) {
+    if (steps.isEmpty) return const Center(child: Padding(
+        padding: EdgeInsets.all(40), child: Text('No steps found.')));
 
     return GridView.builder(
       shrinkWrap: true,
@@ -145,23 +158,25 @@ class ManualView extends GetView<ManualController> {
     );
   }
 
-  Widget _buildStepCard(ManualStepModel step, bool isDark, BuildContext context, int index) {
+  Widget _buildStepCard(ManualStepModel step, bool isDark, BuildContext context,
+      int index) {
     final bool isWide = !context.isMobileLayout;
-    
+
     return Container(
       margin: EdgeInsets.only(bottom: isWide ? 0 : 20),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF161531) : Colors.white,
+        color: isDark ? AppColors.cinematicSurface : Colors.white,
         borderRadius: BorderRadius.circular(28),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
+          color: isDark ? AppColors.distinctBorderDark : AppColors
+              .distinctBorderLight,
           width: 1.2,
         ),
         boxShadow: [
           if (!isDark)
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 15,
               offset: const Offset(0, 8),
             ),
@@ -177,12 +192,12 @@ class ManualView extends GetView<ManualController> {
                 height: 36,
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
+                    colors: [AppColors.primary, AppColors.indigoPrimaryDark],
                   ),
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF6366F1).withOpacity(0.3),
+                      color: AppColors.primary.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 4),
                     ),
@@ -222,7 +237,8 @@ class ManualView extends GetView<ManualController> {
               maxLines: isWide ? 4 : null,
               overflow: isWide ? TextOverflow.ellipsis : TextOverflow.visible,
               style: TextStyle(
-                color: (isDark ? Colors.white : Colors.black).withOpacity(0.6),
+                color: (isDark ? Colors.white : Colors.black).withValues(
+                    alpha: 0.6),
                 fontSize: 15,
                 height: 1.5,
               ),
@@ -235,21 +251,23 @@ class ManualView extends GetView<ManualController> {
         ],
       ),
     )
-    .animate(key: ValueKey('${step.category}_${step.stepNumber}'))
-    .fadeIn(duration: 400.ms, delay: (index * 100).ms)
-    .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
+        .animate(key: ValueKey('${step.category}_${step.stepNumber}'))
+        .fadeIn(duration: 400.ms, delay: (index * 100).ms)
+        .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
   }
 
   Widget _buildNoteBox(String text, StepNoteType type, bool isDark) {
-    final Color bgColor = type == StepNoteType.warning 
-        ? const Color(0xFFFEF3C7).withOpacity(isDark ? 0.05 : 0.5)
-        : const Color(0xFFE0E7FF).withOpacity(isDark ? 0.05 : 0.5);
-    
-    final Color borderColor = type == StepNoteType.warning
-        ? const Color(0xFFF59E0B).withOpacity(0.3)
-        : const Color(0xFF6366F1).withOpacity(0.3);
+    final Color bgColor = type == StepNoteType.warning
+        ? AppColors.warning.withValues(alpha: isDark ? 0.05 : 0.5)
+        : AppColors.primary.withValues(alpha: isDark ? 0.05 : 0.5);
 
-    final Color iconColor = type == StepNoteType.warning ? const Color(0xFFF59E0B) : const Color(0xFF6366F1);
+    final Color borderColor = type == StepNoteType.warning
+        ? AppColors.warning.withValues(alpha: 0.3)
+        : AppColors.primary.withValues(alpha: 0.3);
+
+    final Color iconColor = type == StepNoteType.warning
+        ? AppColors.warning
+        : AppColors.primary;
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -262,7 +280,8 @@ class ManualView extends GetView<ManualController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(
-            type == StepNoteType.warning ? Icons.warning_amber_rounded : Icons.info_outline_rounded,
+            type == StepNoteType.warning ? Icons.warning_amber_rounded : Icons
+                .info_outline_rounded,
             color: iconColor,
             size: 20,
           ),
@@ -273,7 +292,8 @@ class ManualView extends GetView<ManualController> {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color: isDark ? Colors.white.withOpacity(0.8) : Colors.black.withOpacity(0.7),
+                color: isDark ? Colors.white.withValues(alpha: 0.8) : Colors
+                    .black.withValues(alpha: 0.7),
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
               ),
@@ -289,10 +309,13 @@ class ManualView extends GetView<ManualController> {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF161531).withOpacity(0.4) : Colors.white,
+        color: isDark
+            ? AppColors.cinematicSurface.withValues(alpha: 0.4)
+            : Colors.white,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.05),
+          color: isDark ? AppColors.distinctBorderDark : AppColors
+              .distinctBorderLight,
           width: 1.5,
         ),
       ),
@@ -302,14 +325,16 @@ class ManualView extends GetView<ManualController> {
         children: [
           Icon(
             Icons.menu_book_rounded,
-            color: (isDark ? Colors.white : Colors.black).withOpacity(0.3),
+            color: (isDark ? Colors.white : Colors.black).withValues(
+                alpha: 0.3),
             size: 20,
           ),
           const SizedBox(width: 12),
           Text(
             'Need more help? ',
             style: TextStyle(
-              color: (isDark ? Colors.white : Colors.black).withOpacity(0.4),
+              color: (isDark ? Colors.white : Colors.black).withValues(
+                  alpha: 0.4),
               fontSize: 15,
               fontWeight: FontWeight.w500,
             ),
@@ -317,7 +342,7 @@ class ManualView extends GetView<ManualController> {
           Text(
             'Contact Support',
             style: TextStyle(
-              color: const Color(0xFF6366F1).withOpacity(0.8),
+              color: AppColors.primary.withValues(alpha: 0.8),
               fontSize: 15,
               fontWeight: FontWeight.bold,
               decoration: TextDecoration.underline,

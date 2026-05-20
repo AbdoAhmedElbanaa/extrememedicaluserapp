@@ -1,3 +1,4 @@
+import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -164,7 +165,7 @@ class RegisterController extends GetxController {
       'Success',
       'Account created successfully ✨',
       snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.green.withOpacity(0.7),
+      backgroundColor: AppColors.success.withValues(alpha: 0.7),
       colorText: Colors.white,
     );
   }

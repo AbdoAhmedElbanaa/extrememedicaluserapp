@@ -1,23 +1,26 @@
-import 'dart:ui';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
+import 'package:extrememedicaluserapp/theme/app_colors.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:get/get.dart';
+
 import '../controllers/diagnose_controller.dart';
-import '../../data/models/diagnose_result_model.dart';
-import '../widgets/scanner_widget.dart';
 import '../widgets/diagnosis_result_card.dart';
+import '../widgets/scanner_widget.dart';
 
 class DiagnoseView extends GetView<DiagnoseController> {
   const DiagnoseView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = Theme
+        .of(context)
+        .brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0D0C21) : AppColors.backgroundLight,
+      backgroundColor: isDark
+          ? AppColors.surfaceDark
+          : AppColors.backgroundLight,
       body: Stack(
         children: [
           // Background Glows
@@ -25,12 +28,12 @@ class DiagnoseView extends GetView<DiagnoseController> {
             Positioned(
               top: -100,
               left: -50,
-              child: _buildGlow(const Color(0xFF6366F1).withOpacity(0.08)),
+              child: _buildGlow(AppColors.primary.withValues(alpha: 0.08)),
             ),
             Positioned(
               bottom: -100,
               right: -50,
-              child: _buildGlow(const Color(0xFFA855F7).withOpacity(0.08)),
+              child: _buildGlow(AppColors.secondary.withValues(alpha: 0.08)),
             ),
           ],
 
@@ -72,13 +75,7 @@ class DiagnoseView extends GetView<DiagnoseController> {
       height: 400,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: color,
-            blurRadius: 100,
-            spreadRadius: 50,
-          ),
-        ],
+        boxShadow: [BoxShadow(color: color, blurRadius: 100, spreadRadius: 50)],
       ),
     );
   }
@@ -90,8 +87,11 @@ class DiagnoseView extends GetView<DiagnoseController> {
         children: [
           IconButton(
             onPressed: () => Get.back(),
-            icon: Icon(Icons.arrow_back_ios_new_rounded, 
-              color: isDark ? Colors.white : Colors.black, size: 20),
+            icon: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: isDark ? Colors.white : Colors.black,
+              size: 20,
+            ),
           ),
           const SizedBox(width: 8),
           Text(
@@ -115,9 +115,13 @@ class DiagnoseView extends GetView<DiagnoseController> {
         Icon(
           Icons.biotech_rounded,
           size: 80,
-          color: const Color(0xFF6366F1).withOpacity(0.8),
-        ).animate(onPlay: (controller) => controller.repeat())
-         .shimmer(duration: const Duration(seconds: 2), color: Colors.white24),
+          color: AppColors.primary.withValues(alpha: 0.8),
+        )
+            .animate(onPlay: (controller) => controller.repeat())
+            .shimmer(
+          duration: const Duration(seconds: 2),
+          color: Colors.white24,
+        ),
         const SizedBox(height: 30),
         Text(
           "Ready to Scan",
@@ -133,13 +137,17 @@ class DiagnoseView extends GetView<DiagnoseController> {
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 16,
-            color: (isDark ? Colors.white : Colors.black).withOpacity(0.6),
+            color: (isDark ? Colors.white : Colors.black).withValues(
+                alpha: 0.6),
           ),
         ),
         const SizedBox(height: 50),
         _buildStartButton(),
       ],
-    ).animate().fadeIn(duration: const Duration(milliseconds: 600)).slideY(begin: 0.1, end: 0);
+    )
+        .animate()
+        .fadeIn(duration: const Duration(milliseconds: 600))
+        .slideY(begin: 0.1, end: 0);
   }
 
   Widget _buildStartButton() {
@@ -150,12 +158,12 @@ class DiagnoseView extends GetView<DiagnoseController> {
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
+            colors: [AppColors.primary, AppColors.indigoPrimaryDark],
           ),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF6366F1).withOpacity(0.4),
+              color: AppColors.primary.withValues(alpha: 0.4),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -185,38 +193,48 @@ class DiagnoseView extends GetView<DiagnoseController> {
       children: [
         const ScannerWidget(),
         const SizedBox(height: 40),
-        Obx(() => Text(
-          controller.currentScanPhase.value,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: isDark ? Colors.white : Colors.black,
-          ),
-        )),
+        Obx(
+              () =>
+              Text(
+                controller.currentScanPhase.value,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? Colors.white : Colors.black,
+                ),
+              ),
+        ),
         const SizedBox(height: 20),
-        Obx(() => Container(
-          width: 300,
-          height: 8,
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
-            color: isDark ? Colors.white10 : Colors.black.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: LinearProgressIndicator(
-            value: controller.scanProgress.value,
-            backgroundColor: Colors.transparent,
-            valueColor: const AlwaysStoppedAnimation(Color(0xFF6366F1)),
-          ),
-        )),
+        Obx(
+              () =>
+              Container(
+                width: 300,
+                height: 8,
+                clipBehavior: Clip.antiAlias,
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.white10 : Colors.black.withValues(
+                      alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: LinearProgressIndicator(
+                  value: controller.scanProgress.value,
+                  backgroundColor: Colors.transparent,
+                  valueColor: const AlwaysStoppedAnimation(AppColors.primary),
+                ),
+              ),
+        ),
         const SizedBox(height: 12),
-        Obx(() => Text(
-          "${(controller.scanProgress.value * 100).toInt()}%",
-          style: const TextStyle(
-            color: Color(0xFF6366F1),
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
-        )),
+        Obx(
+              () =>
+              Text(
+                "${(controller.scanProgress.value * 100).toInt()}%",
+                style: const TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+        ),
       ],
     );
   }
@@ -243,7 +261,10 @@ class DiagnoseView extends GetView<DiagnoseController> {
               side: BorderSide(color: isDark ? Colors.white24 : Colors.black12),
               shape: RoundedRectangle_circular(20),
             ),
-            child: Text("Scan Again", style: TextStyle(color: isDark ? Colors.white : Colors.black)),
+            child: Text(
+              "Scan Again",
+              style: TextStyle(color: isDark ? Colors.white : Colors.black),
+            ),
           ),
         ),
         const SizedBox(width: 15),
@@ -252,16 +273,22 @@ class DiagnoseView extends GetView<DiagnoseController> {
             onPressed: () => Get.back(),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 18),
-              backgroundColor: const Color(0xFF6366F1),
+              backgroundColor: AppColors.primary,
               shape: RoundedRectangle_circular(20),
             ),
-            child: const Text("Done", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            child: const Text(
+              "Done",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ),
       ],
     );
   }
 
-  RoundedRectangleBorder RoundedRectangle_circular(double radius) => 
+  RoundedRectangleBorder RoundedRectangle_circular(double radius) =>
       RoundedRectangleBorder(borderRadius: BorderRadius.circular(radius));
 }

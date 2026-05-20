@@ -1,15 +1,18 @@
+import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:extrememedicaluserapp/theme/app_colors.dart';
-import '../controllers/home_controller.dart';
+
 import '../../data/models/recent_activity_model.dart';
+import '../controllers/home_controller.dart';
 
 class RecentActivitySection extends GetView<HomeController> {
   const RecentActivitySection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = Theme
+        .of(context)
+        .brightness == Brightness.dark;
 
     return Column(
       children: [
@@ -42,10 +45,14 @@ class RecentActivitySection extends GetView<HomeController> {
         // Activity List Container
         Container(
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF161531).withOpacity(0.6) : Colors.white,
+            color: isDark
+                ? AppColors.cinematicSurface.withValues(alpha: 0.6)
+                : Colors.white,
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
+              color: isDark
+                  ? AppColors.distinctBorderDark
+                  : AppColors.distinctBorderLight,
               width: 1.2,
             ),
           ),
@@ -54,14 +61,20 @@ class RecentActivitySection extends GetView<HomeController> {
             padding: EdgeInsets.zero,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: controller.recentActivities.length,
-            separatorBuilder: (context, index) => Divider(
-              height: 1,
-              color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
-              indent: 70,
-            ),
+            separatorBuilder: (context, index) =>
+                Divider(
+                  height: 1,
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.05)
+                      : Colors.black.withValues(alpha: 0.05),
+                  indent: 70,
+                ),
             itemBuilder: (context, index) {
               final activity = controller.recentActivities[index];
-              return _buildActivityItem(activity, isDark);
+              return _buildActivityItem(
+                activity as RecentActivityModel,
+                isDark,
+              );
             },
           ),
         ),
@@ -79,14 +92,10 @@ class RecentActivitySection extends GetView<HomeController> {
       leading: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: activity.getStatusColor().withOpacity(0.1),
+          color: activity.getStatusColor().withValues(alpha: 0.1),
           shape: BoxShape.circle,
         ),
-        child: Icon(
-          activity.icon,
-          color: activity.getStatusColor(),
-          size: 20,
-        ),
+        child: Icon(activity.icon, color: activity.getStatusColor(), size: 20),
       ),
       title: Text(
         activity.title,
@@ -101,7 +110,8 @@ class RecentActivitySection extends GetView<HomeController> {
           Text(
             activity.subtitle,
             style: TextStyle(
-              color: (isDark ? Colors.white : Colors.black).withOpacity(0.4),
+              color: (isDark ? Colors.white : Colors.black).withValues(
+                  alpha: 0.4),
               fontSize: 12,
             ),
           ),
@@ -109,7 +119,8 @@ class RecentActivitySection extends GetView<HomeController> {
           Text(
             '• ${activity.time}',
             style: TextStyle(
-              color: (isDark ? Colors.white : Colors.black).withOpacity(0.3),
+              color: (isDark ? Colors.white : Colors.black).withValues(
+                  alpha: 0.3),
               fontSize: 11,
             ),
           ),
@@ -117,7 +128,7 @@ class RecentActivitySection extends GetView<HomeController> {
       ),
       trailing: Icon(
         Icons.arrow_forward_ios_rounded,
-        color: (isDark ? Colors.white : Colors.black).withOpacity(0.1),
+        color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.1),
         size: 14,
       ),
       onTap: () {},
@@ -131,11 +142,11 @@ class RecentActivitySection extends GetView<HomeController> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppColors.primary.withOpacity(0.3),
+          color: AppColors.primary.withValues(alpha: 0.3),
           width: 1.5,
           style: BorderStyle.solid,
         ),
-        color: AppColors.primary.withOpacity(0.05),
+        color: AppColors.primary.withValues(alpha: 0.05),
       ),
       child: Material(
         color: Colors.transparent,

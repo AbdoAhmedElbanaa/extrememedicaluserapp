@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:extrememedicaluserapp/theme/app_colors.dart';
 
 class LoginController extends GetxController {
   final emailController = TextEditingController();
@@ -26,7 +27,7 @@ class LoginController extends GetxController {
         'Success',
         'Logged in successfully',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green.withOpacity(0.7),
+        backgroundColor: AppColors.success.withValues(alpha: 0.7),
         colorText: Colors.white,
       );
 

@@ -10,6 +10,7 @@ import 'package:extrememedicaluserapp/features/manual/presentation/controllers/m
 
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
+import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:extrememedicaluserapp/core/services/toast_service.dart';
 
 class HomeController extends GetxController {
@@ -33,7 +34,7 @@ class HomeController extends GetxController {
       QuickActionModel(
         title: 'Manual',
         icon: Icons.menu_book_rounded,
-        color: const Color(0xFF818CF8),
+        color: AppColors.indigoSoft,
         onTap: () {
           Get.put(ManualController());
           Get.to(() => const ManualView(), transition: Transition.rightToLeftWithFade);
@@ -42,7 +43,7 @@ class HomeController extends GetxController {
       QuickActionModel(
         title: 'Diagnose',
         icon: Icons.analytics_rounded,
-        color: const Color(0xFF34D399),
+        color: AppColors.emeraldSoft,
         onTap: () {
           Get.put(DiagnoseController());
           Get.to(() => const DiagnoseView(), transition: Transition.rightToLeftWithFade);
@@ -51,13 +52,13 @@ class HomeController extends GetxController {
       QuickActionModel(
         title: 'Errors',
         icon: Icons.warning_amber_rounded,
-        color: const Color(0xFFFBBF24),
+        color: AppColors.amberSoft,
         onTap: () => _showComingSoon('Errors'),
       ),
       QuickActionModel(
         title: 'Support',
         icon: Icons.bolt_rounded,
-        color: const Color(0xFFF472B6),
+        color: AppColors.pinkSoft,
         onTap: () => _showComingSoon('Support'),
       ),
     ];

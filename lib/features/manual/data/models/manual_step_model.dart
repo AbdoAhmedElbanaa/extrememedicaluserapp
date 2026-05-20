@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 enum StepNoteType { info, warning, none }
 
 class ManualStepModel {

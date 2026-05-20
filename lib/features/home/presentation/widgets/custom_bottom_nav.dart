@@ -7,6 +7,7 @@ import '../controllers/home_controller.dart';
 
 class CustomBottomNav extends GetView<HomeController> {
   final bool isDark;
+
   const CustomBottomNav({super.key, required this.isDark});
 
   @override
@@ -34,37 +35,38 @@ class CustomBottomNav extends GetView<HomeController> {
               height: 80,
               decoration: BoxDecoration(
                 color: isDark
-                    ? AppColors.surfaceDark.withOpacity(0.35)
-                    : AppColors.surfaceLight.withOpacity(0.4),
+                    ? AppColors.surfaceDark.withValues(alpha: 0.35)
+                    : AppColors.surfaceLight.withValues(alpha: 0.4),
                 borderRadius: BorderRadius.circular(28),
                 border: Border.all(
                   color: isDark
-                      ? Colors.white.withOpacity(0.06)
-                      : AppColors.borderLight.withOpacity(0.1),
+                      ? Colors.white.withValues(alpha: 0.06)
+                      : AppColors.borderLight.withValues(alpha: 0.1),
                   width: 1,
                 ),
               ),
               child: Stack(
                 alignment: Alignment.centerLeft,
                 children: [
-                  Obx(() => AnimatedPositioned(
-                    duration: const Duration(milliseconds: 600),
-                    curve: Curves.easeOutBack,
-                    left: (controller.selectedIndex.value * itemWidth) + 8,
-                    top: 10,
-                    child: Container(
-                      width: selectionWidth,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: AppColors.primary.withOpacity(0.3),
-                          width: 1.2,
+                  Obx(() =>
+                      AnimatedPositioned(
+                        duration: const Duration(milliseconds: 600),
+                        curve: Curves.easeOutBack,
+                        left: (controller.selectedIndex.value * itemWidth) + 8,
+                        top: 10,
+                        child: Container(
+                          width: selectionWidth,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: AppColors.primary.withValues(alpha: 0.3),
+                              width: 1.2,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  )),
+                      )),
 
                   Row(
                     children: [
@@ -98,9 +100,10 @@ class CustomBottomNav extends GetView<HomeController> {
                 transform: Matrix4.translationValues(0, isSelected ? -2 : 0, 0),
                 child: Icon(
                   icon,
-                  color: isSelected 
-                      ? AppColors.primary 
-                      : (isDark ? AppColors.textMutedDark : AppColors.textMutedLight),
+                  color: isSelected
+                      ? AppColors.primary
+                      : (isDark ? AppColors.textMutedDark : AppColors
+                      .textMutedLight),
                   size: isSelected ? 26 : 24,
                 ),
               ),
@@ -108,9 +111,10 @@ class CustomBottomNav extends GetView<HomeController> {
               Text(
                 label,
                 style: TextStyle(
-                  color: isSelected 
-                      ? AppColors.primary 
-                      : (isDark ? AppColors.textMutedDark : AppColors.textMutedLight),
+                  color: isSelected
+                      ? AppColors.primary
+                      : (isDark ? AppColors.textMutedDark : AppColors
+                      .textMutedLight),
                   fontSize: 10,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                 ),

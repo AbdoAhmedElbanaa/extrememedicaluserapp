@@ -96,9 +96,9 @@ class HomeView extends GetView<HomeController> {
       selectedIndex: controller.selectedIndex.value,
       onDestinationSelected: (index) => controller.changeIndex(index),
       labelType: NavigationRailLabelType.all,
-      backgroundColor: isDark ? const Color(0xFF161531) : Colors.white,
+      backgroundColor: isDark ? AppColors.cinematicSurface : Colors.white,
       selectedIconTheme: const IconThemeData(color: AppColors.primary),
-      unselectedIconTheme: IconThemeData(color: isDark ? Colors.white.withOpacity(0.3) : Colors.black.withOpacity(0.3)),
+      unselectedIconTheme: IconThemeData(color: isDark ? Colors.white.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.3)),
       destinations: const [
         NavigationRailDestination(icon: Icon(Icons.home_filled), label: Text('Home')),
         NavigationRailDestination(icon: Icon(Icons.layers_rounded), label: Text('Devices')),

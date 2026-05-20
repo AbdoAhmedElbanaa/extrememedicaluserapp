@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:extrememedicaluserapp/features/permissions/data/models/permission_model.dart';
-import 'package:extrememedicaluserapp/main.dart';
 
 class PermissionsController extends GetxController {
   final storage = GetStorage();
@@ -53,7 +52,7 @@ class PermissionsController extends GetxController {
   Future<void> refreshPermissions() async {
     for (var model in permissionsList) {
       PermissionStatus status = await model.permission.status;
-      
+
       // Fix for Storage on Android 13+
       if (model.permission == Permission.storage && !status.isGranted) {
         final photos = await Permission.photos.status;
@@ -63,7 +62,7 @@ class PermissionsController extends GetxController {
           status = PermissionStatus.granted;
         }
       }
-      
+
       permissionStatuses[model.permission] = status;
     }
   }
@@ -71,11 +70,11 @@ class PermissionsController extends GetxController {
   // Request a single permission when clicking on a card
   Future<void> requestSinglePermission(Permission permission) async {
     PermissionStatus status;
-    
+
     if (permission == Permission.storage) {
       // Try standard storage first
       status = await permission.request();
-      
+
       // Android 13+ Fallback: request media permissions if storage request didn't result in "granted"
       if (!status.isGranted) {
         final Map<Permission, PermissionStatus> statuses = await [
@@ -83,7 +82,7 @@ class PermissionsController extends GetxController {
           Permission.videos,
           Permission.audio,
         ].request();
-        
+
         if (statuses.values.any((s) => s.isGranted)) {
           status = PermissionStatus.granted;
         }
@@ -93,7 +92,7 @@ class PermissionsController extends GetxController {
     }
 
     permissionStatuses[permission] = status;
-    
+
     if (status.isPermanentlyDenied) {
       await openAppSettings();
     }

@@ -8,6 +8,7 @@ import 'package:extrememedicaluserapp/features/home/presentation/widgets/user_pr
 
 class HomeHeader extends StatelessWidget {
   final bool isDark;
+
   const HomeHeader({super.key, required this.isDark});
 
   @override
@@ -18,18 +19,22 @@ class HomeHeader extends StatelessWidget {
         child: Container(
           width: double.infinity,
           padding: EdgeInsets.only(
-            top: MediaQuery.of(context).padding.top + 10,
+            top: MediaQuery
+                .of(context)
+                .padding
+                .top + 10,
             bottom: 20,
             left: context.responsive(20, tablet: 50, desktop: 80),
             right: context.responsive(20, tablet: 50, desktop: 80),
           ),
           decoration: BoxDecoration(
-            color: isDark 
-                ? AppColors.backgroundDark.withOpacity(0.7) 
-                : AppColors.backgroundLight.withOpacity(0.7),
+            color: isDark
+                ? AppColors.backgroundDark.withValues(alpha: 0.7)
+                : AppColors.backgroundLight.withValues(alpha: 0.7),
             border: Border(
               bottom: BorderSide(
-                color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
+                color: isDark ? AppColors.distinctBorderDark : AppColors
+                    .distinctBorderLight,
                 width: 1,
               ),
             ),
@@ -50,7 +55,9 @@ class HomeHeader extends StatelessWidget {
                           Text(
                             'Good Morning',
                             style: TextStyle(
-                              color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                              color: isDark
+                                  ? AppColors.textMutedDark
+                                  : AppColors.textMutedLight,
                               fontSize: context.responsive(14, tablet: 16),
                               fontWeight: FontWeight.w500,
                             ),
@@ -63,7 +70,8 @@ class HomeHeader extends StatelessWidget {
                       Text(
                         'Ahmed Hassan',
                         style: TextStyle(
-                          color: isDark ? Colors.white : AppColors.foregroundLight,
+                          color: isDark ? Colors.white : AppColors
+                              .foregroundLight,
                           fontSize: context.responsive(24, tablet: 32),
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.5,
@@ -76,13 +84,14 @@ class HomeHeader extends StatelessWidget {
                   Row(
                     children: [
                       if (context.isDesktopLayout) ...[
-                         _buildTextButton('Dashboard', isDark),
-                         _buildTextButton('Devices', isDark),
-                         _buildTextButton('Analytics', isDark),
-                         const SizedBox(width: 20),
+                        _buildTextButton('Dashboard', isDark),
+                        _buildTextButton('Devices', isDark),
+                        _buildTextButton('Analytics', isDark),
+                        const SizedBox(width: 20),
                       ],
                       _buildIconButton(
-                        icon: isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+                        icon: isDark ? Icons.light_mode_outlined : Icons
+                            .dark_mode_outlined,
                         isDark: isDark,
                         onTap: () {
                           ThemeService().switchTheme();
@@ -146,10 +155,11 @@ class HomeHeader extends StatelessWidget {
         width: 44,
         height: 44,
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E1C44).withOpacity(0.5) : AppColors.mutedLight.withOpacity(0.5),
+          color: isDark ? AppColors.deepNavy.withValues(alpha: 0.5) : AppColors
+              .mutedLight.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isDark ? const Color(0xFF323066) : AppColors.borderLight,
+            color: isDark ? AppColors.deepNavyBorder : AppColors.borderLight,
             width: 1,
           ),
         ),
@@ -169,10 +179,10 @@ class HomeHeader extends StatelessWidget {
                   width: 8,
                   height: 8,
                   decoration: BoxDecoration(
-                    color: Colors.redAccent,
+                    color: AppColors.errorRed,
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: isDark ? const Color(0xFF1E1C44) : Colors.white,
+                      color: isDark ? AppColors.deepNavy : Colors.white,
                       width: 1.5,
                     ),
                   ),
@@ -189,7 +199,7 @@ class HomeHeader extends StatelessWidget {
       onTap: () {
         Get.dialog(
           const UserProfilePopup(),
-          barrierColor: Colors.black.withOpacity(0.6),
+          barrierColor: Colors.black.withValues(alpha: 0.6),
         );
       },
       child: Container(
@@ -204,7 +214,7 @@ class HomeHeader extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withOpacity(0.4),
+              color: AppColors.primary.withValues(alpha: 0.4),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -228,10 +238,13 @@ class HomeHeader extends StatelessWidget {
     return Container(
       height: 55,
       decoration: BoxDecoration(
-        color: isDark ? AppColors.cinematicSurface.withOpacity(0.5) : AppColors.inputBackgroundLight,
+        color: isDark
+            ? AppColors.cinematicSurface.withValues(alpha: 0.5)
+            : AppColors.inputBackgroundLight,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: isDark ? AppColors.primary.withOpacity(0.15) : AppColors.borderLight.withOpacity(0.5),
+          color: isDark ? AppColors.primary.withValues(alpha: 0.15) : AppColors
+              .borderLight.withValues(alpha: 0.5),
         ),
       ),
       child: TextField(
@@ -239,12 +252,14 @@ class HomeHeader extends StatelessWidget {
         decoration: InputDecoration(
           hintText: 'Search devices, manuals...',
           hintStyle: TextStyle(
-            color: isDark ? AppColors.textMutedDark.withOpacity(0.5) : AppColors.textMutedLight.withOpacity(0.5),
+            color: isDark
+                ? AppColors.textMutedDark.withValues(alpha: 0.5)
+                : AppColors.textMutedLight.withValues(alpha: 0.5),
             fontSize: 15,
           ),
           prefixIcon: Icon(
             Icons.search_rounded,
-            color: AppColors.primary.withOpacity(0.7),
+            color: AppColors.primary.withValues(alpha: 0.7),
             size: 22,
           ),
           border: InputBorder.none,

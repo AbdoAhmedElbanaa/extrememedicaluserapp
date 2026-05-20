@@ -6,32 +6,35 @@ class ActiveDeviceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = Theme
+        .of(context)
+        .brightness == Brightness.dark;
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12), // Compact padding
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      // Compact padding
       decoration: BoxDecoration(
-        color: isDark 
-            ? const Color(0xFF0D0C21) 
+        color: isDark
+            ? AppColors.surfaceDark
             : Colors.white,
         borderRadius: BorderRadius.circular(28),
         border: Border.all(
-          color: isDark 
-              ? Colors.white.withOpacity(0.08) 
-              : Colors.black.withOpacity(0.05),
+          color: isDark
+              ? AppColors.distinctBorderDark
+              : AppColors.distinctBorderLight,
           width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.4 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.05),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
         ],
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min, 
+        mainAxisSize: MainAxisSize.min,
         children: [
           // Header: Icon + Info + Online Badge
           Row(
@@ -39,14 +42,15 @@ class ActiveDeviceCard extends StatelessWidget {
             children: [
               // Device Icon
               Container(
-                width: 48, 
-                height: 48, 
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF2A2859) : AppColors.primary.withOpacity(0.1),
+                  color: isDark ? AppColors.indigoDeep : AppColors.primary
+                      .withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: isDark ? [
                     BoxShadow(
-                      color: AppColors.primary.withOpacity(0.2),
+                      color: AppColors.primary.withValues(alpha: 0.2),
                       blurRadius: 10,
                       spreadRadius: 1,
                     ),
@@ -69,7 +73,8 @@ class ActiveDeviceCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: isDark ? Colors.white : AppColors.foregroundLight,
+                        color: isDark ? Colors.white : AppColors
+                            .foregroundLight,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -77,7 +82,8 @@ class ActiveDeviceCard extends StatelessWidget {
                     Text(
                       'Model: ST-2024-X',
                       style: TextStyle(
-                        color: (isDark ? Colors.white : Colors.black).withOpacity(0.4),
+                        color: (isDark ? Colors.white : Colors.black)
+                            .withValues(alpha: 0.4),
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
                       ),
@@ -89,10 +95,10 @@ class ActiveDeviceCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
+                  color: AppColors.success.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: Colors.green.withOpacity(0.3),
+                    color: AppColors.success.withValues(alpha: 0.3),
                     width: 1,
                   ),
                 ),
@@ -103,7 +109,7 @@ class ActiveDeviceCard extends StatelessWidget {
                       width: 5,
                       height: 5,
                       decoration: const BoxDecoration(
-                        color: Colors.green,
+                        color: AppColors.success,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -111,7 +117,7 @@ class ActiveDeviceCard extends StatelessWidget {
                     const Text(
                       'Online',
                       style: TextStyle(
-                        color: Colors.green,
+                        color: AppColors.success,
                         fontSize: 9,
                         fontWeight: FontWeight.bold,
                       ),
@@ -121,7 +127,7 @@ class ActiveDeviceCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12), 
+          const SizedBox(height: 12),
           // Stats Row
           Row(
             children: [
@@ -130,7 +136,7 @@ class ActiveDeviceCard extends StatelessWidget {
                 icon: Icons.wifi_rounded,
                 value: '92%',
                 label: 'Signal',
-                iconColor: Colors.blueAccent,
+                iconColor: AppColors.blueSoft,
                 isDark: isDark,
               ),
               const SizedBox(width: 8),
@@ -139,7 +145,7 @@ class ActiveDeviceCard extends StatelessWidget {
                 icon: Icons.battery_charging_full_rounded,
                 value: '78%',
                 label: 'Battery',
-                iconColor: Colors.greenAccent,
+                iconColor: AppColors.emeraldSoft,
                 isDark: isDark,
               ),
               const SizedBox(width: 8),
@@ -148,17 +154,18 @@ class ActiveDeviceCard extends StatelessWidget {
                 icon: Icons.auto_graph_rounded,
                 value: '99.8%',
                 label: 'Uptime',
-                iconColor: Colors.blue,
+                iconColor: AppColors.bluePrimary,
                 isDark: isDark,
               ),
             ],
           ),
-          const SizedBox(height: 12), 
+          const SizedBox(height: 12),
           // Serial Number Footer
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: (isDark ? Colors.white : Colors.black).withOpacity(0.04),
+              color: (isDark ? Colors.white : Colors.black).withValues(
+                  alpha: 0.04),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
@@ -167,7 +174,8 @@ class ActiveDeviceCard extends StatelessWidget {
                 Text(
                   'Serial Number',
                   style: TextStyle(
-                    color: (isDark ? Colors.white : Colors.black).withOpacity(0.3),
+                    color: (isDark ? Colors.white : Colors.black).withValues(
+                        alpha: 0.3),
                     fontSize: 10,
                     fontWeight: FontWeight.w500,
                   ),
@@ -201,16 +209,17 @@ class ActiveDeviceCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: (isDark ? Colors.white : Colors.black).withOpacity(0.04),
+          color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.04),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: (isDark ? Colors.white : Colors.black).withOpacity(0.05),
+            color: (isDark ? Colors.white : Colors.black).withValues(
+                alpha: 0.05),
             width: 1,
           ),
         ),
         child: Column(
           children: [
-            Icon(icon, color: iconColor.withOpacity(0.7), size: 14),
+            Icon(icon, color: iconColor.withValues(alpha: 0.7), size: 14),
             const SizedBox(height: 4),
             Text(
               value,
@@ -223,7 +232,8 @@ class ActiveDeviceCard extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                color: (isDark ? Colors.white : Colors.black).withOpacity(0.3),
+                color: (isDark ? Colors.white : Colors.black).withValues(
+                    alpha: 0.3),
                 fontSize: 9,
                 fontWeight: FontWeight.w500,
               ),

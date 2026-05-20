@@ -31,14 +31,14 @@ class SecuritySection extends StatelessWidget {
             borderRadius: BorderRadius.circular(28),
             border: Border.all(
               color: isDark 
-                  ? Colors.white.withValues(alpha: 0.05) 
-                  : AppColors.borderLight.withValues(alpha: 0.5),
+                  ? AppColors.distinctBorderDark 
+                  : AppColors.distinctBorderLight,
               width: 1,
             ),
           ),
           child: _buildSecurityTile(
             icon: Icons.lock_outline_rounded,
-            iconColor: const Color(0xFFFBBF24), // Orange/Gold color for security
+            iconColor: AppColors.amberSoft, // Orange/Gold color for security
             title: 'Change Password',
             isDark: isDark,
             onTap: () {},

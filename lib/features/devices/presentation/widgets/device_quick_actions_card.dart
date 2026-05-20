@@ -16,7 +16,9 @@ class DeviceQuickActionsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = Theme
+        .of(context)
+        .brightness == Brightness.dark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -28,7 +30,7 @@ class DeviceQuickActionsCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w900,
-              color: isDark ? Colors.white : const Color(0xFF1E1B4B),
+              color: isDark ? Colors.white : AppColors.indigoMuted,
               letterSpacing: -0.3,
             ),
           ),
@@ -37,15 +39,17 @@ class DeviceQuickActionsCard extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 20),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: isDark ? AppColors.indigoDeep.withOpacity(0.3) : Colors.white,
+            color: isDark ? AppColors.indigoDeep.withValues(alpha: 0.3) : Colors
+                .white,
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
+              color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors
+                  .black.withValues(alpha: 0.05),
             ),
             boxShadow: [
               if (!isDark)
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.03),
+                  color: Colors.black.withValues(alpha: 0.03),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),

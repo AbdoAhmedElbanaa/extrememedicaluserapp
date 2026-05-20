@@ -34,8 +34,8 @@ class ThemeModeSelector extends GetView<SettingsController> {
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
               color: isDark 
-                  ? Colors.white.withValues(alpha: 0.05) 
-                  : AppColors.borderLight.withValues(alpha: 0.5),
+                  ? AppColors.distinctBorderDark 
+                  : AppColors.distinctBorderLight,
               width: 1,
             ),
           ),

@@ -14,111 +14,209 @@ class DevicesView extends GetView<DevicesController> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final topPadding = MediaQuery.of(context).padding.top;
-    
-    // حساب ارتفاع الهيدر الفعلي بدقة لضمان أن الـ Refresh يبدأ من نهايته
-    // الهيدر يحتوي على (Title + Search + Chips + Paddings)
-    final double headerHeight = topPadding + 225; 
-    
-    // المسافة الجمالية (Gap) بين الهيدر والبطاقات لإعطاء مظهر سينمائي
-    const double cinematicGap = 20.0;
+    final isDark = Theme
+        .of(context)
+        .brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Colors.transparent, // للسماح للتوهج الخلفي بالظهور
-      body: Stack(
-        children: [
-          // 1. طبقة المحتوى ومنطقة التحديث (تغطي الشاشة كاملة)
-          SmartRefresher(
-            controller: controller.refreshController,
+      backgroundColor: Colors.transparent,
+      body: ResponsiveLayout(
+        mobile: _buildMobileLayout(context, isDark),
+        tablet: _buildTabletLayout(context, isDark),
+        desktop: _buildDesktopLayout(context, isDark),
+      ),
+      floatingActionButton: ResponsiveLayout.isMobile(context)
+          ? _buildFAB(isDark)
+          : const SizedBox.shrink(),
+    );
+  }
+
+  Widget _buildMobileLayout(BuildContext context, bool isDark) {
+    final topPadding = MediaQuery
+        .of(context)
+        .padding
+        .top;
+    final double headerHeight = topPadding + 225;
+    const double cinematicGap = 20.0;
+
+    return Stack(
+      children: [
+        SmartRefresher(
+          controller: controller.refreshController,
+          onRefresh: controller.onRefresh,
+          header: WaterDropMaterialHeader(
+            backgroundColor: AppColors.primary,
+            color: Colors.white,
+            offset: headerHeight,
+          ),
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            slivers: [
+              SliverToBoxAdapter(
+                child: SizedBox(height: headerHeight + cinematicGap),
+              ),
+              _buildDeviceGrid(context),
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 120),
+              ),
+            ],
+          ),
+        ),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: const DevicesHeader(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTabletLayout(BuildContext context, bool isDark) {
+    return _buildWideLayout(context, isDark, isDesktop: false);
+  }
+
+  Widget _buildDesktopLayout(BuildContext context, bool isDark) {
+    return _buildWideLayout(context, isDark, isDesktop: true);
+  }
+
+  Widget _buildWideLayout(BuildContext context, bool isDark,
+      {required bool isDesktop}) {
+    return Row(
+      children: [
+        // Sidebar Header for Wide Screens
+        Container(
+          width: isDesktop ? 350 : 300,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.backgroundDark : AppColors
+                .backgroundLight,
+            border: Border(
+              right: BorderSide(
+                color: isDark ? AppColors.distinctBorderDark : AppColors
+                    .distinctBorderLight,
+                width: 1,
+              ),
+            ),
+          ),
+          child: Column(
+            children: [
+              Expanded(child: DevicesHeader(isSidebar: true)),
+              Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: _buildAddDeviceButton(isDark),
+              ),
+            ],
+          ),
+        ),
+
+        // Main Content Area
+        Expanded(
+          child: SmartRefresher(
+            controller: controller.refreshControllerWide,
             onRefresh: controller.onRefresh,
-            header: WaterDropMaterialHeader(
-              backgroundColor: const Color(0xFF6366F1),
+            header: const WaterDropMaterialHeader(
+              backgroundColor: AppColors.primary,
               color: Colors.white,
-              // ✅ السر هنا: الأيقونة ستبدأ بالظهور بالضبط من تحت حافة الهيدر
-              offset: headerHeight,
             ),
             child: CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(
-                parent: BouncingScrollPhysics(),
-              ),
               slivers: [
-                // إضافة مساحة فارغة في أعلى القائمة تعادل (ارتفاع الهيدر + الفراغ الجمالي)
-                SliverToBoxAdapter(
-                  child: SizedBox(height: headerHeight + cinematicGap),
-                ),
-                
-                // عرض شبكة الأجهزة
-                Obx(() {
-                  if (controller.filteredDevices.isEmpty) {
-                    return SliverFillRemaining(
-                      hasScrollBody: false,
-                      child: _buildEmptyState(isDark),
-                    );
-                  }
-                  
-                  final crossAxisCount = context.responsive(1, tablet: 2, desktop: 3).toInt();
-                  
-                  return SliverPadding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: context.responsive(20, tablet: 30, desktop: 40),
-                    ),
-                    sliver: crossAxisCount == 1 
-                      ? SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) => DeviceCard(
-                              device: controller.filteredDevices[index],
-                              onTap: () {
-                                Get.toNamed(
-                                  AppRoutes.deviceDetails,
-                                  arguments: controller.filteredDevices[index],
-                                );
-                              },
-                            ),
-                            childCount: controller.filteredDevices.length,
-                          ),
-                        )
-                      : SliverGrid(
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: crossAxisCount,
-                            childAspectRatio: context.responsive(1.4, tablet: 1.2, desktop: 1.3),
-                            crossAxisSpacing: 16,
-                            mainAxisSpacing: 16,
-                          ),
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) => DeviceCard(
-                              device: controller.filteredDevices[index],
-                              onTap: () {
-                                Get.toNamed(
-                                  AppRoutes.deviceDetails,
-                                  arguments: controller.filteredDevices[index],
-                                );
-                              },
-                            ),
-                            childCount: controller.filteredDevices.length,
-                          ),
-                        ),
-                  );
-                }),
-                
-                // مساحة أمان سفلية لضمان عدم التداخل مع الـ Bottom Navigation
-                const SliverToBoxAdapter(
-                  child: SizedBox(height: 120),
-                ),
+                const SliverToBoxAdapter(child: SizedBox(height: 40)),
+                _buildDeviceGrid(context),
+                const SliverToBoxAdapter(child: SizedBox(height: 40)),
               ],
             ),
           ),
+        ),
+      ],
+    );
+  }
 
-          // 2. الهيدر الزجاجي الثابت (Floating Header)
-          const Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: DevicesHeader(),
+  Widget _buildDeviceGrid(BuildContext context) {
+    return Obx(() {
+      if (controller.filteredDevices.isEmpty) {
+        return SliverFillRemaining(
+          hasScrollBody: false,
+          child: _buildEmptyState(Theme
+              .of(context)
+              .brightness == Brightness.dark),
+        );
+      }
+
+      final crossAxisCount = context.responsive<int>(1, tablet: 2, desktop: 3);
+
+      return SliverPadding(
+        padding: EdgeInsets.symmetric(
+          horizontal: context.responsive<double>(20, tablet: 30, desktop: 40),
+        ),
+        sliver: crossAxisCount == 1
+            ? SliverList(
+          delegate: SliverChildBuilderDelegate(
+                (context, index) =>
+                DeviceCard(
+                  device: controller.filteredDevices[index],
+                  onTap: () {
+                    Get.toNamed(
+                      AppRoutes.deviceDetails,
+                      arguments: controller.filteredDevices[index],
+                    );
+                  },
+                ),
+            childCount: controller.filteredDevices.length,
           ),
-        ],
+        )
+            : SliverGrid(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            childAspectRatio: context.responsive<double>(
+                1.4, tablet: 0.85, desktop: 0.95),
+            crossAxisSpacing: 20,
+            mainAxisSpacing: 20,
+          ),
+          delegate: SliverChildBuilderDelegate(
+                (context, index) =>
+                DeviceCard(
+                  device: controller.filteredDevices[index],
+                  onTap: () {
+                    Get.toNamed(
+                      AppRoutes.deviceDetails,
+                      arguments: controller.filteredDevices[index],
+                    );
+                  },
+                ),
+            childCount: controller.filteredDevices.length,
+          ),
+        ),
+      );
+    });
+  }
+
+  Widget _buildAddDeviceButton(bool isDark) {
+    return SizedBox(
+      width: double.infinity,
+      height: 55,
+      child: ElevatedButton.icon(
+        onPressed: () {
+          Get.bottomSheet(
+            const AddDeviceSheet(),
+            isScrollControlled: true,
+          );
+        },
+        icon: const Icon(Icons.add_rounded, color: Colors.white),
+        label: const Text(
+          'Add New Device',
+          style: TextStyle(
+              fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16)),
+          elevation: 0,
+        ),
       ),
-      floatingActionButton: _buildFAB(isDark),
     );
   }
 
@@ -130,7 +228,7 @@ class DevicesView extends GetView<DevicesController> {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.4),
+            color: AppColors.primary.withValues(alpha: 0.4),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -145,7 +243,8 @@ class DevicesView extends GetView<DevicesController> {
           );
         },
         backgroundColor: AppColors.primary,
-        elevation: 0, // نلغي الـ elevation الافتراضي لنعتمد على الـ boxShadow الخاص بنا
+        elevation: 0,
+        // نلغي الـ elevation الافتراضي لنعتمد على الـ boxShadow الخاص بنا
         highlightElevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18),
@@ -168,7 +267,8 @@ class DevicesView extends GetView<DevicesController> {
           Icon(
             Icons.devices_other_rounded,
             size: 64,
-            color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
+            color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black
+                .withValues(alpha: 0.05),
           ),
           const SizedBox(height: 20),
           Text(

@@ -13,17 +13,21 @@ class DeviceTabNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = Theme
+        .of(context)
+        .brightness == Brightness.dark;
     final List<String> tabs = ['Overview', 'Stats', 'Settings'];
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.indigoDeep.withOpacity(0.3) : Colors.white,
+        color: isDark ? AppColors.indigoDeep.withValues(alpha: 0.3) : Colors
+            .white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.03),
+          color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black
+              .withValues(alpha: 0.03),
         ),
       ),
       child: Row(
@@ -40,20 +44,20 @@ class DeviceTabNavigation extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                   gradient: isSelected
                       ? LinearGradient(
-                          colors: [
-                            AppColors.primary,
-                            AppColors.primary.withOpacity(0.8),
-                          ],
-                        )
+                    colors: [
+                      AppColors.primary,
+                      AppColors.primary.withValues(alpha: 0.8),
+                    ],
+                  )
                       : null,
                   boxShadow: isSelected
                       ? [
-                          BoxShadow(
-                            color: AppColors.primary.withOpacity(0.3),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ]
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.3),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
                       : [],
                 ),
                 child: Center(
@@ -61,10 +65,12 @@ class DeviceTabNavigation extends StatelessWidget {
                     tabs[index],
                     style: TextStyle(
                       fontSize: 14,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight
+                          .w600,
                       color: isSelected
                           ? Colors.white
-                          : (isDark ? AppColors.textMutedDark : AppColors.textMutedLight),
+                          : (isDark ? AppColors.textMutedDark : AppColors
+                          .textMutedLight),
                     ),
                   ),
                 ),

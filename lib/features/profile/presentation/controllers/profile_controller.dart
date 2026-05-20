@@ -4,6 +4,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 class ProfileController extends GetxController {
   late RefreshController refreshController;
+  late RefreshController refreshControllerWide;
   
   // User data observables
   final userName = 'Ahmed Hassan'.obs;
@@ -21,6 +22,7 @@ class ProfileController extends GetxController {
   void onInit() {
     super.onInit();
     refreshController = RefreshController(initialRefresh: false);
+    refreshControllerWide = RefreshController(initialRefresh: false);
     darkModeEnabled.value = Get.isDarkMode;
     _getAppVersion();
   }
@@ -33,6 +35,7 @@ class ProfileController extends GetxController {
   @override
   void onClose() {
     refreshController.dispose();
+    refreshControllerWide.dispose();
     super.onClose();
   }
 
@@ -40,9 +43,11 @@ class ProfileController extends GetxController {
     try {
       // Simulate API call to fetch latest user profile data
       await Future.delayed(const Duration(seconds: 1));
-      refreshController.refreshCompleted();
+      if (refreshController.isRefresh) refreshController.refreshCompleted();
+      if (refreshControllerWide.isRefresh) refreshControllerWide.refreshCompleted();
     } catch (e) {
       refreshController.refreshFailed();
+      refreshControllerWide.refreshFailed();
     }
   }
 

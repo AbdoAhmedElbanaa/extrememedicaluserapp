@@ -5,6 +5,7 @@ import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
 import '../controllers/settings_controller.dart';
 import '../widgets/theme_mode_selector.dart';
+import '../widgets/settings_list.dart';
 
 class SettingsView extends GetView<SettingsController> {
   const SettingsView({super.key});
@@ -28,6 +29,9 @@ class SettingsView extends GetView<SettingsController> {
               child: const Column(
                 children: [
                   ThemeModeSelector(),
+                  SizedBox(height: 24),
+                  SettingsList(),
+                  SizedBox(height: 50),
                 ],
               ),
             ),
@@ -57,7 +61,7 @@ class SettingsView extends GetView<SettingsController> {
                 : AppColors.backgroundLight.withValues(alpha: 0.7),
             border: Border(
               bottom: BorderSide(
-                color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.05),
+                color: isDark ? AppColors.distinctBorderDark : AppColors.distinctBorderLight,
                 width: 1,
               ),
             ),
@@ -108,7 +112,7 @@ class SettingsView extends GetView<SettingsController> {
               : AppColors.primary.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isDark ? Colors.white.withValues(alpha: 0.1) : AppColors.primary.withValues(alpha: 0.1),
+            color: isDark ? AppColors.distinctBorderDark : AppColors.distinctBorderLight,
             width: 1,
           ),
         ),

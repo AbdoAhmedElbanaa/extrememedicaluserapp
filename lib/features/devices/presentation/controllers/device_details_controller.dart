@@ -3,6 +3,7 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class DeviceDetailsController extends GetxController {
   final RefreshController refreshController = RefreshController(initialRefresh: false);
+  final RefreshController refreshControllerWide = RefreshController(initialRefresh: false);
   final RxInt selectedTabIndex = 0.obs;
 
   @override
@@ -13,6 +14,7 @@ class DeviceDetailsController extends GetxController {
   @override
   void onClose() {
     refreshController.dispose();
+    refreshControllerWide.dispose();
     super.onClose();
   }
 
@@ -24,9 +26,11 @@ class DeviceDetailsController extends GetxController {
     try {
       // Simulate API call
       await Future.delayed(const Duration(seconds: 2));
-      refreshController.refreshCompleted();
+      if (refreshController.isRefresh) refreshController.refreshCompleted();
+      if (refreshControllerWide.isRefresh) refreshControllerWide.refreshCompleted();
     } catch (e) {
       refreshController.refreshFailed();
+      refreshControllerWide.refreshFailed();
     }
   }
 }

@@ -3,25 +3,36 @@ import 'package:get/get.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
 
 class HelpHeader extends StatelessWidget {
-  const HelpHeader({super.key});
+  final bool isCentered;
+  final bool isLarge;
+
+  const HelpHeader({
+    super.key,
+    this.isCentered = true,
+    this.isLarge = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
+    final alignment = isCentered
+        ? CrossAxisAlignment.center
+        : CrossAxisAlignment.start;
+    final textAlign = isCentered ? TextAlign.center : TextAlign.start;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: alignment,
       children: [
         // Support Center Badge
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             color: isDark
-                ? AppColors.primary.withOpacity(0.15)
-                : AppColors.primary.withOpacity(0.1),
+                ? AppColors.primary.withValues(alpha: 0.15)
+                : AppColors.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: AppColors.primary.withOpacity(0.2),
+              color: AppColors.primary.withValues(alpha: 0.2),
               width: 1,
             ),
           ),
@@ -49,8 +60,17 @@ class HelpHeader extends StatelessWidget {
 
         // Main Title
         RichText(
+          textAlign: textAlign,
           text: TextSpan(
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+            style: (isLarge
+                ? Theme
+                .of(context)
+                .textTheme
+                .displaySmall
+                : Theme
+                .of(context)
+                .textTheme
+                .headlineMedium)?.copyWith(
               fontWeight: FontWeight.w900,
               height: 1.2,
               letterSpacing: -0.5,
@@ -59,13 +79,14 @@ class HelpHeader extends StatelessWidget {
               TextSpan(
                 text: 'How can we ',
                 style: TextStyle(
-                  color: isDark ? AppColors.foregroundDark : AppColors.foregroundLight,
+                  color: isDark ? AppColors.foregroundDark : AppColors
+                      .foregroundLight,
                 ),
               ),
               TextSpan(
                 text: 'help you?',
                 style: const TextStyle(
-                  color: AppColors.primary, // Using primary for the indigo/purple color
+                  color: AppColors.primary,
                 ),
               ),
             ],
@@ -76,7 +97,16 @@ class HelpHeader extends StatelessWidget {
         // Subtitle
         Text(
           'Browse resources or search below',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          textAlign: textAlign,
+          style: (isLarge
+              ? Theme
+              .of(context)
+              .textTheme
+              .titleLarge
+              : Theme
+              .of(context)
+              .textTheme
+              .bodyMedium)?.copyWith(
             color: isDark
                 ? AppColors.mutedForegroundDark
                 : AppColors.mutedForegroundLight,

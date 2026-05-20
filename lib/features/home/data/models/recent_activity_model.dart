@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:extrememedicaluserapp/theme/app_colors.dart';
 
 enum ActivityStatus { success, warning, info }
 
@@ -22,11 +23,11 @@ class RecentActivityModel {
   Color getStatusColor() {
     switch (status) {
       case ActivityStatus.success:
-        return const Color(0xFF34D399); // Emerald/Green
+        return AppColors.emeraldSoft; // Emerald/Green
       case ActivityStatus.warning:
-        return const Color(0xFFFBBF24); // Amber/Yellow
+        return AppColors.amberSoft; // Amber/Yellow
       case ActivityStatus.info:
-        return const Color(0xFF818CF8); // Indigo/Blue
+        return AppColors.indigoSoft; // Indigo/Blue
     }
   }
 }

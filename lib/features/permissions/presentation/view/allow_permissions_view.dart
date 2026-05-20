@@ -130,10 +130,10 @@ class AllowPermissionsView extends GetView<PermissionsController> {
       width: 90,
       height: 90,
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1C44) : AppColors.mutedLight,
+        color: isDark ? AppColors.deepNavy : AppColors.mutedLight,
         borderRadius: BorderRadius.circular(28),
         border: Border.all(
-          color: isDark ? const Color(0xFF323066) : AppColors.borderLight, 
+          color: isDark ? AppColors.deepNavyBorder : AppColors.borderLight, 
           width: 1.5
         ),
         boxShadow: [
@@ -163,7 +163,7 @@ class AllowPermissionsView extends GetView<PermissionsController> {
         color: isDark ? AppColors.surfaceDark : AppColors.cardLight,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? const Color(0xFF1E1D3A) : AppColors.borderLight,
+          color: isDark ? AppColors.deepNavyDarker : AppColors.borderLight,
           width: 1,
         ),
       ),
@@ -174,7 +174,7 @@ class AllowPermissionsView extends GetView<PermissionsController> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF161531) : AppColors.surfaceLight,
+              color: isDark ? AppColors.cinematicSurface : AppColors.surfaceLight,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(
@@ -206,7 +206,7 @@ class AllowPermissionsView extends GetView<PermissionsController> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF232151) : AppColors.primary.withValues(alpha: 0.1),
+                          color: isDark ? AppColors.indigoDeep : AppColors.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Text(
@@ -241,10 +241,10 @@ class AllowPermissionsView extends GetView<PermissionsController> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: isGranted ? const Color(0xFF10B981) : (isDark ? const Color(0xFF323066) : AppColors.borderLight),
+                color: isGranted ? AppColors.success : (isDark ? AppColors.deepNavyBorder : AppColors.borderLight),
                 width: 2,
               ),
-              color: isGranted ? const Color(0xFF10B981) : Colors.transparent,
+              color: isGranted ? AppColors.success : Colors.transparent,
             ),
             child: isGranted 
               ? const Icon(Icons.check, size: 16, color: Colors.white) 
@@ -271,16 +271,16 @@ class AllowPermissionsView extends GetView<PermissionsController> {
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
             colors: allGranted
-                ? [const Color(0xFF10B981), const Color(0xFF059669)]
+                ? [AppColors.success, AppColors.emeraldDark]
                 : [
                     AppColors.primary,
                     AppColors.primary.withValues(alpha: 0.8),
-                    const Color(0xFF3B82F6),
+                    AppColors.bluePrimary,
                   ],
           ),
           boxShadow: [
             BoxShadow(
-              color: (allGranted ? const Color(0xFF10B981) : AppColors.primary).withValues(alpha: 0.3),
+              color: (allGranted ? AppColors.success : AppColors.primary).withValues(alpha: 0.3),
               blurRadius: 15,
               offset: const Offset(0, 8),
             ),

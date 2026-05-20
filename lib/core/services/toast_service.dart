@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
 import 'package:get/get.dart';
+import 'package:extrememedicaluserapp/theme/app_colors.dart';
 
 enum ToastType { success, error, warning, info }
 
@@ -13,26 +14,28 @@ class ToastService {
     final context = Get.context;
     if (context == null) return;
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+    final isDark = Theme
+        .of(context)
+        .brightness == Brightness.dark;
+
     Color primaryColor;
     IconData icon;
 
     switch (type) {
       case ToastType.success:
-        primaryColor = const Color(0xFF10B981);
+        primaryColor = AppColors.success;
         icon = Icons.check_rounded;
         break;
       case ToastType.error:
-        primaryColor = const Color(0xFFEF4444);
+        primaryColor = AppColors.errorRed;
         icon = Icons.close_rounded;
         break;
       case ToastType.warning:
-        primaryColor = const Color(0xFFF59E0B);
+        primaryColor = AppColors.warning;
         icon = Icons.warning_amber_rounded;
         break;
       case ToastType.info:
-        primaryColor = const Color(0xFF3B82F6);
+        primaryColor = AppColors.bluePrimary;
         icon = Icons.info_outline_rounded;
         break;
     }
@@ -53,7 +56,7 @@ class ToastService {
       description: Text(
         message,
         style: TextStyle(
-          color: (isDark ? Colors.white : Colors.black).withOpacity(0.6),
+          color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.6),
           fontSize: 12,
         ),
       ),
@@ -75,26 +78,27 @@ class ToastService {
       icon: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: primaryColor.withOpacity(0.1),
+          color: primaryColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: primaryColor.withOpacity(0.2)),
+          border: Border.all(color: primaryColor.withValues(alpha: 0.2)),
         ),
         child: Icon(icon, color: primaryColor, size: 20),
       ),
-      showIcon: true, 
+      showIcon: true,
       primaryColor: primaryColor,
-      backgroundColor: isDark ? const Color(0xFF0D0C21) : Colors.white,
+      backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
       foregroundColor: isDark ? Colors.white : Colors.black,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       borderRadius: BorderRadius.circular(24),
       borderSide: BorderSide(
-        color: isDark ? Colors.white.withOpacity(0.1) : primaryColor.withOpacity(0.4),
+        color: isDark ? Colors.white.withValues(alpha: 0.1) : primaryColor
+            .withValues(alpha: 0.4),
         width: 1.5,
       ),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withOpacity(0.2),
+          color: Colors.black.withValues(alpha: 0.2),
           blurRadius: 20,
           offset: const Offset(0, 10),
         ),

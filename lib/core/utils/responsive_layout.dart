@@ -46,8 +46,8 @@ extension ResponsiveContext on BuildContext {
   bool get isTabletLayout => screenWidth >= 600 && screenWidth < 1100;
   bool get isDesktopLayout => screenWidth >= 1100;
 
-  // Responsive padding/margin helper
-  double responsive(double mobile, {double? tablet, double? desktop}) {
+  // Responsive helper for any type
+  T responsive<T>(T mobile, {T? tablet, T? desktop}) {
     if (isDesktopLayout) return desktop ?? tablet ?? mobile;
     if (isTabletLayout) return tablet ?? mobile;
     return mobile;

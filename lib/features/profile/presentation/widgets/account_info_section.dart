@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
-import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
 
 class AccountInfoSection extends StatelessWidget {
   const AccountInfoSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = Theme
+        .of(context)
+        .brightness == Brightness.dark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -17,7 +18,8 @@ class AccountInfoSection extends StatelessWidget {
           child: Text(
             'ACCOUNT INFORMATION',
             style: TextStyle(
-              color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+              color: isDark ? AppColors.textMutedDark : AppColors
+                  .textMutedLight,
               fontSize: 12,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.2,
@@ -26,14 +28,14 @@ class AccountInfoSection extends StatelessWidget {
         ),
         Container(
           decoration: BoxDecoration(
-            color: isDark 
-                ? AppColors.cinematicSurface.withValues(alpha: 0.4) 
+            color: isDark
+                ? AppColors.cinematicSurface.withValues(alpha: 0.4)
                 : AppColors.surfaceLight.withValues(alpha: 0.6),
             borderRadius: BorderRadius.circular(28),
             border: Border.all(
-              color: isDark 
-                  ? Colors.white.withValues(alpha: 0.05) 
-                  : AppColors.borderLight.withValues(alpha: 0.5),
+              color: isDark
+                  ? AppColors.distinctBorderDark
+                  : AppColors.distinctBorderLight,
               width: 1,
             ),
           ),
@@ -41,7 +43,7 @@ class AccountInfoSection extends StatelessWidget {
             children: [
               _buildInfoTile(
                 icon: Icons.person_outline_rounded,
-                iconColor: const Color(0xFF818CF8),
+                iconColor: AppColors.indigoSoft,
                 title: 'Full Name',
                 value: 'Ahmed Hassan',
                 isDark: isDark,
@@ -49,7 +51,7 @@ class AccountInfoSection extends StatelessWidget {
               ),
               _buildInfoTile(
                 icon: Icons.email_outlined,
-                iconColor: const Color(0xFF60A5FA),
+                iconColor: AppColors.blueSoft,
                 title: 'Email',
                 value: 'ahmed@clinic.com',
                 isDark: isDark,
@@ -57,7 +59,7 @@ class AccountInfoSection extends StatelessWidget {
               ),
               _buildInfoTile(
                 icon: Icons.phone_outlined,
-                iconColor: const Color(0xFF34D399),
+                iconColor: AppColors.emeraldSoft,
                 title: 'Phone',
                 value: '+966 50 123 4567',
                 isDark: isDark,
@@ -65,7 +67,7 @@ class AccountInfoSection extends StatelessWidget {
               ),
               _buildInfoTile(
                 icon: Icons.business_outlined,
-                iconColor: const Color(0xFFA78BFA),
+                iconColor: AppColors.purpleSoft,
                 title: 'Clinic',
                 value: 'Al-Noor Medical Center',
                 isDark: isDark,
@@ -117,7 +119,8 @@ class AccountInfoSection extends StatelessWidget {
                     Text(
                       title,
                       style: TextStyle(
-                        color: isDark ? Colors.white : AppColors.foregroundLight,
+                        color: isDark ? Colors.white : AppColors
+                            .foregroundLight,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -126,7 +129,8 @@ class AccountInfoSection extends StatelessWidget {
                     Text(
                       value,
                       style: TextStyle(
-                        color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                        color: isDark ? AppColors.textMutedDark : AppColors
+                            .textMutedLight,
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
@@ -136,7 +140,8 @@ class AccountInfoSection extends StatelessWidget {
               ),
               Icon(
                 Icons.arrow_forward_ios_rounded,
-                color: isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.1),
+                color: isDark ? Colors.white.withValues(alpha: 0.15) : Colors
+                    .black.withValues(alpha: 0.1),
                 size: 14,
               ),
             ],
@@ -148,7 +153,8 @@ class AccountInfoSection extends StatelessWidget {
             thickness: 1,
             indent: 76,
             endIndent: 16,
-            color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.05),
+            color: isDark ? AppColors.distinctBorderDark : AppColors
+                .distinctBorderLight,
           ),
       ],
     );

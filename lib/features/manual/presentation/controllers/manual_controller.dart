@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../data/models/manual_model.dart';
 import '../../data/models/manual_step_model.dart';
 
+import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class ManualController extends GetxController {
@@ -38,7 +39,7 @@ class ManualController extends GetxController {
         lastUpdated: 'Oct 12, 2023',
         fileSize: '4.2 MB',
         icon: Icons.thermostat_rounded,
-        color: const Color(0xFF6366F1),
+        color: AppColors.primary,
       ),
       ManualModel(
         title: 'BPM Alpha Manual',
@@ -46,7 +47,7 @@ class ManualController extends GetxController {
         lastUpdated: 'Sep 05, 2023',
         fileSize: '2.8 MB',
         icon: Icons.monitor_heart_rounded,
-        color: const Color(0xFFF472B6),
+        color: AppColors.pinkSoft,
       ),
     ];
   }

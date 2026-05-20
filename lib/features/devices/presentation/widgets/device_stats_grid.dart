@@ -69,10 +69,14 @@ class DeviceStatsGrid extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.indigoDeep.withOpacity(0.3) : Colors.white,
+        color: isDark
+            ? AppColors.indigoDeep.withValues(alpha: 0.3)
+            : Colors.white,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? color.withOpacity(0.1) : Colors.black.withOpacity(0.05),
+          color: isDark
+              ? color.withValues(alpha: 0.1)
+              : Colors.black.withValues(alpha: 0.05),
         ),
       ),
       child: Column(
@@ -84,7 +88,7 @@ class DeviceStatsGrid extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(icon, size: 16, color: color),
@@ -95,7 +99,9 @@ class DeviceStatsGrid extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white.withOpacity(0.5) : Colors.grey[600],
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.5)
+                      : Colors.grey[600],
                 ),
               ),
             ],
@@ -105,7 +111,7 @@ class DeviceStatsGrid extends StatelessWidget {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : const Color(0xFF1E1B4B),
+              color: isDark ? Colors.white : AppColors.indigoMuted,
             ),
           ),
         ],

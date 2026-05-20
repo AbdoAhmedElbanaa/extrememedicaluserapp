@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:extrememedicaluserapp/theme/app_colors.dart';
 
 class ActionButtonCard extends StatelessWidget {
   final String label;
@@ -23,10 +24,10 @@ class ActionButtonCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: color.withOpacity(0.15),
+            color: color.withValues(alpha: 0.15),
           ),
         ),
         child: Column(
@@ -39,7 +40,8 @@ class ActionButtonCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: isDark ? Colors.white.withOpacity(0.9) : const Color(0xFF1E1B4B),
+                color: isDark ? Colors.white.withValues(alpha: 0.9) : AppColors
+                    .indigoMuted,
               ),
             ),
           ],

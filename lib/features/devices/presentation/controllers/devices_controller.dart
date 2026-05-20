@@ -4,7 +4,8 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import '../../data/models/device_model.dart';
 
 class DevicesController extends GetxController {
-  late RefreshController refreshController;
+  final RefreshController refreshController = RefreshController(initialRefresh: false);
+  final RefreshController refreshControllerWide = RefreshController(initialRefresh: false);
 
   // Observables
   final RxList<DeviceModel> allDevices = <DeviceModel>[].obs;
@@ -15,13 +16,13 @@ class DevicesController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    refreshController = RefreshController(initialRefresh: false);
     _loadMockDevices();
   }
 
   @override
   void onClose() {
     refreshController.dispose();
+    refreshControllerWide.dispose();
     super.onClose();
   }
 
@@ -29,9 +30,11 @@ class DevicesController extends GetxController {
     try {
       await Future.delayed(const Duration(seconds: 2));
       _loadMockDevices();
-      refreshController.refreshCompleted();
+      if (refreshController.isRefresh) refreshController.refreshCompleted();
+      if (refreshControllerWide.isRefresh) refreshControllerWide.refreshCompleted();
     } catch (e) {
       refreshController.refreshFailed();
+      refreshControllerWide.refreshFailed();
     }
   }
 
@@ -112,12 +115,15 @@ class DevicesController extends GetxController {
 
   int getCount(String filter) {
     if (filter == 'All') return allDevices.length;
-    if (filter == 'Online')
+    if (filter == 'Online') {
       return allDevices.where((d) => d.status == DeviceStatus.online).length;
-    if (filter == 'Warning')
+    }
+    if (filter == 'Warning') {
       return allDevices.where((d) => d.status == DeviceStatus.warning).length;
-    if (filter == 'Offline')
+    }
+    if (filter == 'Offline') {
       return allDevices.where((d) => d.status == DeviceStatus.offline).length;
+    }
     return 0;
   }
 

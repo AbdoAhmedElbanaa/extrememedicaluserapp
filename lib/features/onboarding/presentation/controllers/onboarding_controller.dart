@@ -24,19 +24,19 @@ class OnboardingController extends GetxController {
       description: 'Learn with high-quality visual content and interactive guides designed by medical professionals.',
       imagePath: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=2070&auto=format&fit=crop', // Professional medical image
       isImagePage: true,
-      gradientColors: [const Color(0xFF0EA5E9), const Color(0xFF2DD4BF)],
+      gradientColors: [AppColors.skyBlue, AppColors.tealAccent],
     ),
     OnboardingModel(
       title: 'Smart Diagnostics',
       description: 'Intelligent troubleshooting and step-by-step solutions at your fingertips, anytime, anywhere.',
       icon: Icons.psychology_rounded,
-      gradientColors: [AppColors.secondary, const Color(0xFFEC4899)],
+      gradientColors: [AppColors.secondary, AppColors.brightPink],
     ),
     OnboardingModel(
       title: 'Seamless Integration',
       description: 'Connect with healthcare professionals and keep your manual library updated automatically.',
       icon: Icons.sync_rounded,
-      gradientColors: [const Color(0xFFEC4899), AppColors.primary],
+      gradientColors: [AppColors.brightPink, AppColors.primary],
     ),
   ];
 

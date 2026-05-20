@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
+
 import '../../../../theme/app_colors.dart';
 import '../../data/models/device_model.dart';
 
 class DeviceWarrantyCard extends StatelessWidget {
   final DeviceModel device;
 
-  const DeviceWarrantyCard({
-    super.key,
-    required this.device,
-  });
+  const DeviceWarrantyCard({super.key, required this.device});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +22,7 @@ class DeviceWarrantyCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w900,
-              color: isDark ? Colors.white : const Color(0xFF1E1B4B),
+              color: isDark ? Colors.white : AppColors.indigoMuted,
               letterSpacing: -0.3,
             ),
           ),
@@ -33,15 +31,19 @@ class DeviceWarrantyCard extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 20),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
-            color: isDark ? AppColors.indigoDeep.withOpacity(0.3) : Colors.white,
+            color: isDark
+                ? AppColors.indigoDeep.withValues(alpha: 0.3)
+                : Colors.white,
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.05)
+                  : Colors.black.withValues(alpha: 0.05),
             ),
             boxShadow: [
               if (!isDark)
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.03),
+                  color: Colors.black.withValues(alpha: 0.03),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -100,31 +102,36 @@ class DeviceWarrantyCard extends StatelessWidget {
             width: 38,
             height: 38,
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.12),
+              color: iconColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
-              icon,
-              size: 18,
-              color: iconColor,
-            ),
+            child: Icon(icon, size: 18, color: iconColor),
           ),
           const SizedBox(width: 16),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: isDark ? Colors.white.withOpacity(0.5) : Colors.black54,
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.5)
+                    : Colors.black54,
+              ),
             ),
           ),
-          const Spacer(),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: isDark ? const Color(0xFF818CF8) : AppColors.primary, // لون أزرق فاتح/مضيء للقيم
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: isDark
+                    ? AppColors.indigoSoft
+                    : AppColors.primary, // لون أزرق فاتح/مضيء للقيم
+              ),
             ),
           ),
         ],
@@ -137,7 +144,9 @@ class DeviceWarrantyCard extends StatelessWidget {
       height: 1,
       indent: 65,
       endIndent: 20,
-      color: isDark ? Colors.white.withOpacity(0.04) : Colors.black.withOpacity(0.03),
+      color: isDark
+          ? Colors.white.withValues(alpha: 0.04)
+          : Colors.black.withValues(alpha: 0.03),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
+import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
 import '../controllers/profile_controller.dart';
 
 class SupportLegalSection extends GetView<ProfileController> {
@@ -10,6 +11,7 @@ class SupportLegalSection extends GetView<ProfileController> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final currentYear = DateTime.now().year;
+    final isWide = context.screenWidth >= 600;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,8 +36,8 @@ class SupportLegalSection extends GetView<ProfileController> {
             borderRadius: BorderRadius.circular(28),
             border: Border.all(
               color: isDark 
-                  ? Colors.white.withValues(alpha: 0.05) 
-                  : AppColors.borderLight.withValues(alpha: 0.5),
+                  ? AppColors.distinctBorderDark 
+                  : AppColors.distinctBorderLight,
               width: 1,
             ),
           ),
@@ -43,7 +45,7 @@ class SupportLegalSection extends GetView<ProfileController> {
             children: [
               _buildSupportTile(
                 icon: Icons.help_outline_rounded,
-                iconColor: const Color(0xFF818CF8),
+                iconColor: AppColors.indigoSoft,
                 title: 'Help Center',
                 isDark: isDark,
                 showDivider: true,
@@ -51,7 +53,7 @@ class SupportLegalSection extends GetView<ProfileController> {
               ),
               _buildSupportTile(
                 icon: Icons.description_outlined,
-                iconColor: const Color(0xFF60A5FA),
+                iconColor: AppColors.blueSoft,
                 title: 'Privacy Policy',
                 isDark: isDark,
                 showDivider: true,
@@ -59,7 +61,7 @@ class SupportLegalSection extends GetView<ProfileController> {
               ),
               _buildSupportTile(
                 icon: Icons.assignment_outlined,
-                iconColor: const Color(0xFFA78BFA),
+                iconColor: AppColors.purpleSoft,
                 title: 'Terms of Service',
                 isDark: isDark,
                 showDivider: true,
@@ -67,7 +69,7 @@ class SupportLegalSection extends GetView<ProfileController> {
               ),
               _buildSupportTile(
                 icon: Icons.star_outline_rounded,
-                iconColor: const Color(0xFFFBBF24),
+                iconColor: AppColors.amberSoft,
                 title: 'Rate the App',
                 isDark: isDark,
                 showDivider: false,
@@ -76,8 +78,10 @@ class SupportLegalSection extends GetView<ProfileController> {
             ],
           ),
         ),
-        const SizedBox(height: 24),
-        _buildSignOutButton(isDark),
+        if (!isWide) ...[
+          const SizedBox(height: 24),
+          _buildSignOutButton(isDark),
+        ],
         const SizedBox(height: 24),
         Center(
           child: Obx(() => Text(
@@ -153,7 +157,7 @@ class SupportLegalSection extends GetView<ProfileController> {
             thickness: 1,
             indent: 76,
             endIndent: 16,
-            color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.05),
+            color: isDark ? AppColors.distinctBorderDark : AppColors.distinctBorderLight,
           ),
       ],
     );
@@ -162,10 +166,10 @@ class SupportLegalSection extends GetView<ProfileController> {
   Widget _buildSignOutButton(bool isDark) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFDC2626).withValues(alpha: 0.1),
+        color: AppColors.errorRed.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(28),
         border: Border.all(
-          color: const Color(0xFFDC2626).withValues(alpha: 0.1),
+          color: isDark ? AppColors.distinctBorderDark : AppColors.errorRed.withValues(alpha: 0.1),
           width: 1,
         ),
       ),
@@ -180,12 +184,12 @@ class SupportLegalSection extends GetView<ProfileController> {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFDC2626).withValues(alpha: 0.15),
+                  color: AppColors.errorRed.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: const Icon(
                   Icons.logout_rounded,
-                  color: Color(0xFFEF4444),
+                  color: AppColors.errorRedBright,
                   size: 22,
                 ),
               ),
@@ -193,7 +197,7 @@ class SupportLegalSection extends GetView<ProfileController> {
               const Text(
                 'Sign Out',
                 style: TextStyle(
-                  color: Color(0xFFEF4444),
+                  color: AppColors.errorRedBright,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),

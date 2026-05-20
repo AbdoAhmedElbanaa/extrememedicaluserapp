@@ -10,6 +10,8 @@ import '../widgets/device_info_list_card.dart';
 import '../widgets/device_warranty_card.dart';
 import '../controllers/device_details_controller.dart';
 
+import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
+
 class DeviceDetailsView extends StatelessWidget {
   const DeviceDetailsView({super.key});
 
@@ -19,100 +21,196 @@ class DeviceDetailsView extends StatelessWidget {
     final DeviceModel? device = (Get.arguments is DeviceModel) ? Get.arguments as DeviceModel : null;
 
     if (device == null) {
-      return Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline_rounded, color: Colors.red, size: 50),
-              const SizedBox(height: 16),
-              const Text('Device data could not be loaded.'),
-              TextButton(onPressed: () => Get.back(), child: const Text('Go Back')),
-            ],
-          ),
-        ),
-      );
+      return _buildErrorState();
     }
 
     // استخدام tag فريد (الرقم التسلسلي) لمنع تعارض الـ RefreshController
     final controller = Get.put(DeviceDetailsController(), tag: device.serialNumber);
-    
-    final DeviceModel activeDevice = device;
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildHeader(context, activeDevice),
-            const SizedBox(height: 10),
-            
-            // 2. بطاقة حالة الجهاز الاحترافية (تبقى ثابتة)
-            DeviceStatusInfoCard(
-              device: activeDevice,
-              currentValue: '23.1°', 
-              label: 'Current Temp',
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: ResponsiveLayout(
+        mobile: _buildMobileLayout(context, device, controller, isDark),
+        tablet: _buildTabletLayout(context, device, controller, isDark),
+        desktop: _buildDesktopLayout(context, device, controller, isDark),
+      ),
+    );
+  }
+
+  Widget _buildMobileLayout(BuildContext context, DeviceModel device, DeviceDetailsController controller, bool isDark) {
+    return SafeArea(
+      child: Column(
+        children: [
+          _buildHeader(context, device),
+          const SizedBox(height: 10),
+          DeviceStatusInfoCard(
+            device: device,
+            currentValue: '23.1°', 
+            label: 'Current Temp',
+          ),
+          const SizedBox(height: 20),
+          Obx(() => DeviceTabNavigation(
+            selectedIndex: controller.selectedTabIndex.value,
+            onTabChanged: (index) => controller.changeTab(index),
+          )),
+          const SizedBox(height: 10),
+          Expanded(
+            child: _buildRefreshContent(device, controller, isDark),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabletLayout(BuildContext context, DeviceModel device, DeviceDetailsController controller, bool isDark) {
+    return _buildWideLayout(context, device, controller, isDark, isDesktop: false);
+  }
+
+  Widget _buildDesktopLayout(BuildContext context, DeviceModel device, DeviceDetailsController controller, bool isDark) {
+    return _buildWideLayout(context, device, controller, isDark, isDesktop: true);
+  }
+
+  Widget _buildWideLayout(BuildContext context, DeviceModel device, DeviceDetailsController controller, bool isDark, {required bool isDesktop}) {
+    return Row(
+      children: [
+        // Left Column: Status & Info
+        Container(
+          width: isDesktop ? 400 : 320,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
+            border: Border(
+              right: BorderSide(
+                color: isDark ? AppColors.distinctBorderDark : AppColors.distinctBorderLight,
+                width: 1,
+              ),
             ),
-            
-            const SizedBox(height: 20),
-
-            // 3. التنقل بين التبويبات (يبقى ثابتاً)
-            Obx(() => DeviceTabNavigation(
-              selectedIndex: controller.selectedTabIndex.value,
-              onTabChanged: (index) => controller.changeTab(index),
-            )),
-            
-            const SizedBox(height: 10),
-
-            // 4. منطقة التحديث والمحتوى المتغير
-            Expanded(
-              child: SmartRefresher(
-                key: Key('refresher_${activeDevice.serialNumber}'), // مفتاح فريد لمنع التعارض
-                controller: controller.refreshController,
-                onRefresh: controller.onRefresh,
-                header: WaterDropMaterialHeader(
-                  backgroundColor: AppColors.primary,
-                  color: Colors.white,
+          ),
+          child: Column(
+            children: [
+              _buildHeader(context, device),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: DeviceStatusInfoCard(
+                  device: device,
+                  currentValue: '23.1°', 
+                  label: 'Current Temp',
                 ),
+              ),
+              const SizedBox(height: 30),
+              Expanded(
                 child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     children: [
-                      const SizedBox(height: 10),
-                      Obx(() {
-                        switch (controller.selectedTabIndex.value) {
-                          case 0: // Overview
-                            return Column(
-                              children: [
-                                DeviceInfoListCard(device: activeDevice),
-                                const SizedBox(height: 25),
-                                DeviceWarrantyCard(device: activeDevice),
-                                const SizedBox(height: 25),
-                                DeviceQuickActionsCard(
-                                  onRestart: () => _showActionSnackbar('Restarting', activeDevice, isDark),
-                                  onUpdate: () => _showActionSnackbar('Update', activeDevice, isDark),
-                                  onSettings: () => _showActionSnackbar('Settings', activeDevice, isDark),
-                                ),
-                                const SizedBox(height: 30),
-                              ],
-                            );
-                          case 1: // Stats
-                            return _buildStatsPlaceholder(isDark);
-                          case 2: // Settings
-                            return _buildSettingsPlaceholder(isDark);
-                          default:
-                            return const SizedBox();
-                        }
-                      }),
-                      const SizedBox(height: 20),
+                      DeviceInfoListCard(device: device),
+                      const SizedBox(height: 24),
+                      DeviceWarrantyCard(device: device),
+                      const SizedBox(height: 30),
                     ],
                   ),
                 ),
               ),
+            ],
+          ),
+        ),
+        
+        // Right Column: Tabs & Dynamic Content
+        Expanded(
+          child: Container(
+            color: isDark ? AppColors.cinematicSurface.withValues(alpha: 0.2) : Colors.white,
+            child: Column(
+              children: [
+                const SizedBox(height: 40),
+                Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 800),
+                    child: Obx(() => DeviceTabNavigation(
+                      selectedIndex: controller.selectedTabIndex.value,
+                      onTabChanged: (index) => controller.changeTab(index),
+                    )),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Expanded(
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 1000),
+                      child: _buildRefreshContent(device, controller, isDark, isWide: true),
+                    ),
+                  ),
+                ),
+              ],
             ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRefreshContent(DeviceModel device, DeviceDetailsController controller, bool isDark, {bool isWide = false}) {
+    return SmartRefresher(
+      key: Key('refresher_${device.serialNumber}_${isWide ? "wide" : "mobile"}'),
+      controller: isWide ? controller.refreshControllerWide : controller.refreshController,
+      onRefresh: controller.onRefresh,
+      header: const WaterDropMaterialHeader(
+        backgroundColor: AppColors.primary,
+        color: Colors.white,
+      ),
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: isWide ? 40 : 0),
+          child: Column(
+            children: [
+              const SizedBox(height: 10),
+              Obx(() {
+                switch (controller.selectedTabIndex.value) {
+                  case 0: // Overview
+                    return Column(
+                      children: [
+                        if (!isWide) ...[
+                          DeviceInfoListCard(device: device),
+                          const SizedBox(height: 25),
+                          DeviceWarrantyCard(device: device),
+                          const SizedBox(height: 25),
+                        ],
+                        DeviceQuickActionsCard(
+                          onRestart: () => _showActionSnackbar('Restarting', device, isDark),
+                          onUpdate: () => _showActionSnackbar('Update', device, isDark),
+                          onSettings: () => _showActionSnackbar('Settings', device, isDark),
+                        ),
+                        const SizedBox(height: 30),
+                      ],
+                    );
+                  case 1: // Stats
+                    return _buildStatsPlaceholder(isDark);
+                  case 2: // Settings
+                    return _buildSettingsPlaceholder(isDark);
+                  default:
+                    return const SizedBox();
+                }
+              }),
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorState() {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error_outline_rounded, color: AppColors.errorRed, size: 50),
+            const SizedBox(height: 16),
+            const Text('Device data could not be loaded.'),
+            TextButton(onPressed: () => Get.back(), child: const Text('Go Back')),
           ],
         ),
       ),
@@ -192,7 +290,7 @@ class DeviceDetailsView extends StatelessWidget {
               child: Icon(
                 Icons.arrow_back_ios_new_rounded,
                 size: 18,
-                color: isDark ? Colors.white : const Color(0xFF1E1B4B),
+                color: isDark ? Colors.white : AppColors.deepNavy,
               ),
             ),
           ),
@@ -206,7 +304,7 @@ class DeviceDetailsView extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : const Color(0xFF1E1B4B),
+                    color: isDark ? Colors.white : AppColors.deepNavy,
                     letterSpacing: -0.5,
                   ),
                 ),
@@ -215,7 +313,7 @@ class DeviceDetailsView extends StatelessWidget {
                   '${device.model} · ${device.serialNumber}',
                   style: TextStyle(
                     fontSize: 12,
-                    color: isDark ? Colors.white.withValues(alpha: 0.4) : const Color(0xFF64748B),
+                    color: isDark ? Colors.white.withValues(alpha: 0.4) : AppColors.textMutedLight,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -226,7 +324,7 @@ class DeviceDetailsView extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
-              color: isDark ? AppColors.primary.withValues(alpha: 0.12) : const Color(0xFFEEF2FF),
+              color: isDark ? AppColors.primary.withValues(alpha: 0.12) : AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(25),
               border: Border.all(
                 color: isDark ? AppColors.primary.withValues(alpha: 0.2) : Colors.transparent,
@@ -237,7 +335,7 @@ class DeviceDetailsView extends StatelessWidget {
                 Icon(
                   Icons.menu_book_rounded,
                   size: 16,
-                  color: isDark ? AppColors.primary : const Color(0xFF6366F1),
+                  color: isDark ? AppColors.primary : AppColors.primary,
                 ),
                 const SizedBox(width: 8),
                 Text(
@@ -245,7 +343,7 @@ class DeviceDetailsView extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? AppColors.primary : const Color(0xFF6366F1),
+                    color: isDark ? AppColors.primary : AppColors.primary,
                   ),
                 ),
               ],

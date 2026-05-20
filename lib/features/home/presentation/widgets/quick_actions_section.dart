@@ -1,15 +1,18 @@
+import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:extrememedicaluserapp/theme/app_colors.dart';
-import '../controllers/home_controller.dart';
+
 import '../../data/models/quick_action_model.dart';
+import '../controllers/home_controller.dart';
 
 class QuickActionsSection extends GetView<HomeController> {
   const QuickActionsSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = Theme
+        .of(context)
+        .brightness == Brightness.dark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -26,7 +29,12 @@ class QuickActionsSection extends GetView<HomeController> {
         // Action Buttons Row
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: controller.quickActions.map((action) => _buildActionButton(action, isDark)).toList(),
+          children: controller.quickActions
+              .map(
+                (action) =>
+                _buildActionButton(action as QuickActionModel, isDark),
+          )
+              .toList(),
         ),
         const SizedBox(height: 20),
         // Help Center Card
@@ -44,25 +52,23 @@ class QuickActionsSection extends GetView<HomeController> {
             width: 70,
             height: 70,
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF161531) : Colors.white,
+              color: isDark ? AppColors.cinematicSurface : Colors.white,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: isDark ? action.color.withOpacity(0.2) : action.color.withOpacity(0.1),
+                color: isDark
+                    ? action.color.withValues(alpha: 0.2)
+                    : action.color.withValues(alpha: 0.1),
                 width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: action.color.withOpacity(isDark ? 0.15 : 0.05),
+                  color: action.color.withValues(alpha: isDark ? 0.15 : 0.05),
                   blurRadius: 10,
                   spreadRadius: 1,
                 ),
               ],
             ),
-            child: Icon(
-              action.icon,
-              color: action.color,
-              size: 28,
-            ),
+            child: Icon(action.icon, color: action.color, size: 28),
           ),
         ),
         const SizedBox(height: 8),
@@ -83,10 +89,12 @@ class QuickActionsSection extends GetView<HomeController> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF161531) : Colors.white,
+        color: isDark ? AppColors.cinematicSurface : Colors.white,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.03),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.05)
+              : Colors.black.withValues(alpha: 0.03),
           width: 1.2,
         ),
       ),
@@ -98,20 +106,24 @@ class QuickActionsSection extends GetView<HomeController> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  const Color(0xFF6366F1),
-                  const Color(0xFF6366F1).withOpacity(0.7),
+                  AppColors.primary,
+                  AppColors.primary.withValues(alpha: 0.7),
                 ],
               ),
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF6366F1).withOpacity(0.3),
+                  color: AppColors.primary.withValues(alpha: 0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
               ],
             ),
-            child: const Icon(Icons.help_center_rounded, color: Colors.white, size: 24),
+            child: const Icon(
+              Icons.help_center_rounded,
+              color: Colors.white,
+              size: 24,
+            ),
           ),
           const SizedBox(width: 16),
           // Text Content
@@ -130,7 +142,10 @@ class QuickActionsSection extends GetView<HomeController> {
                 Text(
                   'FAQs, Error Codes, Tutorials & Support',
                   style: TextStyle(
-                    color: (isDark ? Colors.white : Colors.black).withOpacity(0.4),
+                    color: (isDark ? Colors.white : Colors.black).withValues(
+                      alpha:
+                      0.4,
+                    ),
                     fontSize: 11,
                   ),
                 ),
@@ -140,7 +155,8 @@ class QuickActionsSection extends GetView<HomeController> {
           // Arrow
           Icon(
             Icons.arrow_forward_ios_rounded,
-            color: (isDark ? Colors.white : Colors.black).withOpacity(0.2),
+            color: (isDark ? Colors.white : Colors.black).withValues(
+                alpha: 0.2),
             size: 16,
           ),
         ],

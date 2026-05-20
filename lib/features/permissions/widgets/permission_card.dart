@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
+import 'package:flutter/material.dart';
 
 class PermissionCard extends StatelessWidget {
   final IconData icon;
@@ -25,16 +25,12 @@ class PermissionCard extends StatelessWidget {
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
         ),
       ),
       child: Row(
         children: [
-          Icon(
-            icon,
-            size: 40,
-            color: AppColors.primary,
-          ),
+          Icon(icon, size: 40, color: AppColors.primary),
           const SizedBox(width: 20),
           Expanded(
             child: Column(
@@ -52,7 +48,9 @@ class PermissionCard extends StatelessWidget {
                   subtitle,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
               ],
@@ -62,7 +60,7 @@ class PermissionCard extends StatelessWidget {
           Switch(
             value: isGranted,
             onChanged: (value) => onRequest(),
-            activeColor: AppColors.primary,
+            activeThumbColor: AppColors.primary,
           ),
         ],
       ),

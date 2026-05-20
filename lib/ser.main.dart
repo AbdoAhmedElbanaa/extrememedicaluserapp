@@ -1,3 +1,4 @@
+import 'package:extrememedicaluserapp/features/devices/presentation/views/device_details_view.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,7 +16,13 @@ import 'package:extrememedicaluserapp/features/home/presentation/views/home_view
 import 'package:extrememedicaluserapp/features/home/presentation/controllers/home_controller.dart';
 import 'package:extrememedicaluserapp/features/devices/presentation/views/devices_view.dart';
 import 'package:extrememedicaluserapp/features/devices/presentation/controllers/devices_controller.dart';
+import 'package:extrememedicaluserapp/features/help/views/help_view.dart';
+import 'package:extrememedicaluserapp/features/help/controllers/help_controller.dart';
+import 'package:extrememedicaluserapp/features/profile/presentation/controllers/profile_controller.dart';
+import 'package:extrememedicaluserapp/features/settings/presentation/views/settings_view.dart';
+import 'package:extrememedicaluserapp/features/settings/presentation/controllers/settings_controller.dart';
 import 'package:extrememedicaluserapp/core/services/theme_service.dart';
+import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:toastification/toastification.dart';
 
@@ -55,6 +62,10 @@ class MyApp extends StatelessWidget {
       enableScrollWhenRefreshCompleted: true,
       enableLoadingWhenFailed: true,
       child: ToastificationWrapper(
+        config: const ToastificationConfig(
+          animationDuration: Duration(milliseconds: 300),
+          alignment: Alignment.topCenter,
+        ),
         child: GetMaterialApp(
           title: 'Extreme Medical - Preview',
           useInheritedMediaQuery: true, // Required for DevicePreview
@@ -67,47 +78,70 @@ class MyApp extends StatelessWidget {
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: ThemeService().theme,
-          initialRoute: '/',
+          initialRoute: AppRoutes.splash,
           getPages: [
             GetPage(
-              name: '/', 
+              name: AppRoutes.splash, 
               page: () => const SplashView(),
               transition: Transition.fadeIn,
             ),
             GetPage(
-              name: '/onboarding', 
+              name: AppRoutes.onboarding, 
               page: () => const OnboardingView(),
               transition: Transition.cupertino,
             ),
             GetPage(
-              name: '/permissions', 
+              name: AppRoutes.permissions, 
               page: () => const AllowPermissionsView(),
               transition: Transition.rightToLeftWithFade,
             ),
             GetPage(
-              name: '/login', 
+              name: AppRoutes.login, 
               page: () => const LoginView(),
               transition: Transition.downToUp,
             ),
             GetPage(
-              name: '/register', 
+              name: AppRoutes.register, 
               page: () => const RegisterView(),
               transition: Transition.rightToLeftWithFade,
             ),
             GetPage(
-              name: '/home', 
+              name: AppRoutes.home, 
               page: () => const HomeView(),
               binding: BindingsBuilder(() {
-                Get.lazyPut(() => HomeController());
-                Get.lazyPut(() => DevicesController());
+                Get.put(HomeController());
+                Get.put(DevicesController());
+                Get.put(HelpController());
+                Get.put(ProfileController());
               }),
               transition: Transition.zoom,
             ),
             GetPage(
-              name: '/devices', 
+              name: AppRoutes.devices, 
               page: () => const DevicesView(),
               binding: BindingsBuilder(() {
                 Get.put(DevicesController());
+              }),
+              transition: Transition.rightToLeftWithFade,
+            ),
+            GetPage(
+              name: AppRoutes.deviceDetails, 
+              page: () => const DeviceDetailsView(),
+              transition: Transition.cupertino,
+            ),
+            GetPage(
+              name: AppRoutes.help, 
+              page: () => const HelpView(),
+              binding: BindingsBuilder(() {
+                Get.put(HelpController());
+              }),
+              transition: Transition.rightToLeftWithFade,
+            ),
+            GetPage(
+              name: AppRoutes.settings, 
+              page: () => const SettingsView(),
+              binding: BindingsBuilder(() {
+                Get.put(SettingsController());
               }),
               transition: Transition.rightToLeftWithFade,
             ),

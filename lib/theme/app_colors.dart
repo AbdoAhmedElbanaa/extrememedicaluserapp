@@ -37,6 +37,36 @@ class AppColors {
   static const Color textMutedDark = Color(0xFF8E8EA9);
   static const Color textMutedLight = Color(0xFF64748B);
 
+  // Distinct Borders for Widgets
+  static const Color distinctBorderDark = Color(0x4DFFFFFF); // 30% White
+  static const Color distinctBorderLight = Color(0x266366F1); // 15% Indigo Primary
+
+  // Additional UI Colors from project
+  static const Color deepNavy = Color(0xFF1E1C44);
+  static const Color deepNavyBorder = Color(0xFF323066);
+  static const Color deepNavyDarker = Color(0xFF1E1D3A);
+  static const Color indigoSoft = Color(0xFF818CF8);
+  static const Color emeraldSoft = Color(0xFF34D399);
+  static const Color amberSoft = Color(0xFFFBBF24);
+  static const Color blueSoft = Color(0xFF60A5FA);
+  static const Color pinkSoft = Color(0xFFF472B6);
+  static const Color errorRed = Color(0xFFEF4444);
+  static const Color errorRedDark = Color(0xFFDC2626);
+  static const Color errorRedBright = Color(0xFFEF4444);
+  static const Color bluePrimary = Color(0xFF3B82F6);
+  static const Color purpleDeep = Color(0xFF8B5CF6);
+  static const Color purpleSoft = Color(0xFFA78BFA);
+  static const Color indigoPrimaryDark = Color(0xFF4F46E5);
+  static const Color indigoMuted = Color(0xFF1E1B4B);
+  static const Color amberMuted = Color(0xFF451A03);
+  static const Color blueMuted = Color(0xFF172554);
+  static const Color slateMuted = Color(0xFF0F172A);
+  static const Color slateSoft = Color(0xFF94A3B8);
+  static const Color skyBlue = Color(0xFF0EA5E9);
+  static const Color tealAccent = Color(0xFF2DD4BF);
+  static const Color brightPink = Color(0xFFEC4899);
+  static const Color emeraldDark = Color(0xFF059669);
+
   // Splash Specific (Gradients & Subtitles)
   static const List<Color> splashGradientDark = [
     Color(0xFF04030D),

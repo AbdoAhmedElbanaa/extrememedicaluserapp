@@ -12,7 +12,9 @@ class DeviceInfoListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = Theme
+        .of(context)
+        .brightness == Brightness.dark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -24,7 +26,7 @@ class DeviceInfoListCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w900,
-              color: isDark ? Colors.white : const Color(0xFF1E1B4B),
+              color: isDark ? Colors.white : AppColors.indigoMuted,
               letterSpacing: -0.3,
             ),
           ),
@@ -33,15 +35,17 @@ class DeviceInfoListCard extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 20),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
-            color: isDark ? AppColors.indigoDeep.withOpacity(0.3) : Colors.white,
+            color: isDark ? AppColors.indigoDeep.withValues(alpha: 0.3) : Colors
+                .white,
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
+              color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors
+                  .black.withValues(alpha: 0.05),
             ),
             boxShadow: [
               if (!isDark)
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.03),
+                  color: Colors.black.withValues(alpha: 0.03),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -92,8 +96,7 @@ class DeviceInfoListCard extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(
-    BuildContext context, {
+  Widget _buildInfoRow(BuildContext context, {
     required IconData icon,
     required String label,
     required String value,
@@ -110,7 +113,7 @@ class DeviceInfoListCard extends StatelessWidget {
             width: 38,
             height: 38,
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.12),
+              color: iconColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -120,26 +123,29 @@ class DeviceInfoListCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 16),
-          
+
           // Label
           Text(
             label,
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: isDark ? Colors.white.withOpacity(0.5) : Colors.black54,
+              color: isDark ? Colors.white.withValues(alpha: 0.5) : Colors
+                  .black54,
             ),
           ),
-          
+
           const Spacer(),
-          
+
           // Value
           Text(
             value,
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: isDark ? AppColors.primary.withOpacity(0.9) : AppColors.primary,
+              color: isDark
+                  ? AppColors.primary.withValues(alpha: 0.9)
+                  : AppColors.primary,
             ),
           ),
         ],
@@ -152,7 +158,8 @@ class DeviceInfoListCard extends StatelessWidget {
       height: 1,
       indent: 65,
       endIndent: 20,
-      color: isDark ? Colors.white.withOpacity(0.04) : Colors.black.withOpacity(0.03),
+      color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black
+          .withValues(alpha: 0.03),
     );
   }
 }

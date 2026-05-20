@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
+import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
 
 class HelpCategoryItem {
   final String title;
@@ -26,61 +27,69 @@ class HelpCategoriesGrid extends StatelessWidget {
         title: 'Knowledge Hub',
         subtitle: 'FAQ - Errors - Diagnose',
         icon: Icons.help_outline_rounded,
-        color: const Color(0xFF6366F1),
+        color: AppColors.primary,
       ),
       HelpCategoryItem(
         title: 'Error Codes',
         subtitle: 'Fix errors fast',
         icon: Icons.warning_amber_rounded,
-        color: const Color(0xFFEF4444),
+        color: AppColors.errorRed,
       ),
       HelpCategoryItem(
         title: 'Troubleshoot',
         subtitle: 'Step-by-step',
         icon: Icons.build_outlined,
-        color: const Color(0xFFF59E0B),
+        color: AppColors.warning,
       ),
       HelpCategoryItem(
         title: 'Video Guides',
         subtitle: 'Watch & learn',
         icon: Icons.play_circle_outline_rounded,
-        color: const Color(0xFFA855F7),
+        color: AppColors.secondary,
       ),
       HelpCategoryItem(
         title: 'User Manual',
         subtitle: 'Setup & guides',
         icon: Icons.menu_book_rounded,
-        color: const Color(0xFF3B82F6),
+        color: AppColors.bluePrimary,
       ),
       HelpCategoryItem(
         title: 'Contact Us',
         subtitle: 'Get help now',
         icon: Icons.chat_bubble_outline_rounded,
-        color: const Color(0xFF10B981),
+        color: AppColors.success,
       ),
     ];
+
+    final crossAxisCount = context.responsive<int>(2, tablet: 3, desktop: 3);
+    final childAspectRatio = context.responsive<double>(
+        1.1, tablet: 1.3, desktop: 1.5);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Browse Categories',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: context.isDarkMode 
-                    ? AppColors.foregroundDark 
-                    : AppColors.foregroundLight,
-              ),
+          style: Theme
+              .of(context)
+              .textTheme
+              .titleLarge
+              ?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: context.isDarkMode
+                ? AppColors.foregroundDark
+                : AppColors.foregroundLight,
+          ),
         ),
         const SizedBox(height: 16),
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: 1.1,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            childAspectRatio: childAspectRatio,
           ),
           itemCount: categories.length,
           itemBuilder: (context, index) {
@@ -100,18 +109,18 @@ class _CategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark 
-            ? item.color.withOpacity(0.08) 
-            : item.color.withOpacity(0.05),
+        color: isDark
+            ? item.color.withValues(alpha: 0.08)
+            : item.color.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark 
-              ? item.color.withOpacity(0.2) 
-              : item.color.withOpacity(0.1),
+          color: isDark
+              ? item.color.withValues(alpha: 0.2)
+              : item.color.withValues(alpha: 0.1),
           width: 1.5,
         ),
       ),
@@ -121,7 +130,7 @@ class _CategoryCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: item.color.withOpacity(0.15),
+              color: item.color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(
@@ -144,8 +153,8 @@ class _CategoryCard extends StatelessWidget {
             item.subtitle,
             style: TextStyle(
               fontSize: 12,
-              color: isDark 
-                  ? AppColors.mutedForegroundDark.withOpacity(0.7) 
+              color: isDark
+                  ? AppColors.mutedForegroundDark.withValues(alpha: 0.7)
                   : AppColors.mutedForegroundLight,
             ),
           ),

@@ -1,27 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import '../../data/models/diagnose_result_model.dart';
 
 class DiagnosisResultCard extends StatelessWidget {
   final DiagnoseResultModel result;
+
   const DiagnosisResultCard({super.key, required this.result});
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = Theme
+        .of(context)
+        .brightness == Brightness.dark;
 
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF161531) : Colors.white,
+        color: isDark ? AppColors.cinematicSurface : Colors.white,
         borderRadius: BorderRadius.circular(32),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
+          color: isDark ? AppColors.distinctBorderDark : AppColors
+              .distinctBorderLight,
           width: 1.5,
         ),
         boxShadow: [
           if (!isDark)
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -45,7 +50,8 @@ class DiagnosisResultCard extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 15,
-              color: (isDark ? Colors.white : Colors.black).withOpacity(0.6),
+              color: (isDark ? Colors.white : Colors.black).withValues(
+                  alpha: 0.6),
               height: 1.5,
             ),
           ),
@@ -68,8 +74,8 @@ class DiagnosisResultCard extends StatelessWidget {
           child: CircularProgressIndicator(
             value: result.score,
             strokeWidth: 10,
-            backgroundColor: const Color(0xFF6366F1).withOpacity(0.1),
-            valueColor: const AlwaysStoppedAnimation(Color(0xFF6366F1)),
+            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+            valueColor: const AlwaysStoppedAnimation(AppColors.primary),
             strokeCap: StrokeCap.round,
           ),
         ),
@@ -81,7 +87,7 @@ class DiagnosisResultCard extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF6366F1),
+                color: AppColors.primary,
               ),
             ),
             const Text(
@@ -100,15 +106,15 @@ class DiagnosisResultCard extends StatelessWidget {
 
     switch (detail.status) {
       case DiagnoseStatus.healthy:
-        statusColor = const Color(0xFF10B981);
+        statusColor = AppColors.success;
         statusIcon = Icons.check_circle_outline_rounded;
         break;
       case DiagnoseStatus.warning:
-        statusColor = const Color(0xFFF59E0B);
+        statusColor = AppColors.warning;
         statusIcon = Icons.error_outline_rounded;
         break;
       case DiagnoseStatus.critical:
-        statusColor = const Color(0xFFEF4444);
+        statusColor = AppColors.errorRed;
         statusIcon = Icons.cancel_outlined;
         break;
       default:
@@ -123,7 +129,7 @@ class DiagnosisResultCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.1),
+              color: statusColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(statusIcon, color: statusColor, size: 20),
