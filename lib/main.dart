@@ -8,6 +8,7 @@ import 'package:extrememedicaluserapp/features/auth/services/auth_service.dart';
 import 'package:extrememedicaluserapp/features/auth/data/user_repository.dart';
 import 'package:extrememedicaluserapp/theme/app_theme.dart';
 import 'package:extrememedicaluserapp/features/splash/presentation/views/splash_view.dart';
+import 'package:extrememedicaluserapp/features/splash/presentation/controllers/splash_controller.dart';
 import 'package:extrememedicaluserapp/features/onboarding/presentation/views/onboarding_view.dart';
 import 'package:extrememedicaluserapp/features/permissions/presentation/view/allow_permissions_view.dart';
 import 'package:extrememedicaluserapp/features/auth/presentation/views/login_view.dart';
@@ -38,8 +39,8 @@ void main() async {
 
   await GetStorage.init();
   await Get.putAsync(() => FirebaseService().init());
-  Get.put(AuthService());
-  Get.put(UserRepository());
+  Get.put(AuthService(), permanent: true);
+  Get.put(UserRepository(), permanent: true);
   
   runApp(const MyApp());
 }
@@ -74,6 +75,9 @@ class MyApp extends StatelessWidget {
             GetPage(
               name: AppRoutes.splash, 
               page: () => const SplashView(),
+              binding: BindingsBuilder(() {
+                Get.put(SplashController());
+              }),
               transition: Transition.fadeIn,
             ),
             GetPage(

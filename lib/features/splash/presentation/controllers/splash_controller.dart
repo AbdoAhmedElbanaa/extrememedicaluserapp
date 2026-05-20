@@ -12,11 +12,12 @@ import 'package:extrememedicaluserapp/features/onboarding/presentation/views/onb
 class SplashController extends GetxController {
   var version = '1.0.0'.obs;
   final storage = GetStorage();
-  final _authService = Get.find<AuthService>();
+  late final AuthService _authService;
 
   @override
   void onInit() {
     super.onInit();
+    _authService = Get.find<AuthService>();
     _getVersion();
     _navigateToNext();
   }

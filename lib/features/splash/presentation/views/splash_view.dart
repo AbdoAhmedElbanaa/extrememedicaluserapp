@@ -10,8 +10,6 @@ class SplashView extends GetView<SplashController> {
 
   @override
   Widget build(BuildContext context) {
-    // Initialize controller
-    Get.lazyPut(() => SplashController());
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 

@@ -1,9 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import 'package:extrememedicaluserapp/theme/app_colors.dart';
-import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
+import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
+import 'package:extrememedicaluserapp/theme/app_colors.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:get/get.dart';
+
 import '../controllers/login_controller.dart';
 
 class LoginView extends GetView<LoginController> {
@@ -19,8 +21,9 @@ class LoginView extends GetView<LoginController> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors
-          .backgroundLight,
+      backgroundColor: isDark
+          ? AppColors.backgroundDark
+          : AppColors.backgroundLight,
       body: ResponsiveLayout(
         mobile: _buildMobileLayout(context, isDark),
         tablet: _buildMobileLayout(context, isDark, isTablet: true),
@@ -29,8 +32,11 @@ class LoginView extends GetView<LoginController> {
     );
   }
 
-  Widget _buildMobileLayout(BuildContext context, bool isDark,
-      {bool isTablet = false}) {
+  Widget _buildMobileLayout(
+    BuildContext context,
+    bool isDark, {
+    bool isTablet = false,
+  }) {
     return Container(
       width: double.infinity,
       height: double.infinity,
@@ -40,9 +46,9 @@ class LoginView extends GetView<LoginController> {
           radius: 1.2,
           colors: isDark
               ? [
-            AppColors.indigoDeep.withValues(alpha: 0.8),
-            AppColors.backgroundDark
-          ]
+                  AppColors.indigoDeep.withValues(alpha: 0.8),
+                  AppColors.backgroundDark,
+                ]
               : [AppColors.splashGradientLight[1], AppColors.backgroundLight],
         ),
       ),
@@ -104,27 +110,31 @@ class LoginView extends GetView<LoginController> {
                         _buildLogo(false, isLarge: true),
                         const SizedBox(height: 40),
                         const Text(
-                          'Advanced Medical Management',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 42,
-                            fontWeight: FontWeight.w900,
-                            height: 1.1,
-                          ),
-                        ).animate().fadeIn(duration: 800.ms).slideY(
-                            begin: 0.2, end: 0),
+                              'Advanced Medical Management',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 42,
+                                fontWeight: FontWeight.w900,
+                                height: 1.1,
+                              ),
+                            )
+                            .animate()
+                            .fadeIn(duration: 800.ms)
+                            .slideY(begin: 0.2, end: 0),
                         const SizedBox(height: 24),
                         Text(
-                          'Experience the future of clinical documentation and device management with our all-in-one solution.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.8),
-                            fontSize: 18,
-                            height: 1.6,
-                          ),
-                        ).animate().fadeIn(delay: 300.ms).slideY(
-                            begin: 0.2, end: 0),
+                              'Experience the future of clinical documentation and device management with our all-in-one solution.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.8),
+                                fontSize: 18,
+                                height: 1.6,
+                              ),
+                            )
+                            .animate()
+                            .fadeIn(delay: 300.ms)
+                            .slideY(begin: 0.2, end: 0),
                       ],
                     ),
                   ),
@@ -138,8 +148,9 @@ class LoginView extends GetView<LoginController> {
         Expanded(
           flex: 1,
           child: Container(
-            color: isDark ? AppColors.backgroundDark : AppColors
-                .backgroundLight,
+            color: isDark
+                ? AppColors.backgroundDark
+                : AppColors.backgroundLight,
             child: Center(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(60),
@@ -233,7 +244,8 @@ class LoginView extends GetView<LoginController> {
         boxShadow: [
           BoxShadow(
             color: (isLarge ? Colors.black : AppColors.primary).withValues(
-                alpha: 0.3),
+              alpha: 0.3,
+            ),
             blurRadius: 25,
             spreadRadius: 2,
           ),
@@ -269,11 +281,13 @@ class LoginView extends GetView<LoginController> {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.deepNavy.withValues(alpha: 0.5) : AppColors
-            .mutedLight,
+        color: isDark
+            ? AppColors.deepNavy.withValues(alpha: 0.5)
+            : AppColors.mutedLight,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-            color: isDark ? AppColors.deepNavyBorder : AppColors.borderLight),
+          color: isDark ? AppColors.deepNavyBorder : AppColors.borderLight,
+        ),
       ),
       child: Icon(icon, color: AppColors.primary, size: 20),
     );
@@ -284,8 +298,9 @@ class LoginView extends GetView<LoginController> {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark.withValues(alpha: 0.6) : AppColors
-            .cardLight,
+        color: isDark
+            ? AppColors.surfaceDark.withValues(alpha: 0.6)
+            : AppColors.cardLight,
         borderRadius: BorderRadius.circular(28),
         border: Border.all(
           color: isDark ? AppColors.deepNavyDarker : AppColors.borderLight,
@@ -338,30 +353,39 @@ class LoginView extends GetView<LoginController> {
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: TextStyle(
-            color: isDark
-                ? AppColors.textMutedDark.withValues(alpha: 0.5)
-                : AppColors.textMutedLight.withValues(alpha: 0.5)),
-        prefixIcon: Icon(icon,
-            color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
-            size: 20),
-        suffixIcon: isPassword ? Obx(() =>
-            IconButton(
-              icon: Icon(
-                this.controller.isPasswordVisible.value
-                    ? Icons.visibility_off_outlined
-                    : Icons.visibility_outlined,
-                color: isDark ? AppColors.textMutedDark : AppColors
-                    .textMutedLight,
-                size: 20,
-              ),
-              onPressed: this.controller.togglePasswordVisibility,
-            )) : null,
+          color: isDark
+              ? AppColors.textMutedDark.withValues(alpha: 0.5)
+              : AppColors.textMutedLight.withValues(alpha: 0.5),
+        ),
+        prefixIcon: Icon(
+          icon,
+          color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+          size: 20,
+        ),
+        suffixIcon: isPassword
+            ? Obx(
+                () => IconButton(
+                  icon: Icon(
+                    this.controller.isPasswordVisible.value
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
+                    color: isDark
+                        ? AppColors.textMutedDark
+                        : AppColors.textMutedLight,
+                    size: 20,
+                  ),
+                  onPressed: this.controller.togglePasswordVisibility,
+                ),
+              )
+            : null,
         filled: true,
         fillColor: isDark
             ? AppColors.cinematicSurface.withValues(alpha: 0.5)
             : AppColors.inputBackgroundLight,
         contentPadding: const EdgeInsets.symmetric(
-            vertical: 20, horizontal: 16),
+          vertical: 20,
+          horizontal: 16,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
           borderSide: BorderSide.none,
@@ -393,25 +417,31 @@ class LoginView extends GetView<LoginController> {
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(22)),
+            borderRadius: BorderRadius.circular(22),
+          ),
         ),
-        child: Obx(() =>
-        controller.isLoading.value
-            ? const CircularProgressIndicator(color: Colors.white)
-            : const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Sign In',
-              style: TextStyle(fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white),
-            ),
-            SizedBox(width: 8),
-            Icon(
-                Icons.arrow_forward_ios_rounded, size: 16, color: Colors.white),
-          ],
-        ),
+        child: Obx(
+          () => controller.isLoading.value
+              ? const CircularProgressIndicator(color: Colors.white)
+              : const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Sign In',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                  ],
+                ),
         ),
       ),
     ).animate().fadeIn(delay: 500.ms).scale(begin: const Offset(0.9, 0.9));
@@ -421,7 +451,8 @@ class LoginView extends GetView<LoginController> {
     return Row(
       children: [
         Expanded(
-            child: Divider(color: isDark ? Colors.white10 : Colors.black12)),
+          child: Divider(color: isDark ? Colors.white10 : Colors.black12),
+        ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
@@ -436,7 +467,8 @@ class LoginView extends GetView<LoginController> {
           ),
         ),
         Expanded(
-            child: Divider(color: isDark ? Colors.white10 : Colors.black12)),
+          child: Divider(color: isDark ? Colors.white10 : Colors.black12),
+        ),
       ],
     );
   }
@@ -447,35 +479,86 @@ class LoginView extends GetView<LoginController> {
       spacing: 12,
       runSpacing: 12,
       children: [
-        _buildSocialButton('G Google', isDark, context),
-        _buildSocialButton('🍎 Apple', isDark, context),
-        _buildSocialButton('📱 Phone', isDark, context),
+        _buildSocialButton(
+          'Google',
+          isDark,
+          context,
+          onTap: controller.loginWithGoogle,
+          logoUrl: 'https://img.icons8.com/color/48/google-logo.png',
+        ),
+        _buildSocialButton('Apple', isDark, context, icon: Icons.apple_rounded),
+        _buildSocialButton(
+          'Phone',
+          isDark,
+          context,
+          icon: Icons.phone_android_rounded,
+        ),
       ],
     ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.2, end: 0);
   }
 
-  Widget _buildSocialButton(String label, bool isDark, BuildContext context) {
+  Widget _buildSocialButton(
+    String label,
+    bool isDark,
+    BuildContext context, {
+    VoidCallback? onTap,
+    String? logoUrl,
+    IconData? icon,
+  }) {
     // Dynamic width based on screen size but with limits
     double buttonWidth = (context.screenWidth - 72) / 3;
     if (buttonWidth < 100) buttonWidth = 100;
 
-    return Container(
-      width: context.isMobileLayout ? buttonWidth : 140,
-      height: 55,
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.cardLight,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-            color: isDark ? AppColors.deepNavyDarker : AppColors.borderLight),
-      ),
-      child: Center(
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isDark ? Colors.white : Colors.black87,
-            fontSize: 13,
-            fontWeight: FontWeight.bold,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: context.isMobileLayout ? buttonWidth : 140,
+        height: 55,
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.surfaceDark : AppColors.cardLight,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isDark ? AppColors.deepNavyDarker : AppColors.borderLight,
           ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (logoUrl != null)
+              CachedNetworkImage(
+                imageUrl: logoUrl,
+                width: 22,
+                height: 22,
+                placeholder: (context, url) => const SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                errorWidget: (context, url, error) => const Icon(
+                  Icons.g_mobiledata_rounded,
+                  color: Colors.blue,
+                  size: 24,
+                ),
+              )
+            else if (icon != null)
+              Icon(
+                icon,
+                color: isDark ? Colors.white : Colors.black87,
+                size: 22,
+              ),
+            const SizedBox(width: 10),
+            Flexible(
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: isDark ? Colors.white : Colors.black87,
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -489,8 +572,11 @@ class LoginView extends GetView<LoginController> {
         children: [
           Text(
             "Don't have an account? ",
-            style: TextStyle(color: isDark ? AppColors.textMutedDark : AppColors
-                .textMutedLight),
+            style: TextStyle(
+              color: isDark
+                  ? AppColors.textMutedDark
+                  : AppColors.textMutedLight,
+            ),
           ),
           Text(
             "Create Account",

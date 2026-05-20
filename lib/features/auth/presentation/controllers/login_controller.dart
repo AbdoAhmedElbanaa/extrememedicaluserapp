@@ -54,6 +54,31 @@ class LoginController extends GetxController {
     }
   }
 
+  Future<void> loginWithGoogle() async {
+    if (isLoading.value) return;
+
+    isLoading.value = true;
+    try {
+      final userCredential = await _authService.signInWithGoogle();
+      if (userCredential != null) {
+        ToastService.show(
+          title: 'Success',
+          message: 'Logged in with Google successfully',
+          type: ToastType.success,
+        );
+        Get.offAllNamed(AppRoutes.home);
+      }
+    } catch (e) {
+      ToastService.show(
+        title: 'Google Login Failed',
+        message: e.toString(),
+        type: ToastType.error,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   @override
   void onClose() {
     emailController.dispose();
