@@ -1,46 +1,298 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
+    <base href="$FLUTTER_BASE_HREF">
 
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
+    <meta charset="UTF-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
 
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+    <!-- SEO -->
+    <title>Extreme Medical User App</title>
+    <meta content="Extreme Medical User Manual App"
+          name="description">
+    <meta content="Medical, Healthcare, Extreme Medical"
+          name="keywords">
+    <meta content="Extreme Medical" name="author">
 
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
-  <base href="$FLUTTER_BASE_HREF">
+    <!-- Mobile -->
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1"
+          name="viewport">
 
-  <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="Extreme Medical User Manaual app">
+    <meta content="yes"
+          name="mobile-web-app-capable">
 
-  <!-- iOS meta tags & icons -->
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="extrememedicaluserapp">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+    <meta content="yes"
+          name="apple-mobile-web-app-capable">
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+    <meta content="black-translucent"
+          name="apple-mobile-web-app-status-bar-style">
 
-  <title>extrememedicaluserapp</title>
-  <link rel="manifest" href="manifest.json">
+    <meta content="Extreme Medical"
+          name="apple-mobile-web-app-title">
+
+    <!-- Theme -->
+    <meta content="#0066ff"
+          name="theme-color">
+
+    <!-- Icons -->
+    <link href="icons/Icon-192.png"
+          rel="apple-touch-icon">
+
+    <link href="favicon.png"
+          rel="icon"
+          type="image/png">
+
+    <link href="manifest.json"
+          rel="manifest">
+
+    <meta name="google-signin-client_id" content="2089029110-enrib5ifja2mfh5eqvfuss290g4u66hi.apps.googleusercontent.com">
+
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com"
+          rel="preconnect">
+
+    <link crossorigin
+          href="https://fonts.gstatic.com"
+          rel="preconnect">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <style>
+
+        *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+        font-family:'Poppins',sans-serif;
+        }
+
+        body{
+        background:#0d1117;
+        overflow:hidden;
+        }
+
+        /* Loading Screen */
+
+        #loading{
+        position:fixed;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background:linear-gradient(
+        135deg,
+        #0f172a,
+        #1e293b,
+        #334155
+        );
+
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        flex-direction:column;
+        z-index:99999;
+
+        transition:all .7s ease;
+        }
+
+        /* Logo */
+
+        .logo{
+
+        width:120px;
+        height:120px;
+        border-radius:50%;
+        background:white;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        box-shadow:
+        0 0 30px rgba(0,102,255,.5);
+
+        animation:pulse 2s infinite;
+        margin-bottom:30px;
+        }
+
+        .logo img{
+
+        width:80px;
+        height:80px;
+        }
+
+        /* Title */
+
+        .app-title{
+
+        color:white;
+        font-size:28px;
+        font-weight:600;
+        margin-bottom:25px;
+        }
+
+        /* Loader */
+
+        .loader{
+
+        width:280px;
+        height:8px;
+        background:rgba(255,255,255,.15);
+
+        border-radius:30px;
+        overflow:hidden;
+        }
+
+        .loader-bar{
+
+        height:100%;
+        width:0%;
+
+        background:linear-gradient(
+        90deg,
+        #0066ff,
+        #00e1ff
+        );
+
+        border-radius:30px;
+
+        animation:loading 3s ease infinite;
+        }
+
+        .loading-text{
+
+        margin-top:20px;
+        color:#ccc;
+        font-size:14px;
+        }
+
+        @keyframes loading{
+
+        0%{
+        width:0%
+        }
+
+        50%{
+        width:70%
+        }
+
+        100%{
+        width:100%
+        }
+
+        }
+
+        @keyframes pulse{
+
+        0%{
+        transform:scale(1)
+        }
+
+        50%{
+        transform:scale(1.08)
+        }
+
+        100%{
+        transform:scale(1)
+        }
+
+        }
+
+        .hide{
+
+        opacity:0;
+        visibility:hidden;
+
+        }
+
+    </style>
+
 </head>
-<body>
-  <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
 
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
-  -->
-  <script src="flutter_bootstrap.js" async></script>
+<body>
+
+<div id="loading">
+
+    <div class="logo">
+        <img src="icons/Icon-192.png">
+    </div>
+
+    <div class="app-title">
+        Extreme Medical
+    </div>
+
+    <div class="loader">
+
+        <div class="loader-bar">
+        </div>
+
+    </div>
+
+    <div class="loading-text"
+         id="loadingText">
+
+        Initializing App...
+
+    </div>
+
+</div>
+
+
+<script>
+
+    const loadingText=document.getElementById(
+    'loadingText'
+    );
+
+    const messages=[
+
+    "Loading assets...",
+    "Preparing interface...",
+    "Connecting services...",
+    "Initializing modules...",
+    "Almost ready..."
+    ];
+
+    let index=0;
+
+    setInterval(()=>{
+
+    loadingText.innerText=
+    messages[index];
+
+    index++;
+
+    if(index>=messages.length){
+
+    index=0;
+
+    }
+
+    },1000);
+
+
+    /* Hide loading screen after Flutter loads */
+
+    window.addEventListener(
+    "flutter-first-frame",
+    function(){
+
+    document
+    .getElementById("loading")
+    .classList.add("hide");
+
+    }
+
+    );
+
+</script>
+
+<script
+        async
+        src="flutter_bootstrap.js">
+</script>
+
 </body>
 </html>

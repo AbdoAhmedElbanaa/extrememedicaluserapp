@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:extrememedicaluserapp/core/services/firebase_service.dart';
+import 'package:extrememedicaluserapp/features/auth/services/auth_service.dart';
+import 'package:extrememedicaluserapp/features/auth/data/user_repository.dart';
 import 'package:extrememedicaluserapp/theme/app_theme.dart';
 import 'package:extrememedicaluserapp/features/splash/presentation/views/splash_view.dart';
 import 'package:extrememedicaluserapp/features/onboarding/presentation/views/onboarding_view.dart';
@@ -36,6 +38,8 @@ void main() async {
 
   await GetStorage.init();
   await Get.putAsync(() => FirebaseService().init());
+  Get.put(AuthService());
+  Get.put(UserRepository());
   
   runApp(const MyApp());
 }

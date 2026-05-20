@@ -9,11 +9,15 @@ class AccountSettingsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isMobile = MediaQuery.of(context).size.width < 600;
 
     return SettingsExpandableTile(
       icon: Icons.person_outline_rounded,
       iconColor: AppColors.indigoSoft,
       title: 'Account',
+      canExpand: isMobile,
+      initiallyExpanded: !isMobile,
+      showHeader: isMobile,
       children: [
         SettingsSubTile(
           icon: Icons.person_outline_rounded,

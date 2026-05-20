@@ -1,3 +1,6 @@
+import 'package:extrememedicaluserapp/features/auth/services/auth_service.dart';
+import 'package:extrememedicaluserapp/features/auth/data/user_repository.dart';
+import 'package:extrememedicaluserapp/features/auth/data/models/user_model.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -6,9 +9,13 @@ class ProfileController extends GetxController {
   late RefreshController refreshController;
   late RefreshController refreshControllerWide;
   
+  final _authService = Get.find<AuthService>();
+  final _userRepo = Get.find<UserRepository>();
+  
   // User data observables
-  final userName = 'Ahmed Hassan'.obs;
-  final userEmail = 'ahmed.hassan@example.com'.obs;
+  var userData = Rxn<UserModel>();
+  final userName = 'User'.obs;
+  final userEmail = ''.obs;
   final userAvatar = ''.obs; 
   
   // Settings observables
@@ -25,6 +32,18 @@ class ProfileController extends GetxController {
     refreshControllerWide = RefreshController(initialRefresh: false);
     darkModeEnabled.value = Get.isDarkMode;
     _getAppVersion();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final user = _authService.currentUser;
+    if (user != null) {
+      userEmail.value = user.email ?? user.phoneNumber ?? '';
+      userData.value = await _userRepo.getUser(user.uid);
+      if (userData.value != null) {
+        userName.value = "${userData.value!.firstName} ${userData.value!.lastName}";
+      }
+    }
   }
 
   Future<void> _getAppVersion() async {

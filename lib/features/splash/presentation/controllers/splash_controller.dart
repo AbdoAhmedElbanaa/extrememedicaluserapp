@@ -1,3 +1,4 @@
+import 'package:extrememedicaluserapp/features/auth/services/auth_service.dart';
 import 'package:extrememedicaluserapp/features/auth/presentation/views/login_view.dart';
 import 'package:extrememedicaluserapp/features/permissions/presentation/view/allow_permissions_view.dart';
 import 'package:get/get.dart';
@@ -11,6 +12,7 @@ import 'package:extrememedicaluserapp/features/onboarding/presentation/views/onb
 class SplashController extends GetxController {
   var version = '1.0.0'.obs;
   final storage = GetStorage();
+  final _authService = Get.find<AuthService>();
 
   @override
   void onInit() {
@@ -46,7 +48,6 @@ class SplashController extends GetxController {
     
     bool onboardingSeen = storage.read('onboarding_seen') ?? false;
     bool allPermissionsGranted = storage.read('all_permissions_granted') ?? false;
-    bool isLoggedIn = storage.read('is_logged_in') ?? false;
 
     if (!onboardingSeen) {
       Get.offAll(() => const OnboardingView());
@@ -64,6 +65,8 @@ class SplashController extends GetxController {
     }
 
     // After permissions are confirmed, check login status
+    bool isLoggedIn = _authService.currentUser != null;
+
     if (isLoggedIn) {
       if (!Get.isRegistered<HomeController>()) {
         Get.put(HomeController());

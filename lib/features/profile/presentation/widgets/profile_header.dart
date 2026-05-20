@@ -39,61 +39,66 @@ class ProfileHeader extends GetView<ProfileController> {
           ),
         ),
       ),
-      child: Column(
-        mainAxisAlignment: isWide
-            ? MainAxisAlignment.center
-            : MainAxisAlignment.start,
-        children: [
-          _buildAvatar(isDark, isWide),
-          const SizedBox(height: 16),
-          Obx(
-            () => Text(
-              controller.userName.value,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: isDark ? Colors.white : AppColors.foregroundLight,
-                fontSize: isWide ? 28 : 24,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 0.5,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: isWide
+              ? MainAxisAlignment.center
+              : MainAxisAlignment.start,
+          children: [
+            _buildAvatar(isDark, isWide),
+            const SizedBox(height: 16),
+            Obx(
+              () => Text(
+                controller.userName.value,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: isDark ? Colors.white : AppColors.foregroundLight,
+                  fontSize: isWide ? 28 : 24,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 4),
-          Obx(
-            () => Text(
-              controller.userEmail.value,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: isDark
-                    ? AppColors.textMutedDark
-                    : AppColors.textMutedLight,
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
+            const SizedBox(height: 4),
+            Obx(
+              () => Text(
+                controller.userEmail.value,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: isDark
+                      ? AppColors.textMutedDark
+                      : AppColors.textMutedLight,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 24),
-          Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 12,
-            runSpacing: 12,
-            children: [
-              _buildHeaderButton(
-                icon: Icons.edit_outlined,
-                label: 'Edit Profile',
-                isDark: isDark,
-                onTap: () {},
-              ),
-              _buildHeaderButton(
-                icon: Icons.settings_outlined,
-                label: 'Settings',
-                isDark: isDark,
-                onTap: () => Get.toNamed(AppRoutes.settings),
-              ),
+            const SizedBox(height: 24),
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                _buildHeaderButton(
+                  icon: Icons.edit_outlined,
+                  label: 'Edit Profile',
+                  isDark: isDark,
+                  onTap: () {},
+                ),
+                _buildHeaderButton(
+                  icon: Icons.settings_outlined,
+                  label: 'Settings',
+                  isDark: isDark,
+                  onTap: () => Get.toNamed(AppRoutes.settings),
+                ),
+              ],
+            ),
+            if (isWide) ...[
+              const SizedBox(height: 40),
+              _buildLogoutButton(isDark),
             ],
-          ),
-          if (isWide) ...[const Spacer(), _buildLogoutButton(isDark)],
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -8,10 +8,15 @@ class LanguageRegionSettingsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
+
     return SettingsExpandableTile(
       icon: Icons.language_rounded,
       iconColor: AppColors.blueSoft,
       title: 'Language & Region',
+      canExpand: isMobile,
+      initiallyExpanded: !isMobile,
+      showHeader: isMobile,
       children: [
         SettingsSubTile(
           icon: Icons.language_rounded,

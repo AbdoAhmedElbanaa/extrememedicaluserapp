@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:extrememedicaluserapp/theme/app_colors.dart';
+import 'package:extrememedicaluserapp/features/auth/services/auth_service.dart';
+import 'package:extrememedicaluserapp/core/services/toast_service.dart';
+import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
 
 class LoginController extends GetxController {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  
+  final _authService = Get.find<AuthService>();
   
   var isPasswordVisible = false.obs;
   var isLoading = false.obs;
@@ -13,28 +17,38 @@ class LoginController extends GetxController {
     isPasswordVisible.value = !isPasswordVisible.value;
   }
 
-  void login() async {
-    print("Login button pressed"); // Debug print
+  Future<void> login() async {
+    if (emailController.text.trim().isEmpty || passwordController.text.trim().isEmpty) {
+      ToastService.show(
+        title: 'Error',
+        message: 'Please fill in all fields',
+        type: ToastType.error,
+      );
+      return;
+    }
+
     if (isLoading.value) return;
     
     isLoading.value = true;
     try {
-      // Simulate login
-      await Future.delayed(const Duration(seconds: 1));
-      print("Login simulation finished");
+      await _authService.signInWithEmailAndPassword(
+        emailController.text.trim(),
+        passwordController.text.trim(),
+      );
       
-      Get.snackbar(
-        'Success',
-        'Logged in successfully',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: AppColors.success.withValues(alpha: 0.7),
-        colorText: Colors.white,
+      ToastService.show(
+        title: 'Success',
+        message: 'Logged in successfully',
+        type: ToastType.success,
       );
 
-      print("Navigating to home...");
-      Get.offAllNamed('/home');
+      Get.offAllNamed(AppRoutes.home);
     } catch (e) {
-      print("Login error: $e");
+      ToastService.show(
+        title: 'Login Failed',
+        message: e.toString(),
+        type: ToastType.error,
+      );
     } finally {
       isLoading.value = false;
     }

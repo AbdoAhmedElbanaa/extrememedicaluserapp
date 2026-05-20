@@ -10,10 +10,15 @@ class NotificationsSettingsSection extends GetView<SettingsController> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
+
     return SettingsExpandableTile(
       icon: Icons.notifications_none_rounded,
       iconColor: AppColors.amberSoft,
       title: 'Notifications',
+      canExpand: isMobile,
+      initiallyExpanded: !isMobile,
+      showHeader: isMobile,
       children: [
         Obx(() => SettingsSubTile(
           icon: Icons.notifications_none_rounded,

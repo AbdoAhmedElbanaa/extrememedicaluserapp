@@ -7,6 +7,8 @@ class SettingsExpandableTile extends StatefulWidget {
   final String title;
   final List<Widget> children;
   final bool initiallyExpanded;
+  final bool canExpand;
+  final bool showHeader;
 
   const SettingsExpandableTile({
     super.key,
@@ -15,6 +17,8 @@ class SettingsExpandableTile extends StatefulWidget {
     required this.title,
     required this.children,
     this.initiallyExpanded = false,
+    this.canExpand = true,
+    this.showHeader = true,
   });
 
   @override
@@ -29,7 +33,7 @@ class _SettingsExpandableTileState extends State<SettingsExpandableTile> with Si
   @override
   void initState() {
     super.initState();
-    _isExpanded = widget.initiallyExpanded;
+    _isExpanded = !widget.canExpand || widget.initiallyExpanded;
     _controller = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -47,6 +51,7 @@ class _SettingsExpandableTileState extends State<SettingsExpandableTile> with Si
   }
 
   void _handleTap() {
+    if (!widget.canExpand) return;
     setState(() {
       _isExpanded = !_isExpanded;
       if (_isExpanded) {
@@ -77,53 +82,55 @@ class _SettingsExpandableTileState extends State<SettingsExpandableTile> with Si
       ),
       child: Column(
         children: [
-          InkWell(
-            onTap: _handleTap,
-            borderRadius: BorderRadius.circular(28),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: widget.iconColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: widget.iconColor.withValues(alpha: 0.2),
-                        width: 1,
+          if (widget.showHeader)
+            InkWell(
+              onTap: _handleTap,
+              borderRadius: BorderRadius.circular(28),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: widget.iconColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: widget.iconColor.withValues(alpha: 0.2),
+                          width: 1,
+                        ),
+                      ),
+                      child: Icon(
+                        widget.icon,
+                        color: widget.iconColor,
+                        size: 22,
                       ),
                     ),
-                    child: Icon(
-                      widget.icon,
-                      color: widget.iconColor,
-                      size: 22,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Text(
-                      widget.title,
-                      style: TextStyle(
-                        color: isDark ? Colors.white : AppColors.foregroundLight,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Text(
+                        widget.title,
+                        style: TextStyle(
+                          color: isDark ? Colors.white : AppColors.foregroundLight,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-                  RotationTransition(
-                    turns: _iconTurns,
-                    child: Icon(
-                      Icons.expand_more_rounded,
-                      color: isDark ? Colors.white.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.2),
-                      size: 20,
-                    ),
-                  ),
-                ],
+                    if (widget.canExpand)
+                      RotationTransition(
+                        turns: _iconTurns,
+                        child: Icon(
+                          Icons.expand_more_rounded,
+                          color: isDark ? Colors.white.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.2),
+                          size: 20,
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
-          ),
           ClipRect(
             child: AnimatedAlign(
               alignment: Alignment.center,
@@ -132,11 +139,12 @@ class _SettingsExpandableTileState extends State<SettingsExpandableTile> with Si
               curve: Curves.easeInOut,
               child: Column(
                 children: [
-                  Divider(
-                    height: 1,
-                    thickness: 1,
-                    color: isDark ? AppColors.distinctBorderDark : AppColors.distinctBorderLight,
-                  ),
+                  if (widget.showHeader)
+                    Divider(
+                      height: 1,
+                      thickness: 1,
+                      color: isDark ? AppColors.distinctBorderDark : AppColors.distinctBorderLight,
+                    ),
                   ...widget.children,
                   const SizedBox(height: 8),
                 ],

@@ -1,3 +1,8 @@
+import 'package:extrememedicaluserapp/features/auth/services/auth_service.dart';
+import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
+import 'package:extrememedicaluserapp/features/profile/presentation/controllers/profile_controller.dart';
+import 'package:extrememedicaluserapp/features/auth/services/auth_service.dart';
+import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
 import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +17,9 @@ class UserProfilePopup extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final homeController = Get.find<HomeController>();
+    final profileController = Get.isRegistered<ProfileController>() 
+        ? Get.find<ProfileController>() 
+        : Get.put(ProfileController());
 
     return Stack(
       children: [
@@ -56,7 +64,7 @@ class UserProfilePopup extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   // Header Section (Profile Info)
-                  _buildHeader(isDark),
+                  _buildHeader(isDark, profileController),
 
                   Divider(
                     height: 1,
@@ -143,7 +151,7 @@ class UserProfilePopup extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(bool isDark) {
+  Widget _buildHeader(bool isDark, ProfileController profileController) {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Row(
@@ -165,15 +173,17 @@ class UserProfilePopup extends StatelessWidget {
                 ),
               ],
             ),
-            child: const Center(
-              child: Text(
-                'AH',
-                style: TextStyle(
+            child: Center(
+              child: Obx(() => Text(
+                profileController.userName.value.isNotEmpty 
+                    ? profileController.userName.value.substring(0, 1).toUpperCase() 
+                    : 'U',
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
-              ),
+              )),
             ),
           ),
           const SizedBox(width: 16),
@@ -185,14 +195,14 @@ class UserProfilePopup extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Ahmed Hassan',
+                    Obx(() => Text(
+                      profileController.userName.value,
                       style: TextStyle(
                         color: isDark ? Colors.white : Colors.black,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
-                    ),
+                    )),
                     GestureDetector(
                       onTap: () => Get.back(),
                       child: Icon(
@@ -205,15 +215,15 @@ class UserProfilePopup extends StatelessWidget {
                     ),
                   ],
                 ),
-                Text(
-                  'ahmed@clinic.com',
+                Obx(() => Text(
+                  profileController.userEmail.value,
                   style: TextStyle(
                     color: isDark
                         ? Colors.white.withValues(alpha: 0.4)
                         : Colors.black45,
                     fontSize: 14,
                   ),
-                ),
+                )),
                 const SizedBox(height: 10),
                 // Premium Badge
                 Container(
@@ -326,7 +336,10 @@ class UserProfilePopup extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       child: InkWell(
-        onTap: () {},
+        onTap: () async {
+          await Get.find<AuthService>().signOut();
+          Get.offAllNamed(AppRoutes.login);
+        },
         borderRadius: BorderRadius.circular(20),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),

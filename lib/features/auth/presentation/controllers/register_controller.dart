@@ -1,4 +1,9 @@
-import 'package:extrememedicaluserapp/theme/app_colors.dart';
+import 'package:extrememedicaluserapp/features/auth/data/user_repository.dart';
+import 'package:extrememedicaluserapp/features/auth/data/models/user_model.dart';
+import 'package:extrememedicaluserapp/features/auth/services/auth_service.dart';
+import 'package:extrememedicaluserapp/core/services/toast_service.dart';
+import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -10,6 +15,10 @@ class RegisterController extends GetxController {
   var currentStep = 1.obs;
   var isForward = true.obs;
   final int totalSteps = 4;
+  
+  final _authService = Get.find<AuthService>();
+  var isLoading = false.obs;
+  String? _verificationId;
 
   // Step 1: Clinic Information Controllers
   final clinicNameController = TextEditingController();
@@ -141,12 +150,88 @@ class RegisterController extends GetxController {
     isMapLoading.value = false;
   }
 
-  void nextStep() {
-    if (currentStep.value < totalSteps) {
+  void nextStep() async {
+    if (isLoading.value) return;
+
+    if (currentStep.value == 1) {
+      if (clinicNameController.text.isEmpty || firstNameController.text.isEmpty) {
+        ToastService.show(title: 'Error', message: 'Please fill clinic info', type: ToastType.error);
+        return;
+      }
+      isForward.value = true;
+      currentStep.value++;
+    } else if (currentStep.value == 2) {
+      await _sendOtp();
+    } else if (currentStep.value == 3) {
+      await _verifyOtp();
+    } else if (currentStep.value < totalSteps) {
       isForward.value = true;
       currentStep.value++;
     } else {
       register();
+    }
+  }
+
+  Future<void> _sendOtp() async {
+    if (phoneController.text.isEmpty) {
+      ToastService.show(title: 'Error', message: 'Please enter phone number', type: ToastType.error);
+      return;
+    }
+
+    isLoading.value = true;
+    try {
+      String phoneNumber = selectedCountryCode.value + phoneController.text.trim();
+      await _authService.verifyPhoneNumber(
+        phoneNumber: phoneNumber,
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          // This can happen on some Android devices with auto-retrieval
+          await FirebaseAuth.instance.signInWithCredential(credential);
+          isForward.value = true;
+          currentStep.value = 4; // Skip OTP step if auto-verified
+          ToastService.show(title: 'Verified', message: 'Phone number auto-verified', type: ToastType.success);
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          ToastService.show(title: 'Error', message: e.message ?? 'Verification failed', type: ToastType.error);
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          _verificationId = verificationId;
+          isForward.value = true;
+          currentStep.value++;
+          startTimer();
+          ToastService.show(title: 'OTP Sent', message: 'Please check your messages', type: ToastType.success);
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          _verificationId = verificationId;
+        },
+      );
+    } catch (e) {
+      ToastService.show(title: 'Error', message: e.toString(), type: ToastType.error);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> _verifyOtp() async {
+    if (otpController.text.length < 6) {
+      ToastService.show(title: 'Error', message: 'Please enter valid OTP', type: ToastType.error);
+      return;
+    }
+
+    if (_verificationId == null) {
+      ToastService.show(title: 'Error', message: 'Verification ID missing. Please resend OTP.', type: ToastType.error);
+      return;
+    }
+
+    isLoading.value = true;
+    try {
+      await _authService.signInWithPhoneNumber(_verificationId!, otpController.text.trim());
+      isForward.value = true;
+      currentStep.value++;
+      ToastService.show(title: 'Success', message: 'Phone verified successfully', type: ToastType.success);
+    } catch (e) {
+      ToastService.show(title: 'Error', message: e.toString(), type: ToastType.error);
+    } finally {
+      isLoading.value = false;
     }
   }
 
@@ -159,15 +244,45 @@ class RegisterController extends GetxController {
     }
   }
 
-  void register() {
-    Get.offAllNamed('/home');
-    Get.snackbar(
-      'Success',
-      'Account created successfully ✨',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: AppColors.success.withValues(alpha: 0.7),
-      colorText: Colors.white,
-    );
+  void register() async {
+    if (isLoading.value) return;
+
+    isLoading.value = true;
+    try {
+      User? currentUser = _authService.currentUser;
+      if (currentUser == null) {
+        throw 'User not authenticated';
+      }
+
+      UserModel userModel = UserModel(
+        uid: currentUser.uid,
+        phoneNumber: currentUser.phoneNumber,
+        clinicName: clinicNameController.text.trim(),
+        firstName: firstNameController.text.trim(),
+        lastName: lastNameController.text.trim(),
+        address: clinicAddressController.text.trim(),
+        latitude: selectedLocation.value.latitude,
+        longitude: selectedLocation.value.longitude,
+      );
+
+      await Get.find<UserRepository>().createUser(userModel);
+
+      ToastService.show(
+        title: 'Success',
+        message: 'Account created successfully ✨',
+        type: ToastType.success,
+      );
+
+      Get.offAllNamed(AppRoutes.home);
+    } catch (e) {
+      ToastService.show(
+        title: 'Error',
+        message: e.toString(),
+        type: ToastType.error,
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   @override

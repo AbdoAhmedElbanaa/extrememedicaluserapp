@@ -23,10 +23,16 @@ class ProfileView extends GetView<ProfileController> {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: ResponsiveLayout(
-        mobile: _buildMobileLayout(context),
-        tablet: _buildTabletLayout(context),
-        desktop: _buildDesktopLayout(context),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth >= 1100) {
+            return _buildDesktopLayout(context);
+          } else if (constraints.maxWidth >= 600) {
+            return _buildTabletLayout(context);
+          } else {
+            return _buildMobileLayout(context);
+          }
+        },
       ),
     );
   }

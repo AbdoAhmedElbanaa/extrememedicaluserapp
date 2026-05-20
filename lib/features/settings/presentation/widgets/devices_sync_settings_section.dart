@@ -10,10 +10,15 @@ class DevicesSyncSettingsSection extends GetView<SettingsController> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
+
     return SettingsExpandableTile(
       icon: Icons.sync_rounded,
       iconColor: AppColors.purpleSoft,
       title: 'Devices & Sync',
+      canExpand: isMobile,
+      initiallyExpanded: !isMobile,
+      showHeader: isMobile,
       children: [
         Obx(() => SettingsSubTile(
           icon: Icons.sync_rounded,

@@ -20,7 +20,7 @@ class DevicesHeader extends GetView<DevicesController> {
     final mutedTextColor = isDark ? AppColors.textMutedDark : Colors.black54;
 
     if (isSidebar) {
-      return Container(
+      return SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

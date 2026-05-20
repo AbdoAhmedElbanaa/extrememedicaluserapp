@@ -1,0 +1,6 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Dashboard" type="FlutterRunConfigurationType" factoryName="Flutter" folderName="Dashbaord">
+    <option name="filePath" value="$PROJECT_DIR$/lib2/main.dart" />
+    <method v="2" />
+  </configuration>
+</component>

@@ -6,6 +6,9 @@ import 'package:extrememedicaluserapp/core/services/theme_service.dart';
 class SettingsController extends GetxController {
   final currentThemeMode = ThemeMode.system.obs;
 
+  // Selected category for tablet/desktop view
+  final RxInt selectedCategoryIndex = 0.obs;
+
   // Security
   final twoFactorEnabled = false.obs;
   final biometricEnabled = false.obs;

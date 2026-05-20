@@ -12,11 +12,15 @@ class SecuritySettingsSection extends GetView<SettingsController> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isMobile = MediaQuery.of(context).size.width < 600;
 
     return SettingsExpandableTile(
       icon: Icons.security_outlined,
       iconColor: AppColors.emeraldSoft,
       title: 'Security',
+      canExpand: isMobile,
+      initiallyExpanded: !isMobile,
+      showHeader: isMobile,
       children: [
         SettingsSubTile(
           icon: Icons.lock_outline_rounded,

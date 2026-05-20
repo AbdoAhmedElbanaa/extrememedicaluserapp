@@ -10,10 +10,15 @@ class AppearanceSettingsSection extends GetView<SettingsController> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
+
     return SettingsExpandableTile(
       icon: Icons.palette_outlined,
       iconColor: AppColors.pinkSoft,
       title: 'Appearance',
+      canExpand: isMobile,
+      initiallyExpanded: !isMobile,
+      showHeader: isMobile,
       children: [
         Obx(() => SettingsSubTile(
           icon: Icons.palette_outlined,
