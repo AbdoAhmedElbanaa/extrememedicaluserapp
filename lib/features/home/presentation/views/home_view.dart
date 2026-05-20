@@ -10,8 +10,8 @@ import 'package:extrememedicaluserapp/features/home/presentation/widgets/recent_
 import 'package:extrememedicaluserapp/features/home/presentation/widgets/quick_actions_section.dart';
 import 'package:extrememedicaluserapp/features/home/presentation/widgets/device_slider.dart';
 import 'package:extrememedicaluserapp/features/devices/presentation/views/devices_view.dart';
-import 'package:extrememedicaluserapp/features/devices/presentation/controllers/devices_controller.dart';
 import 'package:extrememedicaluserapp/features/help/views/help_view.dart';
+import 'package:extrememedicaluserapp/features/profile/presentation/views/profile_view.dart';
 import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
 import '../controllers/home_controller.dart';
 
@@ -44,7 +44,7 @@ class HomeView extends GetView<HomeController> {
                           height: 300,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: AppColors.primary.withOpacity(0.15),
+                            color: AppColors.primary.withValues(alpha: 0.15),
                           ),
                         ),
                       ),
@@ -59,7 +59,7 @@ class HomeView extends GetView<HomeController> {
                     _buildHomeContent(context, isDark),
                     const DevicesView(),
                     const HelpView(),
-                    _buildPlaceholderPage('Profile'),
+                    const ProfileView(),
                   ],
                 ),
 
@@ -204,22 +204,6 @@ class HomeView extends GetView<HomeController> {
           ],
         ),
       ],
-    );
-  }
-
-  Widget _buildPlaceholderPage(String title) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.construction_rounded, size: 64, color: AppColors.primary.withOpacity(0.5)),
-          const SizedBox(height: 16),
-          Text(
-            '$title Page Coming Soon',
-            style: const TextStyle(color: AppColors.primary, fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
+import '../controllers/home_controller.dart';
 
 class UserProfilePopup extends StatelessWidget {
   const UserProfilePopup({super.key});
@@ -10,6 +11,7 @@ class UserProfilePopup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final homeController = Get.find<HomeController>();
 
     return Stack(
       children: [
@@ -65,13 +67,31 @@ class UserProfilePopup extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: Column(
                         children: [
-                          _buildMenuItem(Icons.person_outline_rounded, 'View Profile', isDark),
+                          _buildMenuItem(
+                            Icons.person_outline_rounded, 
+                            'View Profile', 
+                            isDark,
+                            onTap: () {
+                              Get.back(); // Close popup
+                              homeController.changeIndex(3); // Switch to Profile tab
+                            },
+                          ),
                           _buildMenuItem(Icons.settings_outlined, 'Account Settings', isDark),
-                          _buildMenuItem(Icons.layers_outlined, 'My Devices', isDark),
+                          _buildMenuItem(Icons.layers_outlined, 'My Devices', isDark, 
+                            onTap: () {
+                              Get.back();
+                              homeController.changeIndex(1); // Switch to Devices tab
+                            }
+                          ),
                           _buildMenuItem(Icons.notifications_none_rounded, 'Notifications', isDark, hasUpdate: true),
                           _buildMenuItem(Icons.security_outlined, 'Security', isDark),
                           _buildMenuItem(Icons.credit_card_outlined, 'Billing & Subscription', isDark),
-                          _buildMenuItem(Icons.help_outline_rounded, 'Help Center', isDark),
+                          _buildMenuItem(Icons.help_outline_rounded, 'Help Center', isDark,
+                            onTap: () {
+                              Get.back();
+                              homeController.changeIndex(2); // Switch to Help tab
+                            }
+                          ),
                         ],
                       ),
                     ),
@@ -180,11 +200,11 @@ class UserProfilePopup extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem(IconData icon, String title, bool isDark, {bool hasUpdate = false}) {
+  Widget _buildMenuItem(IconData icon, String title, bool isDark, {bool hasUpdate = false, VoidCallback? onTap}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: InkWell(
-        onTap: () {},
+        onTap: onTap ?? () {},
         borderRadius: BorderRadius.circular(16),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

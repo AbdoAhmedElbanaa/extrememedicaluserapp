@@ -4,20 +4,40 @@ import 'package:get_storage/get_storage.dart';
 
 class ThemeService {
   final _box = GetStorage();
-  final _key = 'isDarkMode';
+  final _key = 'themeMode';
 
-  /// Get isDarkMode info from local storage and return ThemeMode
-  ThemeMode get theme => _loadThemeFromBox() ? ThemeMode.dark : ThemeMode.light;
+  /// Get theme mode from storage
+  ThemeMode get theme {
+    String? themeStr = _box.read(_key);
+    switch (themeStr) {
+      case 'light':
+        return ThemeMode.light;
+      case 'dark':
+        return ThemeMode.dark;
+      case 'system':
+      default:
+        return ThemeMode.system;
+    }
+  }
 
-  /// Load isDarkMode from local storage and if it's empty, returns false (Light Mode)
-  bool _loadThemeFromBox() => _box.read(_key) ?? false;
+  /// Save theme mode to storage
+  void _saveThemeToBox(String themeStr) => _box.write(_key, themeStr);
 
-  /// Save isDarkMode to local storage
-  _saveThemeToBox(bool isDarkMode) => _box.write(_key, isDarkMode);
+  /// Change theme mode
+  void changeThemeMode(ThemeMode mode) {
+    Get.changeThemeMode(mode);
+    String themeStr = 'system';
+    if (mode == ThemeMode.light) themeStr = 'light';
+    if (mode == ThemeMode.dark) themeStr = 'dark';
+    _saveThemeToBox(themeStr);
+  }
 
-  /// Switch theme and save to local storage
+  /// Legacy support for switchTheme (optional, but keep if used elsewhere)
   void switchTheme() {
-    Get.changeThemeMode(_loadThemeFromBox() ? ThemeMode.light : ThemeMode.dark);
-    _saveThemeToBox(!_loadThemeFromBox());
+    if (Get.isDarkMode) {
+      changeThemeMode(ThemeMode.light);
+    } else {
+      changeThemeMode(ThemeMode.dark);
+    }
   }
 }

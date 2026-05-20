@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
+import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
 import '../controllers/login_controller.dart';
 
 class LoginView extends GetView<LoginController> {
@@ -355,7 +356,7 @@ class LoginView extends GetView<LoginController> {
 
   Widget _buildBottomLink(bool isDark) {
     return GestureDetector(
-      onTap: () => Get.toNamed('/register'),
+      onTap: () => Get.toNamed(AppRoutes.register),
       child: Wrap(
         alignment: WrapAlignment.center,
         children: [

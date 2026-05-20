@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
 import '../controllers/devices_controller.dart';
 import '../widgets/devices_header.dart';
 import '../widgets/device_card.dart';
@@ -69,7 +70,7 @@ class DevicesView extends GetView<DevicesController> {
                               device: controller.filteredDevices[index],
                               onTap: () {
                                 Get.toNamed(
-                                  '/device-details',
+                                  AppRoutes.deviceDetails,
                                   arguments: controller.filteredDevices[index],
                                 );
                               },
@@ -89,7 +90,7 @@ class DevicesView extends GetView<DevicesController> {
                               device: controller.filteredDevices[index],
                               onTap: () {
                                 Get.toNamed(
-                                  '/device-details',
+                                  AppRoutes.deviceDetails,
                                   arguments: controller.filteredDevices[index],
                                 );
                               },
