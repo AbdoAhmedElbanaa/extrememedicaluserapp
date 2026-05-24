@@ -1,10 +1,18 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:google_sign_in_platform_interface/google_sign_in_platform_interface.dart';
+import 'package:google_sign_in_web/google_sign_in_web.dart' as web;
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AuthService extends GetxService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  final RxBool isGoogleInitialized = false.obs;
+
+  // Web Client ID from your configuration
+  static const String _webClientId = '2089029110-enrib5ifja2mfh5eqvfuss290g4u66hi.apps.googleusercontent.com';
 
   @override
   void onInit() {
@@ -13,11 +21,56 @@ class AuthService extends GetxService {
   }
 
   Future<void> _initializeGoogleSignIn() async {
+    if (isGoogleInitialized.value) return;
     try {
-      await _googleSignIn.initialize();
+      debugPrint('Initializing Google Sign In for Web...');
+      
+      // We provide both clientId and serverClientId for maximum compatibility on Web
+      await _googleSignIn.initialize(
+        clientId: _webClientId,
+        serverClientId: _webClientId,
+      );
+      
+      debugPrint('Google Sign In successfully initialized');
+      isGoogleInitialized.value = true;
     } catch (e) {
-      print('Google Sign In initialization error: $e');
+      if (e.toString().contains('already been called')) {
+        isGoogleInitialized.value = true;
+      } else {
+        debugPrint('Google Sign In initialization error: $e');
+        // Force true to allow the button to attempt rendering
+        isGoogleInitialized.value = true;
+      }
     }
+  }
+
+  // Improved method for Web rendering with fixed constraints
+  Widget buildGoogleSignInButton() {
+    if (!kIsWeb) return const SizedBox.shrink();
+    
+    return Obx(() {
+      if (!isGoogleInitialized.value) {
+        return const Center(
+          child: Padding(
+            padding: EdgeInsets.all(8.0),
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        );
+      }
+      
+      return Container(
+        height: 44,
+        constraints: const BoxConstraints(minWidth: 220),
+        child: (GoogleSignInPlatform.instance as web.GoogleSignInPlugin).renderButton(
+          configuration: web.GSIButtonConfiguration(
+            shape: web.GSIButtonShape.pill,
+            theme: web.GSIButtonTheme.outline,
+            size: web.GSIButtonSize.large,
+            text: web.GSIButtonText.signinWith,
+          ),
+        ),
+      );
+    });
   }
 
   // Get current user
@@ -44,7 +97,7 @@ class AuthService extends GetxService {
   Future<UserCredential?> signInWithGoogle() async {
     try {
       // Ensure initialized (v7.2.0 requirement)
-      await _googleSignIn.initialize();
+      await _initializeGoogleSignIn();
 
       final GoogleSignInAccount? googleUser = await _googleSignIn.authenticate();
       if (googleUser == null) return null;
@@ -65,9 +118,16 @@ class AuthService extends GetxService {
 
       return await _auth.signInWithCredential(credential);
     } on FirebaseAuthException catch (e) {
+      debugPrint('Firebase Auth Error: ${e.code} - ${e.message}');
       throw _handleFirebaseAuthError(e);
     } catch (e) {
-      throw 'An unexpected error occurred during Google sign in.';
+      debugPrint('Google Sign In Error Details: $e');
+      if (e.toString().contains('already been called')) {
+        // Retry without initialization if it's already done
+        isGoogleInitialized.value = true;
+        return signInWithGoogle();
+      }
+      throw 'Google login failed: ${e.toString()}';
     }
   }
 

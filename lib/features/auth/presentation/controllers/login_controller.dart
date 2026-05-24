@@ -1,3 +1,5 @@
+import 'package:extrememedicaluserapp/features/auth/data/user_repository.dart';
+import 'package:extrememedicaluserapp/features/auth/data/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:extrememedicaluserapp/features/auth/services/auth_service.dart';
@@ -9,6 +11,7 @@ class LoginController extends GetxController {
   final passwordController = TextEditingController();
   
   final _authService = Get.find<AuthService>();
+  final _userRepo = Get.find<UserRepository>();
   
   var isPasswordVisible = false.obs;
   var isLoading = false.obs;
@@ -61,6 +64,28 @@ class LoginController extends GetxController {
     try {
       final userCredential = await _authService.signInWithGoogle();
       if (userCredential != null) {
+        final user = userCredential.user!;
+        
+        // Ensure user exists in Firestore
+        final existingUser = await _userRepo.getUser(user.uid);
+        if (existingUser == null) {
+          String firstName = 'User';
+          String lastName = '';
+          if (user.displayName != null && user.displayName!.isNotEmpty) {
+            List<String> parts = user.displayName!.split(' ');
+            firstName = parts.first;
+            if (parts.length > 1) lastName = parts.sublist(1).join(' ');
+          }
+
+          await _userRepo.createUser(UserModel(
+            uid: user.uid,
+            email: user.email,
+            phoneNumber: user.phoneNumber,
+            firstName: firstName,
+            lastName: lastName,
+          ));
+        }
+
         ToastService.show(
           title: 'Success',
           message: 'Logged in with Google successfully',
@@ -69,6 +94,7 @@ class LoginController extends GetxController {
         Get.offAllNamed(AppRoutes.home);
       }
     } catch (e) {
+      debugPrint('Google Login Error: $e');
       ToastService.show(
         title: 'Google Login Failed',
         message: e.toString(),

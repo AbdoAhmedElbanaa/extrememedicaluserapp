@@ -46,6 +46,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '2089029110',
     projectId: 'extremecool-app',
     authDomain: 'extremecool-app.firebaseapp.com',
+    databaseURL: 'https://extremecool-app-default-rtdb.firebaseio.com',
     storageBucket: 'extremecool-app.firebasestorage.app',
     measurementId: 'G-ZNDYER78ZR',
   );
@@ -55,6 +56,7 @@ class DefaultFirebaseOptions {
     appId: '1:2089029110:android:ee1f975aa1cb2614944bd7',
     messagingSenderId: '2089029110',
     projectId: 'extremecool-app',
+    databaseURL: 'https://extremecool-app-default-rtdb.firebaseio.com',
     storageBucket: 'extremecool-app.firebasestorage.app',
   );
 
@@ -63,6 +65,7 @@ class DefaultFirebaseOptions {
     appId: '1:2089029110:ios:ee9084c418c8e3a8944bd7',
     messagingSenderId: '2089029110',
     projectId: 'extremecool-app',
+    databaseURL: 'https://extremecool-app-default-rtdb.firebaseio.com',
     storageBucket: 'extremecool-app.firebasestorage.app',
     iosBundleId: 'com.extreme.user.app.extrememedicaluserapp',
   );
@@ -72,6 +75,7 @@ class DefaultFirebaseOptions {
     appId: '1:2089029110:ios:ee9084c418c8e3a8944bd7',
     messagingSenderId: '2089029110',
     projectId: 'extremecool-app',
+    databaseURL: 'https://extremecool-app-default-rtdb.firebaseio.com',
     storageBucket: 'extremecool-app.firebasestorage.app',
     iosBundleId: 'com.extreme.user.app.extrememedicaluserapp',
   );
@@ -82,6 +86,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '2089029110',
     projectId: 'extremecool-app',
     authDomain: 'extremecool-app.firebaseapp.com',
+    databaseURL: 'https://extremecool-app-default-rtdb.firebaseio.com',
     storageBucket: 'extremecool-app.firebasestorage.app',
     measurementId: 'G-7PQRVZ3Y23',
   );

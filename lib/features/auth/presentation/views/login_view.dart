@@ -1,4 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
+import 'package:extrememedicaluserapp/features/auth/services/auth_service.dart';
 import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
 import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
@@ -479,13 +481,20 @@ class LoginView extends GetView<LoginController> {
       spacing: 12,
       runSpacing: 12,
       children: [
-        _buildSocialButton(
-          'Google',
-          isDark,
-          context,
-          onTap: controller.loginWithGoogle,
-          logoUrl: 'https://img.icons8.com/color/48/google-logo.png',
-        ),
+        if (kIsWeb)
+          // Ensure the web button has enough horizontal space
+          SizedBox(
+            width: 220,
+            child: Get.find<AuthService>().buildGoogleSignInButton(),
+          )
+        else
+          _buildSocialButton(
+            'Google',
+            isDark,
+            context,
+            onTap: controller.loginWithGoogle,
+            logoUrl: 'https://img.icons8.com/color/48/google-logo.png',
+          ),
         _buildSocialButton('Apple', isDark, context, icon: Icons.apple_rounded),
         _buildSocialButton(
           'Phone',
