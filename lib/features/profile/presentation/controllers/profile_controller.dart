@@ -1,5 +1,4 @@
 import 'package:extrememedicaluserapp/features/auth/services/auth_service.dart';
-import 'package:extrememedicaluserapp/features/auth/data/user_repository.dart';
 import 'package:extrememedicaluserapp/features/auth/data/models/user_model.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -10,7 +9,6 @@ class ProfileController extends GetxController {
   late RefreshController refreshControllerWide;
   
   final _authService = Get.find<AuthService>();
-  final _userRepo = Get.find<UserRepository>();
   
   // User data observables
   var userData = Rxn<UserModel>();
@@ -35,13 +33,26 @@ class ProfileController extends GetxController {
     _loadUserData();
   }
 
-  Future<void> _loadUserData() async {
-    final user = _authService.currentUser;
-    if (user != null) {
-      userEmail.value = user.email ?? user.phoneNumber ?? '';
-      userData.value = await _userRepo.getUser(user.uid);
-      if (userData.value != null) {
-        userName.value = "${userData.value!.firstName} ${userData.value!.lastName}";
+  void _loadUserData() {
+    // Listen to changes in the AuthService's currentUserModel
+    ever(_authService.currentUserModel, (userModel) {
+      userData.value = userModel;
+      if (userModel != null) {
+        userName.value = "${userModel.firstName} ${userModel.lastName}";
+        userEmail.value = userModel.email ?? _authService.currentUser?.email ?? _authService.currentUser?.phoneNumber ?? '';
+      }
+    });
+
+    // Load initial values
+    final initialUser = _authService.currentUserModel.value;
+    userData.value = initialUser;
+    if (initialUser != null) {
+      userName.value = "${initialUser.firstName} ${initialUser.lastName}";
+      userEmail.value = initialUser.email ?? _authService.currentUser?.email ?? _authService.currentUser?.phoneNumber ?? '';
+    } else {
+      final user = _authService.currentUser;
+      if (user != null) {
+        userEmail.value = user.email ?? user.phoneNumber ?? '';
       }
     }
   }

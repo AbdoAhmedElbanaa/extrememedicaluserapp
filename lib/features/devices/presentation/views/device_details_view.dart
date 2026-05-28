@@ -26,15 +26,19 @@ class DeviceDetailsView extends StatelessWidget {
 
     // استخدام tag فريد (الرقم التسلسلي) لمنع تعارض الـ RefreshController
     final controller = Get.put(DeviceDetailsController(), tag: device.serialNumber);
+    controller.initDevice(device);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: ResponsiveLayout(
-        mobile: _buildMobileLayout(context, device, controller, isDark),
-        tablet: _buildTabletLayout(context, device, controller, isDark),
-        desktop: _buildDesktopLayout(context, device, controller, isDark),
-      ),
+      body: Obx(() {
+        final activeDevice = controller.deviceRx.value ?? device;
+        return ResponsiveLayout(
+          mobile: _buildMobileLayout(context, activeDevice, controller, isDark),
+          tablet: _buildTabletLayout(context, activeDevice, controller, isDark),
+          desktop: _buildDesktopLayout(context, activeDevice, controller, isDark),
+        );
+      }),
     );
   }
 
@@ -46,8 +50,6 @@ class DeviceDetailsView extends StatelessWidget {
           const SizedBox(height: 10),
           DeviceStatusInfoCard(
             device: device,
-            currentValue: '23.1°', 
-            label: 'Current Temp',
           ),
           const SizedBox(height: 20),
           Obx(() => DeviceTabNavigation(
@@ -95,8 +97,6 @@ class DeviceDetailsView extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: DeviceStatusInfoCard(
                   device: device,
-                  currentValue: '23.1°', 
-                  label: 'Current Temp',
                 ),
               ),
               const SizedBox(height: 30),

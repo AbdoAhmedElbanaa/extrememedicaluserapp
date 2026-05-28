@@ -35,8 +35,8 @@ function initializeRealtimeDashboard() {
             authEl.textContent = "0";
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 40px 0;">
-                        <i class="fa-solid fa-folder-open" style="font-size: 24px; margin-bottom: 8px; display: block;"></i>
+                    <td colspan="6" class="p-4 border-b border-bordercolor text-xs text-textmuted text-center py-10">
+                        <i class="fa-solid fa-folder-open text-2xl mb-2 block"></i>
                         No registered clinics found.
                     </td>
                 </tr>
@@ -76,19 +76,25 @@ function initializeRealtimeDashboard() {
         const recentUsers = usersList.slice(-5).reverse();
         
         tableBody.innerHTML = '';
-        recentUsers.forEach(user => {
+        recentUsers.forEach((user, index) => {
             const hasLocation = user.latitude !== null && user.longitude !== null;
-            const statusBadge = hasLocation 
-                ? `<span class="status-badge success"><i class="fa-solid fa-location-dot"></i> Configured</span>`
-                : `<span class="status-badge danger"><i class="fa-solid fa-location-pin-slash"></i> Unmapped</span>`;
+            const badgeClass = hasLocation 
+                ? 'bg-success/15 text-success'
+                : 'bg-danger/15 text-danger';
+            const badgeIcon = hasLocation
+                ? '<i class="fa-solid fa-location-dot text-[8px]"></i>'
+                : '<i class="fa-solid fa-location-pin-slash text-[8px]"></i>';
+            const statusBadgeHtml = `<span class="px-2.5 py-1 rounded-lg text-[10px] font-bold inline-flex items-center gap-1.5 ${badgeClass}">${badgeIcon} ${hasLocation ? 'Configured' : 'Unmapped'}</span>`;
                 
             const row = document.createElement('tr');
+            row.className = 'group hover:bg-white/5 transition duration-150';
             row.innerHTML = `
-                <td><strong>${escapeHtml(user.clinicName)}</strong></td>
-                <td>Dr. ${escapeHtml(user.firstName)} ${escapeHtml(user.lastName)}</td>
-                <td>${escapeHtml(user.phoneNumber)}</td>
-                <td>${escapeHtml(user.email)}</td>
-                <td>${statusBadge}</td>
+                <td class="p-4 border-b border-bordercolor text-xs text-white text-center"><span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-white/5 border border-bordercolor text-textsecondary text-[10px] font-bold transition duration-200 group-hover:bg-gradient-to-tr group-hover:from-primary group-hover:to-secondary group-hover:text-white group-hover:border-transparent group-hover:shadow-primaryglow">${index + 1}</span></td>
+                <td class="p-4 border-b border-bordercolor text-xs text-white"><strong>${escapeHtml(user.clinicName)}</strong></td>
+                <td class="p-4 border-b border-bordercolor text-xs text-white">Dr. ${escapeHtml(user.firstName)} ${escapeHtml(user.lastName)}</td>
+                <td class="p-4 border-b border-bordercolor text-xs text-white">${escapeHtml(user.phoneNumber)}</td>
+                <td class="p-4 border-b border-bordercolor text-xs text-white">${escapeHtml(user.email)}</td>
+                <td class="p-4 border-b border-bordercolor text-xs text-white">${statusBadgeHtml}</td>
             `;
             tableBody.appendChild(row);
         });

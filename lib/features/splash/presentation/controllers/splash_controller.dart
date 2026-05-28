@@ -1,13 +1,9 @@
 import 'package:extrememedicaluserapp/features/auth/services/auth_service.dart';
-import 'package:extrememedicaluserapp/features/auth/presentation/views/login_view.dart';
-import 'package:extrememedicaluserapp/features/permissions/presentation/view/allow_permissions_view.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:extrememedicaluserapp/features/home/presentation/views/home_view.dart';
-import 'package:extrememedicaluserapp/features/home/presentation/controllers/home_controller.dart';
-import 'package:extrememedicaluserapp/features/onboarding/presentation/views/onboarding_view.dart';
+import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
 
 class SplashController extends GetxController {
   var version = '1.0.0'.obs;
@@ -51,7 +47,7 @@ class SplashController extends GetxController {
     bool allPermissionsGranted = storage.read('all_permissions_granted') ?? false;
 
     if (!onboardingSeen) {
-      Get.offAll(() => const OnboardingView());
+      Get.offAllNamed(AppRoutes.onboarding);
       return;
     }
 
@@ -59,7 +55,7 @@ class SplashController extends GetxController {
     if (!allPermissionsGranted) {
       bool permissionsReallyGranted = await _checkPermissions();
       if (!permissionsReallyGranted) {
-        Get.offAll(() => const AllowPermissionsView());
+        Get.offAllNamed(AppRoutes.permissions);
         return;
       }
       storage.write('all_permissions_granted', true);
@@ -69,12 +65,10 @@ class SplashController extends GetxController {
     bool isLoggedIn = _authService.currentUser != null;
 
     if (isLoggedIn) {
-      if (!Get.isRegistered<HomeController>()) {
-        Get.put(HomeController());
-      }
-      Get.offAll(() => const HomeView());
+      await _authService.loadUserModel(_authService.currentUser!.uid);
+      Get.offAllNamed(AppRoutes.home);
     } else {
-      Get.offAll(() => const LoginView());
+      Get.offAllNamed(AppRoutes.login);
     }
   }
 }

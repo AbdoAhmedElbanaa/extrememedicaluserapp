@@ -1,83 +1,85 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
+import 'package:extrememedicaluserapp/features/profile/presentation/controllers/profile_controller.dart';
 
-class AccountInfoSection extends StatelessWidget {
+class AccountInfoSection extends GetView<ProfileController> {
   const AccountInfoSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme
-        .of(context)
-        .brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 12),
-          child: Text(
-            'ACCOUNT INFORMATION',
-            style: TextStyle(
-              color: isDark ? AppColors.textMutedDark : AppColors
-                  .textMutedLight,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
+    return Obx(() {
+      final user = controller.userData.value;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 4, bottom: 12),
+            child: Text(
+              'ACCOUNT INFORMATION',
+              style: TextStyle(
+                color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+              ),
             ),
           ),
-        ),
-        Container(
-          decoration: BoxDecoration(
-            color: isDark
-                ? AppColors.cinematicSurface.withValues(alpha: 0.4)
-                : AppColors.surfaceLight.withValues(alpha: 0.6),
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(
+          Container(
+            decoration: BoxDecoration(
               color: isDark
-                  ? AppColors.distinctBorderDark
-                  : AppColors.distinctBorderLight,
-              width: 1,
+                  ? AppColors.cinematicSurface.withValues(alpha: 0.4)
+                  : AppColors.surfaceLight.withValues(alpha: 0.6),
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(
+                color: isDark
+                    ? AppColors.distinctBorderDark
+                    : AppColors.distinctBorderLight,
+                width: 1,
+              ),
+            ),
+            child: Column(
+              children: [
+                _buildInfoTile(
+                  icon: Icons.person_outline_rounded,
+                  iconColor: AppColors.indigoSoft,
+                  title: 'Full Name',
+                  value: controller.userName.value,
+                  isDark: isDark,
+                  showDivider: true,
+                ),
+                _buildInfoTile(
+                  icon: Icons.email_outlined,
+                  iconColor: AppColors.blueSoft,
+                  title: 'Email',
+                  value: controller.userEmail.value.isNotEmpty ? controller.userEmail.value : 'N/A',
+                  isDark: isDark,
+                  showDivider: true,
+                ),
+                _buildInfoTile(
+                  icon: Icons.phone_outlined,
+                  iconColor: AppColors.emeraldSoft,
+                  title: 'Phone',
+                  value: user?.phoneNumber ?? 'N/A',
+                  isDark: isDark,
+                  showDivider: true,
+                ),
+                _buildInfoTile(
+                  icon: Icons.business_outlined,
+                  iconColor: AppColors.purpleSoft,
+                  title: 'Clinic',
+                  value: user?.clinicName ?? 'N/A',
+                  isDark: isDark,
+                  showDivider: false,
+                ),
+              ],
             ),
           ),
-          child: Column(
-            children: [
-              _buildInfoTile(
-                icon: Icons.person_outline_rounded,
-                iconColor: AppColors.indigoSoft,
-                title: 'Full Name',
-                value: 'Ahmed Hassan',
-                isDark: isDark,
-                showDivider: true,
-              ),
-              _buildInfoTile(
-                icon: Icons.email_outlined,
-                iconColor: AppColors.blueSoft,
-                title: 'Email',
-                value: 'ahmed@clinic.com',
-                isDark: isDark,
-                showDivider: true,
-              ),
-              _buildInfoTile(
-                icon: Icons.phone_outlined,
-                iconColor: AppColors.emeraldSoft,
-                title: 'Phone',
-                value: '+966 50 123 4567',
-                isDark: isDark,
-                showDivider: true,
-              ),
-              _buildInfoTile(
-                icon: Icons.business_outlined,
-                iconColor: AppColors.purpleSoft,
-                title: 'Clinic',
-                value: 'Al-Noor Medical Center',
-                isDark: isDark,
-                showDivider: false,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
+        ],
+      );
+    });
   }
 
   Widget _buildInfoTile({

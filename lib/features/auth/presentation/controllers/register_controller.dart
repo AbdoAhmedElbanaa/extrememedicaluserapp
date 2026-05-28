@@ -266,6 +266,7 @@ class RegisterController extends GetxController {
       );
 
       await Get.find<UserRepository>().createUser(userModel);
+      _authService.currentUserModel.value = userModel;
 
       ToastService.show(
         title: 'Success',

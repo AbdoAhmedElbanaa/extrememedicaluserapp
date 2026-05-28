@@ -190,14 +190,26 @@ class ProfileHeader extends GetView<ProfileController> {
         ),
       ),
       child: Center(
-        child: Text(
-          'AH',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: isWide ? 40 : 32,
-          ),
-        ),
+        child: Obx(() {
+          final name = controller.userName.value.trim();
+          String initials = 'U';
+          if (name.isNotEmpty) {
+            final parts = name.split(' ');
+            if (parts.isNotEmpty) {
+              final first = parts.first[0].toUpperCase();
+              final last = parts.length > 1 ? parts.last[0].toUpperCase() : '';
+              initials = first + last;
+            }
+          }
+          return Text(
+            initials,
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: isWide ? 40 : 32,
+            ),
+          );
+        }),
       ),
     );
   }

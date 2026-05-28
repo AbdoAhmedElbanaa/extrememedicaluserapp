@@ -1,6 +1,6 @@
-import 'package:extrememedicaluserapp/features/auth/presentation/views/login_view.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:extrememedicaluserapp/features/permissions/data/models/permission_model.dart';
@@ -128,6 +128,6 @@ class PermissionsController extends GetxController {
 
   void goToNextScreen() {
     storage.write('all_permissions_granted', true);
-    Get.offAll(() => const LoginView());
+    Get.offAllNamed(AppRoutes.login);
   }
 }

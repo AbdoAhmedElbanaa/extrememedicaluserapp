@@ -5,14 +5,10 @@ import '../../data/models/device_model.dart';
 
 class DeviceStatusInfoCard extends StatelessWidget {
   final DeviceModel device;
-  final String currentValue;
-  final String label;
 
   const DeviceStatusInfoCard({
     super.key,
     required this.device,
-    this.currentValue = '23.1°',
-    this.label = 'Current Temp',
   });
 
   @override
@@ -92,36 +88,6 @@ class DeviceStatusInfoCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                ),
-
-                // 3. Value Section (e.g., Temperature)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      currentValue,
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.w900,
-                        color: isDark ? Colors.white : AppColors.indigoMuted,
-                        height: 1,
-                        fontFeatures: const [FontFeature.tabularFigures()],
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      label,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: isDark
-                            ? AppColors.textMutedDark
-                            : AppColors.textMutedLight,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.2,
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),

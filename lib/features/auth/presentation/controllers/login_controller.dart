@@ -34,10 +34,14 @@ class LoginController extends GetxController {
     
     isLoading.value = true;
     try {
-      await _authService.signInWithEmailAndPassword(
+      final userCredential = await _authService.signInWithEmailAndPassword(
         emailController.text.trim(),
         passwordController.text.trim(),
       );
+      
+      if (userCredential.user != null) {
+        await _authService.loadUserModel(userCredential.user!.uid);
+      }
       
       ToastService.show(
         title: 'Success',
@@ -77,13 +81,17 @@ class LoginController extends GetxController {
             if (parts.length > 1) lastName = parts.sublist(1).join(' ');
           }
 
-          await _userRepo.createUser(UserModel(
+          final newUser = UserModel(
             uid: user.uid,
             email: user.email,
             phoneNumber: user.phoneNumber,
             firstName: firstName,
             lastName: lastName,
-          ));
+          );
+          await _userRepo.createUser(newUser);
+          _authService.currentUserModel.value = newUser;
+        } else {
+          _authService.currentUserModel.value = existingUser;
         }
 
         ToastService.show(

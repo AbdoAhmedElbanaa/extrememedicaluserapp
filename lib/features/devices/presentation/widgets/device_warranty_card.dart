@@ -53,25 +53,34 @@ class DeviceWarrantyCard extends StatelessWidget {
             children: [
               _buildInfoRow(
                 context,
-                icon: Icons.check_circle_outline_rounded,
-                label: 'Status',
-                value: 'Active - 14 months left',
-                isDark: isDark,
-                iconColor: AppColors.success,
-              ),
-              _buildDivider(isDark),
-              _buildInfoRow(
-                context,
-                icon: Icons.verified_user_outlined,
-                label: 'Coverage',
-                value: 'Full hardware warranty',
+                icon: Icons.calendar_today_rounded,
+                label: 'Installing Date',
+                value: device.installingDate ?? 'N/A',
                 isDark: isDark,
                 iconColor: AppColors.primary,
               ),
               _buildDivider(isDark),
               _buildInfoRow(
                 context,
-                icon: Icons.report_problem_outlined,
+                icon: Icons.verified_user_rounded,
+                label: 'Warranty End Date',
+                value: device.endWarranty ?? 'N/A',
+                isDark: isDark,
+                iconColor: AppColors.success,
+              ),
+              _buildDivider(isDark),
+              _buildInfoRow(
+                context,
+                icon: Icons.timer_rounded,
+                label: 'Remaining Time',
+                value: _getRemainingWarranty(device.endWarranty),
+                isDark: isDark,
+                iconColor: AppColors.blueSoft,
+              ),
+              _buildDivider(isDark),
+              _buildInfoRow(
+                context,
+                icon: Icons.security_rounded,
                 label: 'Service Plan',
                 value: 'Premium (Included)',
                 isDark: isDark,
@@ -83,6 +92,31 @@ class DeviceWarrantyCard extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  String _getRemainingWarranty(String? endWarrantyStr) {
+    if (endWarrantyStr == null || endWarrantyStr.isEmpty) return 'N/A';
+    final endDate = DateTime.tryParse(endWarrantyStr);
+    if (endDate == null) return 'N/A';
+    
+    final now = DateTime.now();
+    final difference = endDate.difference(now);
+    
+    if (difference.isNegative) {
+      return 'Expired';
+    }
+    
+    final days = difference.inDays;
+    if (days > 30) {
+      final months = (days / 30).floor();
+      final remainingDays = days % 30;
+      if (remainingDays > 0) {
+        return '$months m, $remainingDays d';
+      }
+      return '$months months';
+    } else {
+      return '$days days';
+    }
   }
 
   Widget _buildInfoRow(

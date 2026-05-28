@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import '../../data/models/device_model.dart';
+import 'package:extrememedicaluserapp/features/auth/services/auth_service.dart';
+import 'package:extrememedicaluserapp/features/auth/data/models/user_model.dart';
 
 class DevicesController extends GetxController {
   final RefreshController refreshController = RefreshController(initialRefresh: false);
@@ -13,10 +15,17 @@ class DevicesController extends GetxController {
   final RxString searchQuery = ''.obs;
   final RxString selectedFilter = 'All'.obs;
 
+  final _authService = Get.find<AuthService>();
+
   @override
   void onInit() {
     super.onInit();
-    _loadMockDevices();
+    // Listen to changes in currentUserModel to load/update device list
+    ever(_authService.currentUserModel, (userModel) {
+      _loadDevicesFromUser(userModel);
+    });
+    // Initial load
+    _loadDevicesFromUser(_authService.currentUserModel.value);
   }
 
   @override
@@ -28,8 +37,11 @@ class DevicesController extends GetxController {
 
   Future<void> onRefresh() async {
     try {
-      await Future.delayed(const Duration(seconds: 2));
-      _loadMockDevices();
+      final user = _authService.currentUser;
+      if (user != null) {
+        await _authService.loadUserModel(user.uid);
+      }
+      _loadDevicesFromUser(_authService.currentUserModel.value);
       if (refreshController.isRefresh) refreshController.refreshCompleted();
       if (refreshControllerWide.isRefresh) refreshControllerWide.refreshCompleted();
     } catch (e) {
@@ -38,45 +50,32 @@ class DevicesController extends GetxController {
     }
   }
 
-  void _loadMockDevices() {
-    allDevices.assignAll([
-      DeviceModel(
-        id: '1',
-        name: 'SmartThermo Pro',
-        model: 'ST-2024-X',
-        serialNumber: 'SN-2024-001234',
+  void _loadDevicesFromUser(UserModel? user) {
+    if (user != null && user.device != null) {
+      final userDevice = user.device!;
+      final deviceModel = DeviceModel(
+        id: userDevice.deviceId ?? '1',
+        name: userDevice.deviceName ?? 'Medical Device',
+        model: userDevice.deviceVersion ?? 'N/A',
+        serialNumber: userDevice.serialNo ?? 'N/A',
         status: DeviceStatus.online,
         lastSync: 'Just now',
-        batteryLevel: 78,
-        signalStrength: 92,
-        firmwareVersion: 'v2.4.1',
-        icon: Icons.thermostat_rounded,
-      ),
-      DeviceModel(
-        id: '2',
-        name: 'AirControl Hub',
-        model: 'AC-2023-Pro',
-        serialNumber: 'SN-2023-007891',
-        status: DeviceStatus.warning,
-        lastSync: '14 min ago',
-        batteryLevel: 22,
-        signalStrength: 64,
-        firmwareVersion: 'v1.9.3',
-        icon: Icons.air_rounded,
-      ),
-      DeviceModel(
-        id: '3',
-        name: 'Heart Rate Pro',
-        model: 'HR-2024-Plus',
-        serialNumber: 'SN-2024-009922',
-        status: DeviceStatus.online,
-        lastSync: '2 min ago',
         batteryLevel: 95,
-        signalStrength: 88,
-        firmwareVersion: 'v2.0.5',
-        icon: Icons.favorite_rounded,
-      ),
-    ]);
+        signalStrength: 90,
+        firmwareVersion: 'SW${userDevice.swVer ?? 'N/A'} UI${userDevice.uiVer ?? 'N/A'}',
+        icon: Icons.developer_board_rounded,
+        installingDate: userDevice.installingDate,
+        endWarranty: userDevice.endWarranty,
+        ntcVer: userDevice.ntcVer,
+        pcbVer: userDevice.pcbVer,
+        ssr: userDevice.ssr,
+        swVer: userDevice.swVer,
+        uiVer: userDevice.uiVer,
+      );
+      allDevices.assignAll([deviceModel]);
+    } else {
+      allDevices.clear();
+    }
     applyFilter(selectedFilter.value);
   }
 

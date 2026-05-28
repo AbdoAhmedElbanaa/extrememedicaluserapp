@@ -1,14 +1,27 @@
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import '../../data/models/device_model.dart';
+import 'devices_controller.dart';
+import 'package:extrememedicaluserapp/features/auth/services/auth_service.dart';
 
 class DeviceDetailsController extends GetxController {
   final RefreshController refreshController = RefreshController(initialRefresh: false);
   final RefreshController refreshControllerWide = RefreshController(initialRefresh: false);
   final RxInt selectedTabIndex = 0.obs;
 
-  @override
-  void onInit() {
-    super.onInit();
+  late Rxn<DeviceModel> deviceRx;
+
+  void initDevice(DeviceModel initialDevice) {
+    deviceRx = Rxn<DeviceModel>(initialDevice);
+    
+    // Listen to DevicesController updates to keep the device detail in sync
+    final devicesController = Get.find<DevicesController>();
+    ever(devicesController.allDevices, (devices) {
+      final updatedDevice = devices.firstWhereOrNull((d) => d.serialNumber == initialDevice.serialNumber);
+      if (updatedDevice != null) {
+        deviceRx.value = updatedDevice;
+      }
+    });
   }
 
   @override
@@ -24,8 +37,11 @@ class DeviceDetailsController extends GetxController {
 
   Future<void> onRefresh() async {
     try {
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 2));
+      final authService = Get.find<AuthService>();
+      final user = authService.currentUser;
+      if (user != null) {
+        await authService.loadUserModel(user.uid);
+      }
       if (refreshController.isRefresh) refreshController.refreshCompleted();
       if (refreshControllerWide.isRefresh) refreshControllerWide.refreshCompleted();
     } catch (e) {

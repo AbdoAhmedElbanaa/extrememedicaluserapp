@@ -13,6 +13,13 @@ class DeviceModel {
   final int signalStrength; // نسبة مئوية 0-100
   final String firmwareVersion;
   final IconData icon;
+  final String? installingDate;
+  final String? endWarranty;
+  final String? ntcVer;
+  final String? pcbVer;
+  final String? ssr;
+  final String? swVer;
+  final String? uiVer;
 
   DeviceModel({
     required this.id,
@@ -25,5 +32,12 @@ class DeviceModel {
     required this.signalStrength,
     required this.firmwareVersion,
     required this.icon,
+    this.installingDate,
+    this.endWarranty,
+    this.ntcVer,
+    this.pcbVer,
+    this.ssr,
+    this.swVer,
+    this.uiVer,
   });
 }

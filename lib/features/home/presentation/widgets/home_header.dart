@@ -5,6 +5,7 @@ import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:extrememedicaluserapp/core/services/theme_service.dart';
 import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
 import 'package:extrememedicaluserapp/features/home/presentation/widgets/user_profile_popup.dart';
+import 'package:extrememedicaluserapp/features/auth/services/auth_service.dart';
 
 class HomeHeader extends StatelessWidget {
   final bool isDark;
@@ -13,6 +14,7 @@ class HomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Get.find<AuthService>();
     return ClipRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
@@ -67,16 +69,22 @@ class HomeHeader extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        'Ahmed Hassan',
-                        style: TextStyle(
-                          color: isDark ? Colors.white : AppColors
-                              .foregroundLight,
-                          fontSize: context.responsive(24, tablet: 32),
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
+                      Obx(() {
+                        final user = authService.currentUserModel.value;
+                        final name = user != null
+                            ? '${user.firstName} ${user.lastName}'
+                            : 'User';
+                        return Text(
+                          name,
+                          style: TextStyle(
+                            color: isDark ? Colors.white : AppColors
+                                .foregroundLight,
+                            fontSize: context.responsive(24, tablet: 32),
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        );
+                      }),
                     ],
                   ),
 
@@ -195,6 +203,7 @@ class HomeHeader extends StatelessWidget {
   }
 
   Widget _buildUserAvatar() {
+    final authService = Get.find<AuthService>();
     return GestureDetector(
       onTap: () {
         Get.dialog(
@@ -220,15 +229,25 @@ class HomeHeader extends StatelessWidget {
             ),
           ],
         ),
-        child: const Center(
-          child: Text(
-            'AH',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
+        child: Center(
+          child: Obx(() {
+            final user = authService.currentUserModel.value;
+            String initials = 'U';
+            if (user != null) {
+              final f = (user.firstName ?? '').trim();
+              final l = (user.lastName ?? '').trim();
+              if (f.isNotEmpty) initials = f[0].toUpperCase();
+              if (l.isNotEmpty) initials += l[0].toUpperCase();
+            }
+            return Text(
+              initials,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            );
+          }),
         ),
       ),
     );

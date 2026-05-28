@@ -1,8 +1,6 @@
 import 'package:extrememedicaluserapp/features/auth/services/auth_service.dart';
 import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
 import 'package:extrememedicaluserapp/features/profile/presentation/controllers/profile_controller.dart';
-import 'package:extrememedicaluserapp/features/auth/services/auth_service.dart';
-import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
 import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:flutter/material.dart';

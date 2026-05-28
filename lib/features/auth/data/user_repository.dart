@@ -1,18 +1,19 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:get/get.dart';
 import 'models/user_model.dart';
 
 class UserRepository extends GetxService {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final FirebaseDatabase _db = FirebaseDatabase.instance;
 
   Future<void> createUser(UserModel user) async {
-    await _db.collection('users').doc(user.uid).set(user.toMap());
+    await _db.ref('users').child(user.uid).set(user.toMap());
   }
 
   Future<UserModel?> getUser(String uid) async {
-    var snapshot = await _db.collection('users').doc(uid).get();
-    if (snapshot.exists) {
-      return UserModel.fromMap(snapshot.data()!);
+    var snapshot = await _db.ref('users').child(uid).get();
+    if (snapshot.exists && snapshot.value != null) {
+      final map = Map<String, dynamic>.from(snapshot.value as Map);
+      return UserModel.fromMap(map);
     }
     return null;
   }

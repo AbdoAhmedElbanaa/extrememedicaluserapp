@@ -1,15 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:google_sign_in_platform_interface/google_sign_in_platform_interface.dart';
-import 'package:google_sign_in_web/google_sign_in_web.dart' as web;
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:extrememedicaluserapp/features/auth/data/models/user_model.dart';
+import 'package:extrememedicaluserapp/features/auth/data/user_repository.dart';
+import 'google_sign_in_button.dart' as google_btn;
 
 class AuthService extends GetxService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
   final RxBool isGoogleInitialized = false.obs;
+  final Rxn<UserModel> currentUserModel = Rxn<UserModel>();
 
   // Web Client ID from your configuration
   static const String _webClientId = '2089029110-enrib5ifja2mfh5eqvfuss290g4u66hi.apps.googleusercontent.com';
@@ -18,6 +19,26 @@ class AuthService extends GetxService {
   void onInit() {
     super.onInit();
     _initializeGoogleSignIn();
+    
+    // Listen to auth state changes to load/clear user model
+    _auth.authStateChanges().listen((User? user) async {
+      if (user != null) {
+        await loadUserModel(user.uid);
+      } else {
+        currentUserModel.value = null;
+      }
+    });
+  }
+
+  Future<void> loadUserModel(String uid) async {
+    try {
+      final userRepo = Get.find<UserRepository>();
+      final model = await userRepo.getUser(uid);
+      currentUserModel.value = model;
+      debugPrint('Loaded user model: ${currentUserModel.value?.firstName} ${currentUserModel.value?.lastName}');
+    } catch (e) {
+      debugPrint('Error loading user model: $e');
+    }
   }
 
   Future<void> _initializeGoogleSignIn() async {
@@ -46,31 +67,10 @@ class AuthService extends GetxService {
 
   // Improved method for Web rendering with fixed constraints
   Widget buildGoogleSignInButton() {
-    if (!kIsWeb) return const SizedBox.shrink();
-    
-    return Obx(() {
-      if (!isGoogleInitialized.value) {
-        return const Center(
-          child: Padding(
-            padding: EdgeInsets.all(8.0),
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
-        );
-      }
-      
-      return Container(
-        height: 44,
-        constraints: const BoxConstraints(minWidth: 220),
-        child: (GoogleSignInPlatform.instance as web.GoogleSignInPlugin).renderButton(
-          configuration: web.GSIButtonConfiguration(
-            shape: web.GSIButtonShape.pill,
-            theme: web.GSIButtonTheme.outline,
-            size: web.GSIButtonSize.large,
-            text: web.GSIButtonText.signinWith,
-          ),
-        ),
-      );
-    });
+    return Obx(() => google_btn.buildGoogleSignInButton(
+      isGoogleInitialized: isGoogleInitialized.value,
+      webClientId: _webClientId,
+    ));
   }
 
   // Get current user

@@ -12,108 +12,108 @@ require_once __DIR__ . '/includes/header.php';
 require_once __DIR__ . '/includes/sidebar.php';
 ?>
 
-<div class="main-panel">
+<div class="flex-1 flex flex-col min-w-0 bg-darkbg">
     <!-- Navbar / Header -->
-    <header class="main-header">
-        <div class="header-title-section">
-            <h1 class="header-title">Dashboard Overview</h1>
-            <p class="header-subtitle">Real-time healthcare node statistics</p>
+    <header class="h-20 border-b border-bordercolor px-8 flex items-center justify-between bg-darkbg/80 backdrop-blur-md sticky top-0 z-[90]">
+        <div class="flex flex-col">
+            <h1 class="text-xl font-extrabold text-white">Dashboard Overview</h1>
+            <p class="text-xs text-textsecondary">Real-time healthcare node statistics</p>
         </div>
-        <div class="header-actions">
-            <div class="search-bar">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" placeholder="Search parameters...">
+        <div class="flex items-center gap-4">
+            <div class="relative w-80">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-textsecondary text-sm"></i>
+                <input type="text" placeholder="Search parameters..." class="w-full bg-white/5 border border-bordercolor rounded-xl py-2.5 pl-10 pr-4 text-white text-xs outline-none focus:border-primary transition duration-200">
             </div>
         </div>
     </header>
 
     <!-- Page Content -->
-    <main class="page-content">
+    <main class="p-8 flex-1 overflow-y-auto">
         <!-- Metrics Counter Grid -->
-        <section class="metrics-grid">
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <!-- Card 1 -->
-            <div class="metric-card">
-                <div class="metric-icon-box" style="background: rgba(99, 102, 241, 0.15); color: var(--primary-color);">
+            <div class="bg-darksurface border border-bordercolor rounded-[24px] p-6 flex items-center gap-5 shadow-lg relative overflow-hidden before:absolute before:top-0 before:left-0 before:w-1 before:h-full before:bg-gradient-to-b before:from-primary before:to-secondary">
+                <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl bg-primary/15 text-primary">
                     <i class="fa-solid fa-hospital"></i>
                 </div>
-                <div class="metric-info">
-                    <span class="metric-label">Total Clinics</span>
-                    <span class="metric-value" id="statTotalClinics">0</span>
-                    <span class="metric-desc">Registered medical centers</span>
+                <div class="flex flex-col">
+                    <span class="text-[11px] font-bold text-textsecondary uppercase tracking-wider">Total Clinics</span>
+                    <span class="text-3xl font-extrabold text-white my-1" id="statTotalClinics">0</span>
+                    <span class="text-[10px] text-textmuted">Registered medical centers</span>
                 </div>
             </div>
             <!-- Card 2 -->
-            <div class="metric-card success">
-                <div class="metric-icon-box" style="background: rgba(16, 185, 129, 0.15); color: var(--success-color);">
+            <div class="bg-darksurface border border-bordercolor rounded-[24px] p-6 flex items-center gap-5 shadow-lg relative overflow-hidden before:absolute before:top-0 before:left-0 before:w-1 before:h-full before:bg-success">
+                <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl bg-success/15 text-success">
                     <i class="fa-solid fa-map-location-dot"></i>
                 </div>
-                <div class="metric-info">
-                    <span class="metric-label">Mapped Clinics</span>
-                    <span class="metric-value" id="statMappedClinics">0</span>
-                    <span class="metric-desc">Clinics with coordinates set</span>
+                <div class="flex flex-col">
+                    <span class="text-[11px] font-bold text-textsecondary uppercase tracking-wider">Mapped Clinics</span>
+                    <span class="text-3xl font-extrabold text-white my-1" id="statMappedClinics">0</span>
+                    <span class="text-[10px] text-textmuted">Clinics with coordinates set</span>
                 </div>
             </div>
             <!-- Card 3 -->
-            <div class="metric-card warning">
-                <div class="metric-icon-box" style="background: rgba(245, 158, 11, 0.15); color: var(--warning-color);">
+            <div class="bg-darksurface border border-bordercolor rounded-[24px] p-6 flex items-center gap-5 shadow-lg relative overflow-hidden before:absolute before:top-0 before:left-0 before:w-1 before:h-full before:bg-warning">
+                <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl bg-warning/15 text-warning">
                     <i class="fa-solid fa-user-shield"></i>
                 </div>
-                <div class="metric-info">
-                    <span class="metric-label">Active Accounts</span>
-                    <span class="metric-value" id="statActiveAccounts">0</span>
-                    <span class="metric-desc">Authenticated users in Auth</span>
+                <div class="flex flex-col">
+                    <span class="text-[11px] font-bold text-textsecondary uppercase tracking-wider">Active Accounts</span>
+                    <span class="text-3xl font-extrabold text-white my-1" id="statActiveAccounts">0</span>
+                    <span class="text-[10px] text-textmuted">Authenticated users in Auth</span>
                 </div>
             </div>
         </section>
 
         <!-- Charts and Lists Grid -->
-        <div class="dashboard-grid">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <!-- Left Card: Chart -->
-            <div class="dashboard-card">
-                <div class="card-header">
-                    <h2 class="card-title">
-                        <i class="fa-solid fa-chart-line"></i>
+            <div class="bg-darksurface border border-bordercolor rounded-[24px] p-6 shadow-xl backdrop-blur-md lg:col-span-2">
+                <div class="flex items-center justify-between mb-5">
+                    <h2 class="text-sm font-bold text-white flex items-center gap-2.5">
+                        <i class="fa-solid fa-chart-line text-primary"></i>
                         Clinic Registrations Timeline
                     </h2>
                 </div>
-                <div style="height: 320px; position: relative;">
+                <div class="h-[320px] relative">
                     <canvas id="registrationsChart"></canvas>
                 </div>
             </div>
 
             <!-- Right Card: Service Status / Live Feed -->
-            <div class="dashboard-card">
-                <div class="card-header">
-                    <h2 class="card-title">
-                        <i class="fa-solid fa-network-wired"></i>
+            <div class="bg-darksurface border border-bordercolor rounded-[24px] p-6 shadow-xl backdrop-blur-md lg:col-span-1">
+                <div class="flex items-center justify-between mb-5">
+                    <h2 class="text-sm font-bold text-white flex items-center gap-2.5">
+                        <i class="fa-solid fa-network-wired text-primary"></i>
                         Live Database Status
                     </h2>
                     <span class="status-badge success" id="dbStatusBadge">
                         <i class="fa-solid fa-circle"></i> Connected
                     </span>
                 </div>
-                <div class="detail-card-panel" style="margin-top: 10px; background: transparent; border: none; padding: 0;">
-                    <div class="detail-item">
-                        <i class="fa-solid fa-database detail-item-icon"></i>
-                        <div class="detail-item-content">
-                            <span class="detail-item-label">Database Type</span>
-                            <span class="detail-item-value">Firestore + RTDB</span>
+                <div class="flex flex-col gap-4">
+                    <div class="flex gap-3.5 items-start">
+                        <i class="fa-solid fa-database text-primary text-lg mt-0.5"></i>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-bold text-textsecondary uppercase tracking-wider">Database Type</span>
+                            <span class="text-xs text-white font-semibold mt-0.5">Firestore + RTDB</span>
                         </div>
                     </div>
-                    <div class="sidebar-divider" style="margin: 12px 0;"></div>
-                    <div class="detail-item">
-                        <i class="fa-solid fa-wifi detail-item-icon" style="color: var(--success-color);"></i>
-                        <div class="detail-item-content">
-                            <span class="detail-item-label">RTDB Syncing</span>
-                            <span class="detail-item-value" id="syncStatusDesc">Listening for edits...</span>
+                    <div class="h-[1px] bg-bordercolor my-1"></div>
+                    <div class="flex gap-3.5 items-start">
+                        <i class="fa-solid fa-wifi text-success text-lg mt-0.5"></i>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-bold text-textsecondary uppercase tracking-wider">RTDB Syncing</span>
+                            <span class="text-xs text-white font-semibold mt-0.5" id="syncStatusDesc">Listening for edits...</span>
                         </div>
                     </div>
-                    <div class="sidebar-divider" style="margin: 12px 0;"></div>
-                    <div class="detail-item">
-                        <i class="fa-solid fa-circle-info detail-item-icon" style="color: var(--warning-color);"></i>
-                        <div class="detail-item-content">
-                            <span class="detail-item-label">Active Connection</span>
-                            <span class="detail-item-value" id="activeConnectionDesc">Establishing...</span>
+                    <div class="h-[1px] bg-bordercolor my-1"></div>
+                    <div class="flex gap-3.5 items-start">
+                        <i class="fa-solid fa-circle-info text-warning text-lg mt-0.5"></i>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-bold text-textsecondary uppercase tracking-wider">Active Connection</span>
+                            <span class="text-xs text-white font-semibold mt-0.5" id="activeConnectionDesc">Establishing...</span>
                         </div>
                     </div>
                 </div>
@@ -121,28 +121,29 @@ require_once __DIR__ . '/includes/sidebar.php';
         </div>
 
         <!-- Recent Registrations Section -->
-        <section class="dashboard-card">
-            <div class="card-header">
-                <h2 class="card-title">
-                    <i class="fa-solid fa-clock-rotate-left"></i>
+        <section class="bg-darksurface border border-bordercolor rounded-[24px] p-6 shadow-xl backdrop-blur-md">
+            <div class="flex items-center justify-between mb-5">
+                <h2 class="text-sm font-bold text-white flex items-center gap-2.5">
+                    <i class="fa-solid fa-clock-rotate-left text-primary"></i>
                     Recently Added Clinics
                 </h2>
-                <a href="users.php" class="btn-secondary" style="padding: 6px 14px; font-size: 12px;">Manage All</a>
+                <a href="users.php" class="bg-transparent border border-bordercolor text-textsecondary hover:text-white hover:bg-white/5 px-3.5 py-1.5 rounded-xl text-[11px] font-bold transition duration-200">Manage All</a>
             </div>
-            <div class="table-responsive">
-                <table class="custom-table">
+            <div class="overflow-x-auto w-full">
+                <table class="w-full border-collapse text-left">
                     <thead>
                         <tr>
-                            <th>Clinic Name</th>
-                            <th>Doctor / Contact</th>
-                            <th>Phone</th>
-                            <th>Email</th>
-                            <th>Location Status</th>
+                            <th class="p-4 border-b border-bordercolor text-textsecondary text-[11px] font-bold uppercase tracking-wider text-center" style="width: 50px;">#</th>
+                            <th class="p-4 border-b border-bordercolor text-textsecondary text-[11px] font-bold uppercase tracking-wider">Clinic Name</th>
+                            <th class="p-4 border-b border-bordercolor text-textsecondary text-[11px] font-bold uppercase tracking-wider">Doctor / Contact</th>
+                            <th class="p-4 border-b border-bordercolor text-textsecondary text-[11px] font-bold uppercase tracking-wider">Phone</th>
+                            <th class="p-4 border-b border-bordercolor text-textsecondary text-[11px] font-bold uppercase tracking-wider">Email</th>
+                            <th class="p-4 border-b border-bordercolor text-textsecondary text-[11px] font-bold uppercase tracking-wider">Location Status</th>
                         </tr>
                     </thead>
                     <tbody id="recentClinicsTableBody">
                         <tr>
-                            <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 40px 0;">
+                            <td colspan="6" class="p-4 border-b border-bordercolor text-xs text-white text-center text-textmuted py-10">
                                 <i class="fa-solid fa-circle-notch fa-spin"></i> Loading clinic feed...
                             </td>
                         </tr>

@@ -39,8 +39,8 @@ void main() async {
 
   await GetStorage.init();
   await Get.putAsync(() => FirebaseService().init());
-  Get.put(AuthService(), permanent: true);
   Get.put(UserRepository(), permanent: true);
+  Get.put(AuthService(), permanent: true);
   
   runApp(const MyApp());
 }

@@ -4,6 +4,7 @@
  */
 
 let allClinics = [];
+let allCatalogDevices = []; // Cache for global device models
 let addMap = null;
 let addMarker = null;
 let viewMap = null;
@@ -24,6 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 3. Search Bar Listener
     document.getElementById('clinicSearchInput').addEventListener('input', filterClinicsTable);
+
+    // 4. Hook device catalog stream
+    initializeDevicesSync();
 });
 
 /**
@@ -40,8 +44,8 @@ function initializeRealtimeTable() {
             allClinics = [];
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 40px 0;">
-                        <i class="fa-solid fa-folder-open" style="font-size: 24px; margin-bottom: 8px; display: block;"></i>
+                    <td colspan="7" class="p-4 border-b border-bordercolor text-xs text-textmuted text-center py-10">
+                        <i class="fa-solid fa-folder-open text-2xl mb-2 block"></i>
                         No registered clinics found.
                     </td>
                 </tr>
@@ -61,7 +65,8 @@ function initializeRealtimeTable() {
                 lastName: user.lastName || '',
                 address: user.address || 'No address registered',
                 latitude: user.latitude || null,
-                longitude: user.longitude || null
+                longitude: user.longitude || null,
+                device: user.device || null
             });
         });
         
@@ -70,8 +75,8 @@ function initializeRealtimeTable() {
         console.error("Error streaming table data:", error);
         tableBody.innerHTML = `
             <tr>
-                <td colspan="6" style="text-align: center; color: var(--danger-color); padding: 40px 0;">
-                    <i class="fa-solid fa-triangle-exclamation" style="font-size: 24px; margin-bottom: 8px; display: block;"></i>
+                <td colspan="7" class="p-4 border-b border-bordercolor text-xs text-danger text-center py-10">
+                    <i class="fa-solid fa-triangle-exclamation text-2xl mb-2 block"></i>
                     Failed to connect: ${error.message}
                 </td>
             </tr>
@@ -86,7 +91,7 @@ function renderClinicsTable(list) {
     if (list.length === 0) {
         tableBody.innerHTML = `
             <tr>
-                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px 0;">
+                <td colspan="7" class="p-4 border-b border-bordercolor text-xs text-textmuted text-center py-10">
                     No matching clinics found.
                 </td>
             </tr>
@@ -94,24 +99,37 @@ function renderClinicsTable(list) {
         return;
     }
     
-    list.forEach(clinic => {
+    list.forEach((clinic, index) => {
         const row = document.createElement('tr');
+        row.className = 'group hover:bg-white/5 transition duration-150';
+        
         const hasCoords = clinic.latitude !== null && clinic.longitude !== null;
         const coordsBadge = hasCoords 
-            ? `<span class="status-badge success" title="${clinic.latitude}, ${clinic.longitude}"><i class="fa-solid fa-location-dot"></i> Mapped</span>`
-            : `<span class="status-badge danger"><i class="fa-solid fa-circle-xmark"></i> Unmapped</span>`;
+            ? `<span class="px-2 py-0.5 rounded-lg text-[10px] font-bold inline-flex items-center gap-1 bg-success/15 text-success" title="${clinic.latitude}, ${clinic.longitude}"><i class="fa-solid fa-location-dot"></i> Mapped</span>`
+            : `<span class="px-2 py-0.5 rounded-lg text-[10px] font-bold inline-flex items-center gap-1 bg-danger/15 text-danger"><i class="fa-solid fa-circle-xmark"></i> Unmapped</span>`;
             
+        const hasDevice = clinic.device !== null;
+        const linkDeviceButton = hasDevice
+            ? `<button class="bg-success/15 text-success hover:bg-success hover:text-white border-none cursor-pointer text-sm p-2 rounded-lg transition duration-200 mr-1" title="Edit Linked Device" onclick="openLinkDeviceModal('${clinic.uid}')">
+                 <i class="fa-solid fa-laptop-medical"></i>
+               </button>`
+            : `<button class="bg-white/5 text-textsecondary hover:bg-primary hover:text-white border-none cursor-pointer text-sm p-2 rounded-lg transition duration-200 mr-1" title="Link Hardware Device" onclick="openLinkDeviceModal('${clinic.uid}')">
+                 <i class="fa-solid fa-link"></i>
+               </button>`;
+
         row.innerHTML = `
-            <td><strong>${escapeHtml(clinic.clinicName)}</strong></td>
-            <td>Dr. ${escapeHtml(clinic.firstName)} ${escapeHtml(clinic.lastName)}</td>
-            <td>${escapeHtml(clinic.email)}</td>
-            <td>${escapeHtml(clinic.phoneNumber)}</td>
-            <td>${coordsBadge} <span style="font-size: 11px; color: var(--text-secondary); margin-left: 8px;">${escapeHtml(clinic.address)}</span></td>
-            <td style="text-align: center; white-space: nowrap;">
-                <button class="action-btn primary" title="View details & map" onclick="openViewClinicModal('${clinic.uid}')">
+            <td class="p-4 border-b border-bordercolor text-xs text-white text-center"><span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-white/5 border border-bordercolor text-textsecondary text-[10px] font-bold transition duration-200 group-hover:bg-gradient-to-tr group-hover:from-primary group-hover:to-secondary group-hover:text-white group-hover:border-transparent group-hover:shadow-primaryglow">${index + 1}</span></td>
+            <td class="p-4 border-b border-bordercolor text-xs text-white"><strong>${escapeHtml(clinic.clinicName)}</strong></td>
+            <td class="p-4 border-b border-bordercolor text-xs text-white">Dr. ${escapeHtml(clinic.firstName)} ${escapeHtml(clinic.lastName)}</td>
+            <td class="p-4 border-b border-bordercolor text-xs text-white">${escapeHtml(clinic.email)}</td>
+            <td class="p-4 border-b border-bordercolor text-xs text-white">${escapeHtml(clinic.phoneNumber)}</td>
+            <td class="p-4 border-b border-bordercolor text-xs text-white">${coordsBadge} <span class="text-[10px] text-textsecondary ml-2">${escapeHtml(clinic.address)}</span></td>
+            <td class="p-4 border-b border-bordercolor text-xs text-white text-center whitespace-nowrap">
+                ${linkDeviceButton}
+                <button class="bg-primary/10 text-primary hover:bg-primary hover:text-white border-none cursor-pointer text-sm p-2 rounded-lg transition duration-200 mr-1" title="View details & map" onclick="openViewClinicModal('${clinic.uid}')">
                     <i class="fa-solid fa-map-location-dot"></i>
                 </button>
-                <button class="action-btn danger" title="Delete Clinic" onclick="confirmDeleteClinic('${clinic.uid}', '${escapeHtml(clinic.clinicName)}')">
+                <button class="bg-danger/10 text-danger hover:bg-danger hover:text-white border-none cursor-pointer text-sm p-2 rounded-lg transition duration-200" title="Delete Clinic" onclick="confirmDeleteClinic('${clinic.uid}', '${escapeHtml(clinic.clinicName)}')">
                     <i class="fa-solid fa-trash-can"></i>
                 </button>
             </td>
@@ -154,14 +172,14 @@ function setupModalActions() {
     // Open Dialog
     openAddBtn.addEventListener('click', () => {
         resetAddClinicForm();
-        addOverlay.classList.add('active');
+        openModal('addClinicModal');
         // Instantly init map container
         setTimeout(initAddClinicMap, 200);
     });
     
     // Close / Cancel actions
     const closeHandler = () => {
-        addOverlay.classList.remove('active');
+        closeModal('addClinicModal');
     };
     closeAddBtn.addEventListener('click', closeHandler);
     cancelAddBtn.addEventListener('click', closeHandler);
@@ -169,6 +187,57 @@ function setupModalActions() {
     // Stepper Navigation Actions
     nextBtn.addEventListener('click', handleStep1Submit);
     submitBtn.addEventListener('click', handleStep2Submit);
+
+    // Link Device Modal triggers
+    const openLinkBtn = document.getElementById('openLinkDeviceModalBtn');
+    const closeLinkBtn = document.getElementById('closeLinkDeviceModalBtn');
+    const cancelLinkBtn = document.getElementById('cancelLinkDeviceBtn');
+    const submitLinkBtn = document.getElementById('submitLinkDeviceBtn');
+    
+    if (openLinkBtn) {
+        openLinkBtn.addEventListener('click', () => {
+            openLinkDeviceModal();
+        });
+    }
+    
+    if (closeLinkBtn) {
+        closeLinkBtn.addEventListener('click', () => closeModal('linkDeviceModal'));
+    }
+    if (cancelLinkBtn) {
+        cancelLinkBtn.addEventListener('click', () => closeModal('linkDeviceModal'));
+    }
+    if (submitLinkBtn) {
+        submitLinkBtn.addEventListener('click', submitLinkDeviceForm);
+    }
+    
+    // Dropdown change listeners
+    const clinicSelect = document.getElementById('linkClinicSelect');
+    if (clinicSelect) {
+        clinicSelect.addEventListener('change', (e) => {
+            handleClinicSelectionChange(e.target.value);
+        });
+    }
+    
+    const modelSelect = document.getElementById('linkModelSelect');
+    if (modelSelect) {
+        modelSelect.addEventListener('change', (e) => {
+            populateVersionDropdown(e.target.value);
+        });
+    }
+    
+    const versionSelect = document.getElementById('linkVersionSelect');
+    if (versionSelect) {
+        versionSelect.addEventListener('change', (e) => {
+            const modelId = modelSelect.value;
+            const model = allCatalogDevices.find(m => m.id === modelId);
+            if (model) {
+                const verObj = model.versions.find(v => v.versionName === e.target.value);
+                updateSpecsPreview(verObj);
+            } else {
+                updateSpecsPreview(null);
+            }
+        });
+    }
 }
 
 function withTimeout(promise, ms, errorMessage = "Operation timed out") {
@@ -193,7 +262,7 @@ async function handleStep1Submit() {
         return;
     }
     
-    overlay.classList.add('active');
+    showOverlay('modalLoadingOverlay');
     loadingText.textContent = "Checking if clinic exists...";
     
     try {
@@ -297,7 +366,7 @@ async function handleStep1Submit() {
         console.error("Checking user failed:", error);
         showToast("Error checking user existence: " + error.message, "error");
     } finally {
-        overlay.classList.remove('active');
+        hideOverlay('modalLoadingOverlay');
     }
 }
 
@@ -320,7 +389,7 @@ async function handleStep2Submit() {
         return;
     }
     
-    overlay.classList.add('active');
+    showOverlay('modalLoadingOverlay');
     loadingText.textContent = "Saving to databases...";
     
     try {
@@ -378,7 +447,7 @@ async function handleStep2Submit() {
                 showToast("Saved to Realtime Database. (Firestore sync disabled)", "warning");
             }
             
-            document.getElementById('addClinicModal').classList.remove('active');
+            closeModal('addClinicModal');
             resetAddClinicForm();
         } else {
             throw new Error("Both databases failed: " + errorDetails);
@@ -388,7 +457,7 @@ async function handleStep2Submit() {
         console.error("Database save failed:", error);
         showToast(error.message || "Failed to save database profiles.", "error");
     } finally {
-        overlay.classList.remove('active');
+        hideOverlay('modalLoadingOverlay');
     }
 }
 
@@ -532,7 +601,84 @@ function openViewClinicModal(uid) {
     document.getElementById('viewClinicPhone').textContent = clinic.phoneNumber;
     document.getElementById('viewClinicAddress').textContent = clinic.address;
     
-    document.getElementById('viewClinicModal').classList.add('active');
+    // Draw Linked Device Details
+    const deviceContainer = document.getElementById('viewClinicDeviceContainer');
+    if (deviceContainer) {
+        if (clinic.device) {
+            const dev = clinic.device;
+            deviceContainer.innerHTML = `
+                <div class="bg-white/5 border border-bordercolor rounded-2xl p-5 flex flex-col md:flex-row gap-5 items-center relative overflow-hidden pt-8 md:pt-5">
+                    <!-- Unlink Button -->
+                    <div class="absolute top-3 right-3">
+                        <button class="bg-danger/10 text-danger hover:bg-danger hover:text-white border-none cursor-pointer text-[10px] font-bold py-1 px-2.5 rounded-lg transition duration-200" title="Unlink Device" onclick="confirmUnlinkDevice('${clinic.uid}', '${escapeHtml(clinic.clinicName)}')">
+                            <i class="fa-solid fa-link-slash mr-1"></i> Unlink
+                        </button>
+                    </div>
+                    <!-- Left: Device Image -->
+                    <div class="w-24 h-24 rounded-xl bg-black/20 border border-bordercolor overflow-hidden flex items-center justify-center shrink-0">
+                        ${dev.imageUrl 
+                            ? `<img src="${escapeHtml(dev.imageUrl)}" class="w-full h-full object-cover" alt="Device Image" />`
+                            : `<i class="fa-solid fa-laptop-medical text-3xl text-textsecondary"></i>`
+                        }
+                    </div>
+                    <!-- Middle: Specs -->
+                    <div class="flex-1 min-w-0">
+                        <div class="flex flex-wrap items-center gap-2 mb-1.5 justify-center md:justify-start">
+                            <h4 class="text-sm font-extrabold text-white">${escapeHtml(dev.deviceName || 'System Device')}</h4>
+                            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-primary/10 text-primary border border-primary/20">${escapeHtml(dev.deviceVersion || 'v1.0')}</span>
+                        </div>
+                        <p class="text-xs text-textsecondary mb-3 flex items-center gap-1.5 justify-center md:justify-start">
+                            <i class="fa-solid fa-barcode text-primary"></i>
+                            <span>Serial No: <strong class="text-white select-all">${escapeHtml(dev.serialNo || 'N/A')}</strong></span>
+                        </p>
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3.5 bg-black/20 border border-bordercolor rounded-xl p-3 text-center sm:text-left">
+                            <div class="flex flex-col">
+                                <span class="text-[9px] font-bold text-textsecondary uppercase tracking-wider">SW Ver</span>
+                                <span class="text-xs font-semibold text-white mt-0.5">${escapeHtml(dev.swVer || 'N/A')}</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-[9px] font-bold text-textsecondary uppercase tracking-wider">UI Ver</span>
+                                <span class="text-xs font-semibold text-white mt-0.5">${escapeHtml(dev.uiVer || 'N/A')}</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-[9px] font-bold text-textsecondary uppercase tracking-wider">NTC Ver</span>
+                                <span class="text-xs font-semibold text-white mt-0.5">${escapeHtml(dev.ntcVer || 'N/A')}</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-[9px] font-bold text-textsecondary uppercase tracking-wider">PCB Ver</span>
+                                <span class="text-xs font-semibold text-white mt-0.5">${escapeHtml(dev.pcbVer || 'N/A')}</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-[9px] font-bold text-textsecondary uppercase tracking-wider">SSR</span>
+                                <span class="text-xs font-semibold text-white mt-0.5">${escapeHtml(dev.ssr || 'N/A')}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Right: Dates -->
+                    <div class="flex flex-col items-stretch justify-center gap-2 bg-white/5 border border-bordercolor rounded-xl p-3.5 min-w-[160px] text-center md:text-right w-full md:w-auto shrink-0">
+                        <div class="flex flex-col">
+                            <span class="text-[9px] font-bold text-textsecondary uppercase tracking-wider">Installation</span>
+                            <span class="text-xs font-semibold text-white mt-0.5">${escapeHtml(dev.installingDate || 'N/A')}</span>
+                        </div>
+                        <div class="h-[1px] bg-bordercolor my-1 hidden md:block"></div>
+                        <div class="flex flex-col">
+                            <span class="text-[9px] font-bold text-textsecondary uppercase tracking-wider">Warranty Expiry</span>
+                            <span class="text-xs font-semibold text-white mt-0.5">${escapeHtml(dev.endWarranty || 'N/A')}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else {
+            deviceContainer.innerHTML = `
+                <div class="bg-white/5 border border-bordercolor rounded-2xl p-6 flex flex-col items-center justify-center text-center text-textsecondary">
+                    <i class="fa-solid fa-microchip text-3xl mb-2 text-textsecondary/60"></i>
+                    <span class="text-xs">No hardware device is currently linked to this clinic.</span>
+                </div>
+            `;
+        }
+    }
+    
+    openModal('viewClinicModal');
     
     const lat = clinic.latitude || 30.0444;
     const lng = clinic.longitude || 31.2357;
@@ -567,7 +713,7 @@ function openViewClinicModal(uid) {
     const footerCloseBtn = document.getElementById('closeViewClinicBtn');
     
     const closeHandler = () => {
-        document.getElementById('viewClinicModal').classList.remove('active');
+        closeModal('viewClinicModal');
     };
     closeBtn.onclick = closeHandler;
     footerCloseBtn.onclick = closeHandler;
@@ -576,8 +722,11 @@ function openViewClinicModal(uid) {
 /**
  * Delete User / Clinic Profile
  */
-function confirmDeleteClinic(uid, name) {
-    if (confirm(`Are you sure you want to permanently delete clinic "${name}"? This removes records from both Firestore and Realtime Database.`)) {
+async function confirmDeleteClinic(uid, name) {
+    const title = "Delete Clinic Profile";
+    const message = `Are you sure you want to permanently delete clinic "${name}"? This removes records from both Firestore and Realtime Database.`;
+    const confirmed = await showCustomConfirm(title, message, 'danger');
+    if (confirmed) {
         deleteClinic(uid);
     }
 }
@@ -607,3 +756,332 @@ function escapeHtml(text) {
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
 }
+
+/**
+ * Synchronize and cache devices catalog globally
+ */
+function initializeDevicesSync() {
+    rtdb.ref('devices').on('value', (snapshot) => {
+        const data = snapshot.val();
+        allCatalogDevices = [];
+        if (data) {
+            Object.keys(data).forEach(key => {
+                const dev = data[key];
+                let versionList = [];
+                if (Array.isArray(dev.versions)) {
+                    versionList = dev.versions;
+                } else if (typeof dev.versions === 'string') {
+                    versionList = dev.versions.split(',').map(v => ({
+                        versionName: v.trim(),
+                        swVer: '1.0.0',
+                        uiVer: '1.0.0',
+                        ntcVer: 'v1',
+                        pcbVer: 'Rev.A',
+                        ssr: 'Active'
+                    })).filter(v => v.versionName);
+                }
+                allCatalogDevices.push({
+                    id: key,
+                    name: dev.name || 'Unnamed Device',
+                    description: dev.description || '',
+                    imageUrl: dev.imageUrl || '',
+                    versions: versionList
+                });
+            });
+        }
+    }, (error) => {
+        console.error("Error synchronizing device catalog:", error);
+    });
+}
+
+/**
+ * Open Modal and prepopulate dropdowns and fields
+ */
+function openLinkDeviceModal(targetUid = "") {
+    // 1. Populate Clinic dropdown
+    const clinicSelect = document.getElementById('linkClinicSelect');
+    clinicSelect.innerHTML = '<option value="" class="bg-darksec text-white">Choose a clinic...</option>';
+    allClinics.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.uid;
+        opt.className = 'bg-darksec text-white';
+        opt.textContent = `${c.clinicName} (Dr. ${c.firstName} ${c.lastName})`;
+        clinicSelect.appendChild(opt);
+    });
+    
+    // 2. Populate Model dropdown
+    const modelSelect = document.getElementById('linkModelSelect');
+    modelSelect.innerHTML = '<option value="" class="bg-darksec text-white">Select model...</option>';
+    allCatalogDevices.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.id;
+        opt.className = 'bg-darksec text-white';
+        opt.textContent = m.name;
+        modelSelect.appendChild(opt);
+    });
+    
+    // 3. Clear/Reset other fields
+    document.getElementById('linkVersionSelect').innerHTML = '<option value="" class="bg-darksec text-white">Select version...</option>';
+    document.getElementById('linkVersionSelect').disabled = true;
+    document.getElementById('linkSpecsPreviewContainer').classList.add('hidden');
+    document.getElementById('linkSerialNo').value = '';
+    document.getElementById('linkInstallingDate').value = '';
+    document.getElementById('linkEndWarranty').value = '';
+    
+    // 4. Handle pre-selection if targetUid is passed
+    if (targetUid) {
+        clinicSelect.value = targetUid;
+        handleClinicSelectionChange(targetUid);
+    }
+    
+    openModal('linkDeviceModal');
+}
+window.openLinkDeviceModal = openLinkDeviceModal;
+
+/**
+ * Handle clinic selection change inside Link Device Modal
+ */
+function handleClinicSelectionChange(clinicUid) {
+    const modelSelect = document.getElementById('linkModelSelect');
+    const versionSelect = document.getElementById('linkVersionSelect');
+    const previewContainer = document.getElementById('linkSpecsPreviewContainer');
+    const serialNoInput = document.getElementById('linkSerialNo');
+    const installDateInput = document.getElementById('linkInstallingDate');
+    const warrantyEndInput = document.getElementById('linkEndWarranty');
+    
+    // Reset fields first
+    modelSelect.value = '';
+    versionSelect.innerHTML = '<option value="">Select version...</option>';
+    versionSelect.disabled = true;
+    previewContainer.classList.add('hidden');
+    serialNoInput.value = '';
+    installDateInput.value = '';
+    warrantyEndInput.value = '';
+    
+    if (!clinicUid) return;
+    
+    const clinic = allClinics.find(c => c.uid === clinicUid);
+    if (clinic && clinic.device) {
+        const dev = clinic.device;
+        
+        // Find model in catalog
+        const model = allCatalogDevices.find(m => m.id === dev.deviceId || m.name === dev.deviceName);
+        if (model) {
+            modelSelect.value = model.id;
+            
+            // Populate versions
+            populateVersionDropdown(model.id);
+            
+            // Pre-select version
+            const verObj = model.versions.find(v => v.versionName === dev.deviceVersion);
+            if (verObj) {
+                versionSelect.value = verObj.versionName;
+                updateSpecsPreview(verObj);
+            }
+        }
+        
+        serialNoInput.value = dev.serialNo || '';
+        installDateInput.value = dev.installingDate || '';
+        warrantyEndInput.value = dev.endWarranty || '';
+    }
+}
+
+/**
+ * Populate version dropdown based on selected model
+ */
+function populateVersionDropdown(modelId) {
+    const versionSelect = document.getElementById('linkVersionSelect');
+    versionSelect.innerHTML = '<option value="">Select version...</option>';
+    versionSelect.disabled = true;
+    
+    const previewContainer = document.getElementById('linkSpecsPreviewContainer');
+    previewContainer.classList.add('hidden');
+    
+    if (!modelId) return;
+    
+    const model = allCatalogDevices.find(m => m.id === modelId);
+    if (!model || !model.versions || model.versions.length === 0) {
+        return;
+    }
+    
+    model.versions.forEach(v => {
+        const option = document.createElement('option');
+        option.value = v.versionName;
+        option.className = 'bg-darksec text-white';
+        option.textContent = v.versionName;
+        versionSelect.appendChild(option);
+    });
+    versionSelect.disabled = false;
+}
+
+/**
+ * Render read-only specifications card preview
+ */
+function updateSpecsPreview(v) {
+    const previewContainer = document.getElementById('linkSpecsPreviewContainer');
+    if (!v) {
+        previewContainer.classList.add('hidden');
+        return;
+    }
+    
+    document.getElementById('previewSwVer').textContent = v.swVer || 'N/A';
+    document.getElementById('previewUiVer').textContent = v.uiVer || 'N/A';
+    document.getElementById('previewNtcVer').textContent = v.ntcVer || 'N/A';
+    document.getElementById('previewPcbVer').textContent = v.pcbVer || 'N/A';
+    document.getElementById('previewSsr').textContent = v.ssr || 'N/A';
+    
+    previewContainer.classList.remove('hidden');
+}
+
+/**
+ * Submit and save device linking configuration payload to Firestore & RTDB
+ */
+async function submitLinkDeviceForm() {
+    const clinicUid = document.getElementById('linkClinicSelect').value;
+    const modelId = document.getElementById('linkModelSelect').value;
+    const versionName = document.getElementById('linkVersionSelect').value;
+    
+    const serialNo = document.getElementById('linkSerialNo').value.trim();
+    const installingDate = document.getElementById('linkInstallingDate').value;
+    const endWarranty = document.getElementById('linkEndWarranty').value;
+    
+    if (!clinicUid || !modelId || !versionName || !serialNo || !installingDate || !endWarranty) {
+        showToast("Please fill in all the required fields.", "error");
+        return;
+    }
+    
+    const modelObj = allCatalogDevices.find(m => m.id === modelId);
+    if (!modelObj) {
+        showToast("Selected device model not found.", "error");
+        return;
+    }
+    
+    const versionObj = modelObj.versions.find(v => v.versionName === versionName);
+    if (!versionObj) {
+        showToast("Selected version specs not found.", "error");
+        return;
+    }
+    
+    showOverlay('linkDeviceLoadingOverlay');
+    
+    try {
+        const devicePayload = {
+            deviceId: modelId,
+            deviceName: modelObj.name,
+            deviceVersion: versionName,
+            imageUrl: modelObj.imageUrl || '',
+            swVer: versionObj.swVer || 'N/A',
+            uiVer: versionObj.uiVer || 'N/A',
+            ntcVer: versionObj.ntcVer || 'N/A',
+            pcbVer: versionObj.pcbVer || 'N/A',
+            ssr: versionObj.ssr || 'N/A',
+            serialNo: serialNo,
+            installingDate: installingDate,
+            endWarranty: endWarranty
+        };
+        
+        let firestoreSuccess = false;
+        let rtdbSuccess = false;
+        let errorDetails = "";
+        
+        // 1. Save to Firestore under users/{uid}/device
+        try {
+            await withTimeout(
+                db.collection('users').doc(clinicUid).update({
+                    device: devicePayload
+                }),
+                5000,
+                "Firestore link write timed out."
+            );
+            firestoreSuccess = true;
+        } catch (fsErr) {
+            console.warn("Firestore device link write failed:", fsErr);
+            errorDetails += `Firestore: ${fsErr.message || fsErr}. `;
+        }
+        
+        // 2. Save to Realtime Database under users/{uid}/device
+        try {
+            await withTimeout(
+                rtdb.ref(`users/${clinicUid}/device`).set(devicePayload),
+                5000,
+                "Realtime Database link write timed out."
+            );
+            rtdbSuccess = true;
+        } catch (rtdbErr) {
+            console.warn("RTDB device link write failed:", rtdbErr);
+            errorDetails += `RTDB: ${rtdbErr.message || rtdbErr}. `;
+        }
+        
+        if (firestoreSuccess || rtdbSuccess) {
+            if (firestoreSuccess && rtdbSuccess) {
+                showToast("Device linked successfully! ✨");
+            } else {
+                showToast("Device linked (Partial database sync).", "warning");
+            }
+            closeModal('linkDeviceModal');
+        } else {
+            throw new Error("Both databases failed: " + errorDetails);
+        }
+    } catch (err) {
+        console.error("Linking device failed:", err);
+        showToast("Linking Failed: " + err.message, "error");
+    } finally {
+        hideOverlay('linkDeviceLoadingOverlay');
+    }
+}
+window.submitLinkDeviceForm = submitLinkDeviceForm;
+
+/**
+ * Remove linked device object from clinic profile
+ */
+async function confirmUnlinkDevice(uid, clinicName) {
+    const title = "Unlink Hardware Device";
+    const message = `Are you sure you want to remove the linked hardware device from clinic "${clinicName}"?`;
+    const confirmed = await showCustomConfirm(title, message, 'danger');
+    if (!confirmed) return;
+    
+    try {
+        let firestoreSuccess = false;
+        let rtdbSuccess = false;
+        let errorDetails = "";
+        
+        // 1. Remove from Firestore
+        try {
+            await withTimeout(
+                db.collection('users').doc(uid).update({
+                    device: firebase.firestore.FieldValue.delete()
+                }),
+                5000,
+                "Firestore unlink write timed out."
+            );
+            firestoreSuccess = true;
+        } catch (fsErr) {
+            console.warn("Firestore device unlink failed:", fsErr);
+            errorDetails += `Firestore: ${fsErr.message || fsErr}. `;
+        }
+        
+        // 2. Remove from Realtime Database
+        try {
+            await withTimeout(
+                rtdb.ref(`users/${uid}/device`).remove(),
+                5000,
+                "Realtime Database unlink write timed out."
+            );
+            rtdbSuccess = true;
+        } catch (rtdbErr) {
+            console.warn("RTDB device unlink failed:", rtdbErr);
+            errorDetails += `RTDB: ${rtdbErr.message || rtdbErr}. `;
+        }
+        
+        if (firestoreSuccess || rtdbSuccess) {
+            showToast("Device unlinked successfully.");
+            closeModal('viewClinicModal');
+        } else {
+            throw new Error("Both databases failed: " + errorDetails);
+        }
+    } catch (err) {
+        console.error("Unlinking device failed:", err);
+        showToast("Unlink Failed: " + err.message, "error");
+    }
+}
+window.confirmUnlinkDevice = confirmUnlinkDevice;

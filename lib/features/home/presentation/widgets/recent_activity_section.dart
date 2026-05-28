@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '../../data/models/recent_activity_model.dart';
 import '../controllers/home_controller.dart';
+import 'package:extrememedicaluserapp/features/devices/presentation/widgets/add_device_sheet.dart';
 
 class RecentActivitySection extends GetView<HomeController> {
   const RecentActivitySection({super.key});
@@ -151,7 +152,13 @@ class RecentActivitySection extends GetView<HomeController> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {},
+          onTap: () {
+            Get.bottomSheet(
+              const AddDeviceSheet(),
+              isScrollControlled: true,
+              barrierColor: Colors.black.withValues(alpha: 0.5),
+            );
+          },
           borderRadius: BorderRadius.circular(20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
