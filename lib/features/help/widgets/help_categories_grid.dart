@@ -127,7 +127,7 @@ class _CategoryCard extends StatelessWidget {
         } else if (item.title == 'Video Guides') {
           Get.snackbar('Video Guides', 'Opening video tutorials gallery...');
         } else if (item.title == 'Contact Us') {
-          Get.snackbar('Support', 'Opening support chat...');
+          Get.toNamed(AppRoutes.contactSupport);
         }
       },
       child: Container(

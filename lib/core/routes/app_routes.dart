@@ -11,4 +11,6 @@ class AppRoutes {
   static const String settings = '/settings';
   static const String knowledgeCenter = '/knowledge-center';
   static const String errorDetails = '/error-details';
+  static const String contactSupport = '/contact-support';
+  static const String ticketSubmitted = '/ticket-submitted';
 }

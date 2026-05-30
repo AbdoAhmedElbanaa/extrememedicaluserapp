@@ -61,6 +61,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <span class="w-1.5 h-1.5 bg-white rounded-full absolute right-4"></span>
             <?php endif; ?>
         </a>
+        <a href="contact_support.php" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-sm font-medium transition duration-300 relative <?php echo $current_page == 'contact_support.php' ? 'text-white bg-gradient-to-tr from-primary to-secondary shadow-primaryglow' : 'text-textsecondary hover:text-white hover:bg-white/5'; ?>">
+            <i class="fa-solid fa-headset text-lg"></i>
+            <span>Contact Support</span>
+            <?php if ($current_page == 'contact_support.php'): ?>
+                <span class="w-1.5 h-1.5 bg-white rounded-full absolute right-4"></span>
+            <?php endif; ?>
+        </a>
         <a href="import.php" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-sm font-medium transition duration-300 relative <?php echo $current_page == 'import.php' ? 'text-white bg-gradient-to-tr from-primary to-secondary shadow-primaryglow' : 'text-textsecondary hover:text-white hover:bg-white/5'; ?>">
             <i class="fa-solid fa-file-import text-lg"></i>
             <span>Import Data</span>

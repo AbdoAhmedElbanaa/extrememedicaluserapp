@@ -31,6 +31,9 @@ import 'package:toastification/toastification.dart';
 import 'package:extrememedicaluserapp/features/help/views/knowledge_center_view.dart';
 import 'package:extrememedicaluserapp/features/help/views/error_details_view.dart';
 import 'package:extrememedicaluserapp/features/help/controllers/knowledge_center_controller.dart';
+import 'package:extrememedicaluserapp/features/contact/views/contact_view.dart';
+import 'package:extrememedicaluserapp/features/contact/views/ticket_submitted_view.dart';
+import 'package:extrememedicaluserapp/features/contact/controllers/contact_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -168,6 +171,19 @@ class MyApp extends StatelessWidget {
               name: AppRoutes.errorDetails,
               page: () => const ErrorDetailsView(),
               transition: Transition.cupertino,
+            ),
+            GetPage(
+              name: AppRoutes.contactSupport,
+              page: () => const ContactView(),
+              binding: BindingsBuilder(() {
+                Get.put(ContactController());
+              }),
+              transition: Transition.rightToLeftWithFade,
+            ),
+            GetPage(
+              name: AppRoutes.ticketSubmitted,
+              page: () => const TicketSubmittedView(),
+              transition: Transition.fadeIn,
             ),
           ],
         ),

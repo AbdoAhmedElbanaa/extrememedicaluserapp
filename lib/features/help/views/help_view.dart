@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
+import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
 import 'package:extrememedicaluserapp/features/help/controllers/help_controller.dart';
 import 'package:extrememedicaluserapp/features/help/widgets/help_header.dart';
 import 'package:extrememedicaluserapp/features/help/widgets/help_search_bar.dart';
@@ -260,7 +261,7 @@ class HelpView extends GetView<HelpController> {
           ),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () => Get.toNamed(AppRoutes.contactSupport),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
               foregroundColor: AppColors.primary,
