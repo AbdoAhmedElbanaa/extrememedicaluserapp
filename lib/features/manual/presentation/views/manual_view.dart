@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
 import '../controllers/manual_controller.dart';
@@ -230,20 +231,31 @@ class ManualView extends GetView<ManualController> {
             ],
           ),
           const SizedBox(height: 16),
-          Expanded(
-            flex: isWide ? 1 : 0,
-            child: Text(
+          if (isWide)
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: HtmlWidget(
+                  step.description,
+                  textStyle: TextStyle(
+                    color: (isDark ? Colors.white : Colors.black).withValues(
+                        alpha: 0.6),
+                    fontSize: 15,
+                    height: 1.5,
+                  ),
+                ),
+              ),
+            )
+          else
+            HtmlWidget(
               step.description,
-              maxLines: isWide ? 4 : null,
-              overflow: isWide ? TextOverflow.ellipsis : TextOverflow.visible,
-              style: TextStyle(
+              textStyle: TextStyle(
                 color: (isDark ? Colors.white : Colors.black).withValues(
                     alpha: 0.6),
                 fontSize: 15,
                 height: 1.5,
               ),
             ),
-          ),
           if (step.noteText != null) ...[
             const SizedBox(height: 16),
             _buildNoteBox(step.noteText!, step.noteType, isDark),

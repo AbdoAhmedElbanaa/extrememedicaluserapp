@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../data/models/manual_model.dart';
 import '../../data/models/manual_step_model.dart';
+import '../../data/services/manual_service.dart';
 
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -9,22 +10,29 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 class ManualController extends GetxController {
   final RxList<ManualModel> manuals = <ManualModel>[].obs;
   final RxList<ManualStepModel> manualSteps = <ManualStepModel>[].obs;
+  final RxList<String> categories = <String>[].obs;
   final RxString searchQuery = ''.obs;
-  final RxString selectedCategory = 'Installation'.obs;
+  final RxString selectedCategory = ''.obs;
+  final RxBool isLoading = true.obs;
   final RefreshController refreshController = RefreshController(initialRefresh: false);
+
+  final ManualService _service = ManualService();
 
   @override
   void onInit() {
     super.onInit();
     _loadManuals();
-    _loadSteps();
+    loadStepsData();
   }
 
   Future<void> onRefresh() async {
-    await Future.delayed(const Duration(seconds: 1));
-    _loadManuals();
-    _loadSteps();
-    refreshController.refreshCompleted();
+    try {
+      _loadManuals();
+      await loadStepsData();
+      refreshController.refreshCompleted();
+    } catch (e) {
+      refreshController.refreshFailed();
+    }
   }
 
   void changeCategory(String category) {
@@ -52,66 +60,25 @@ class ManualController extends GetxController {
     ];
   }
 
-  void _loadSteps() {
-    manualSteps.value = [
-      // Installation Steps
-      ManualStepModel(
-        stepNumber: 1,
-        title: 'Unbox & Inspect',
-        description: 'Remove the device from packaging. Check for visible damage. Verify all components: unit, power adapter, mounting bracket, and this manual are present.',
-        category: 'Installation',
-      ),
-      ManualStepModel(
-        stepNumber: 2,
-        title: 'Choose Installation Location',
-        description: 'Mount at least 1.5m from the floor. Avoid direct sunlight, heat sources, and moisture. Ensure 30cm clearance on all sides for proper airflow.',
-        noteText: 'Optimal range: 18–24°C ambient temperature.',
-        noteType: StepNoteType.info,
-        category: 'Installation',
-      ),
-      ManualStepModel(
-        stepNumber: 3,
-        title: 'Mount the Bracket',
-        description: 'Use the provided 4 × M4 screws and wall anchors. Ensure the surface can support 2.5kg. Use a spirit level to align the bracket horizontally.',
-        noteText: 'Do not install near electrical panels or HVAC vents.',
-        noteType: StepNoteType.warning,
-        category: 'Installation',
-      ),
-      
-      // Setup Steps
-      ManualStepModel(
-        stepNumber: 1,
-        title: 'Power On Device',
-        description: 'Connect the power adapter to the device and plug it into a wall outlet. Press the power button for 3 seconds until the display lights up.',
-        category: 'Setup',
-      ),
-      ManualStepModel(
-        stepNumber: 2,
-        title: 'Connect to Wi-Fi',
-        description: 'Open the Extreme Medical app on your phone. Go to "Add Device" and follow the instructions to connect the device to your 2.4GHz Wi-Fi network.',
-        noteText: 'The device only supports 2.4GHz networks.',
-        noteType: StepNoteType.info,
-        category: 'Setup',
-      ),
+  Future<void> loadStepsData() async {
+    try {
+      isLoading.value = true;
+      final steps = await _service.getManualSteps();
+      manualSteps.assignAll(steps);
 
-      // Maintenance Steps
-      ManualStepModel(
-        stepNumber: 1,
-        title: 'Cleaning the Sensor',
-        description: 'Use a soft, dry cloth to wipe the sensor lens once a month. Do not use abrasive cleaners or liquids.',
-        category: 'Maintenance',
-      ),
+      // Extract unique categories
+      final uniqueCats = steps.map((s) => s.category).toSet().toList();
+      categories.assignAll(uniqueCats);
 
-      // Safety Steps
-      ManualStepModel(
-        stepNumber: 1,
-        title: 'Electrical Safety',
-        description: 'Do not use the device with a damaged power cord. Always unplug the device before cleaning or performing maintenance.',
-        noteType: StepNoteType.warning,
-        noteText: 'Risk of electric shock if handled improperly.',
-        category: 'Safety',
-      ),
-    ];
+      // Check if selectedCategory is still valid, else set to first
+      if (!categories.contains(selectedCategory.value)) {
+        selectedCategory.value = categories.isNotEmpty ? categories.first : '';
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to load user manual: $e');
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   List<ManualStepModel> get filteredSteps {

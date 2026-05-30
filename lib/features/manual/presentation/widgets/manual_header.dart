@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
+import 'package:extrememedicaluserapp/features/auth/services/auth_service.dart';
 import '../controllers/manual_controller.dart';
 
 class ManualHeader extends GetView<ManualController> {
@@ -9,118 +10,122 @@ class ManualHeader extends GetView<ManualController> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme
-        .of(context)
-        .brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final bool isWide = context.isDesktopLayout || context.isTabletLayout;
+    final authService = Get.find<AuthService>();
 
-    return Container(
-      constraints: const BoxConstraints(maxWidth: 1400),
-      padding: EdgeInsets.only(
-        top: MediaQuery
-            .of(context)
-            .padding
-            .top + 10,
-        left: context.responsive(20, tablet: 40, desktop: 60),
-        right: context.responsive(20, tablet: 40, desktop: 60),
-        bottom: 20,
-      ),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : Colors.white,
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              _buildSquareButton(
-                icon: Icons.arrow_back_ios_new_rounded,
-                onTap: () => Get.back(),
-                isDark: isDark,
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'User Manual',
-                      style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black,
-                        fontSize: context.responsive(
-                            22, tablet: 26, desktop: 30),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      'SmartThermo Pro - SN-2024-001234',
-                      style: TextStyle(
-                        color: (isDark ? Colors.white : Colors.black)
-                            .withValues(alpha: 0.4),
-                        fontSize: context.responsive(
-                            13, tablet: 14, desktop: 16),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
+    return Obx(() {
+      final user = authService.currentUserModel.value;
+      final device = user?.device;
+      final deviceName = device?.deviceName ?? 'SmartThermo Pro';
+      final serialNo = device?.serialNo ?? 'SN-2024-001234';
+      final deviceVersion = device?.deviceVersion ?? 'Version 2.4';
+
+      return Container(
+        constraints: const BoxConstraints(maxWidth: 1400),
+        padding: EdgeInsets.only(
+          top: MediaQuery.of(context).padding.top + 10,
+          left: context.responsive(20, tablet: 40, desktop: 60),
+          right: context.responsive(20, tablet: 40, desktop: 60),
+          bottom: 20,
+        ),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.surfaceDark : Colors.white,
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                _buildSquareButton(
+                  icon: Icons.arrow_back_ios_new_rounded,
+                  onTap: () => Get.back(),
+                  isDark: isDark,
                 ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.responsive(14, tablet: 20),
-                  vertical: context.responsive(8, tablet: 12),
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.3),
-                    width: 1.5,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'User Manual',
+                        style: TextStyle(
+                          color: isDark ? Colors.white : Colors.black,
+                          fontSize: context.responsive(
+                              22, tablet: 26, desktop: 30),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        '$deviceName - $serialNo',
+                        style: TextStyle(
+                          color: (isDark ? Colors.white : Colors.black)
+                              .withValues(alpha: 0.4),
+                          fontSize: context.responsive(
+                              13, tablet: 14, desktop: 16),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                child: Row(
-                  children: [
-                    const Icon(
-                        Icons.file_download_outlined, color: AppColors.primary,
-                        size: 18),
-                    const SizedBox(width: 6),
-                    Text(
-                      'PDF',
-                      style: TextStyle(
-                        color: AppColors.primary,
-                        fontSize: context.responsive(13, tablet: 14),
-                        fontWeight: FontWeight.bold,
-                      ),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.responsive(14, tablet: 20),
+                    vertical: context.responsive(8, tablet: 12),
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: AppColors.primary.withValues(alpha: 0.3),
+                      width: 1.5,
                     ),
-                  ],
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                          Icons.file_download_outlined, color: AppColors.primary,
+                          size: 18),
+                      const SizedBox(width: 6),
+                      Text(
+                        'PDF',
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontSize: context.responsive(13, tablet: 14),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 25),
-
-          if (isWide)
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(flex: 3, child: _buildDeviceInfoCard(isDark, context)),
-                const SizedBox(width: 20),
-                Expanded(flex: 2, child: _buildCategoriesList(isDark, context)),
-              ],
-            )
-          else
-            Column(
-              children: [
-                _buildDeviceInfoCard(isDark, context),
-                const SizedBox(height: 20),
-                _buildCategoriesList(isDark, context),
               ],
             ),
-        ],
-      ),
-    );
+            const SizedBox(height: 25),
+
+            if (isWide)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(flex: 3, child: _buildDeviceInfoCard(deviceName, deviceVersion, isDark, context)),
+                  const SizedBox(width: 20),
+                  Expanded(flex: 2, child: _buildCategoriesList(isDark, context)),
+                ],
+              )
+            else
+              Column(
+                children: [
+                  _buildDeviceInfoCard(deviceName, deviceVersion, isDark, context),
+                  const SizedBox(height: 20),
+                  _buildCategoriesList(isDark, context),
+                ],
+              ),
+          ],
+        ),
+      );
+    });
   }
 
-  Widget _buildDeviceInfoCard(bool isDark, BuildContext context) {
+  Widget _buildDeviceInfoCard(String deviceName, String deviceVersion, bool isDark, BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -149,7 +154,7 @@ class ManualHeader extends GetView<ManualController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'SmartThermo Pro X',
+                  deviceName,
                   style: TextStyle(
                     color: isDark ? Colors.white : Colors.black,
                     fontSize: 16,
@@ -158,7 +163,7 @@ class ManualHeader extends GetView<ManualController> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Version 2.4 · 48 pages · EN/AR',
+                  '$deviceVersion · 48 pages · EN/AR',
                   style: TextStyle(
                     color: (isDark ? Colors.white : Colors.black).withValues(
                         alpha: 0.3),
@@ -189,20 +194,35 @@ class ManualHeader extends GetView<ManualController> {
   }
 
   Widget _buildCategoriesList(bool isDark, BuildContext context) {
-    return Obx(() =>
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          child: Row(
-            children: [
-              _buildCategoryChip(
-                  Icons.flash_on_rounded, 'Installation', isDark),
-              _buildCategoryChip(Icons.settings_rounded, 'Setup', isDark),
-              _buildCategoryChip(Icons.build_rounded, 'Maintenance', isDark),
-              _buildCategoryChip(Icons.security_rounded, 'Safety', isDark),
-            ],
-          ),
-        ));
+    return Obx(() {
+      final cats = controller.categories;
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        child: Row(
+          children: cats.map((category) {
+            IconData icon;
+            switch (category.toLowerCase()) {
+              case 'installation':
+                icon = Icons.flash_on_rounded;
+                break;
+              case 'setup':
+                icon = Icons.settings_rounded;
+                break;
+              case 'maintenance':
+                icon = Icons.build_rounded;
+                break;
+              case 'safety':
+                icon = Icons.security_rounded;
+                break;
+              default:
+                icon = Icons.bookmark_rounded;
+            }
+            return _buildCategoryChip(icon, category, isDark);
+          }).toList(),
+        ),
+      );
+    });
   }
 
   Widget _buildSquareButton(

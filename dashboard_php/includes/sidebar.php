@@ -54,6 +54,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <span class="w-1.5 h-1.5 bg-white rounded-full absolute right-4"></span>
             <?php endif; ?>
         </a>
+        <a href="user_manual.php" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-sm font-medium transition duration-300 relative <?php echo $current_page == 'user_manual.php' ? 'text-white bg-gradient-to-tr from-primary to-secondary shadow-primaryglow' : 'text-textsecondary hover:text-white hover:bg-white/5'; ?>">
+            <i class="fa-solid fa-book-open text-lg"></i>
+            <span>User Manual</span>
+            <?php if ($current_page == 'user_manual.php'): ?>
+                <span class="w-1.5 h-1.5 bg-white rounded-full absolute right-4"></span>
+            <?php endif; ?>
+        </a>
         <a href="import.php" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-sm font-medium transition duration-300 relative <?php echo $current_page == 'import.php' ? 'text-white bg-gradient-to-tr from-primary to-secondary shadow-primaryglow' : 'text-textsecondary hover:text-white hover:bg-white/5'; ?>">
             <i class="fa-solid fa-file-import text-lg"></i>
             <span>Import Data</span>
