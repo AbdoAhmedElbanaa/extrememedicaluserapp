@@ -125,7 +125,7 @@ class _CategoryCard extends StatelessWidget {
           Get.put(ManualController());
           Get.to(() => const ManualView(), transition: Transition.rightToLeftWithFade);
         } else if (item.title == 'Video Guides') {
-          Get.snackbar('Video Guides', 'Opening video tutorials gallery...');
+          Get.toNamed(AppRoutes.videoTutorials);
         } else if (item.title == 'Contact Us') {
           Get.toNamed(AppRoutes.contactSupport);
         }

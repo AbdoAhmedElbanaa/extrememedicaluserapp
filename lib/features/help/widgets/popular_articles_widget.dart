@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
+import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
 
 class PopularArticlesWidget extends StatelessWidget {
   const PopularArticlesWidget({super.key});
@@ -136,7 +137,13 @@ class _ArticleItem extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {},
+          onTap: () {
+            if (data.title == 'My Support Requests') {
+              Get.toNamed(AppRoutes.mySupportRequests);
+            } else if (data.isLiveChat) {
+              Get.toNamed(AppRoutes.contactSupport);
+            }
+          },
           borderRadius: BorderRadius.circular(20),
           child: Padding(
             padding: const EdgeInsets.all(16.0),

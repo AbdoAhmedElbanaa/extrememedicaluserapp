@@ -31,7 +31,11 @@ import 'package:extrememedicaluserapp/features/help/views/error_details_view.dar
 import 'package:extrememedicaluserapp/features/help/controllers/knowledge_center_controller.dart';
 import 'package:extrememedicaluserapp/features/contact/views/contact_view.dart';
 import 'package:extrememedicaluserapp/features/contact/views/ticket_submitted_view.dart';
+import 'package:extrememedicaluserapp/features/contact/views/my_support_requests_view.dart';
+import 'package:extrememedicaluserapp/features/contact/views/ticket_tracker_view.dart';
 import 'package:extrememedicaluserapp/features/contact/controllers/contact_controller.dart';
+import 'package:extrememedicaluserapp/features/video_tutorials/views/video_tutorials_view.dart';
+import 'package:extrememedicaluserapp/features/video_tutorials/controllers/video_tutorials_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -171,6 +175,30 @@ class MyApp extends StatelessWidget {
               name: AppRoutes.ticketSubmitted,
               page: () => const TicketSubmittedView(),
               transition: Transition.fadeIn,
+            ),
+            GetPage(
+              name: AppRoutes.mySupportRequests,
+              page: () => const MySupportRequestsView(),
+              binding: BindingsBuilder(() {
+                Get.put(ContactController());
+              }),
+              transition: Transition.rightToLeftWithFade,
+            ),
+            GetPage(
+              name: AppRoutes.ticketTracker,
+              page: () => const TicketTrackerView(),
+              binding: BindingsBuilder(() {
+                Get.put(ContactController());
+              }),
+              transition: Transition.rightToLeftWithFade,
+            ),
+            GetPage(
+              name: AppRoutes.videoTutorials,
+              page: () => const VideoTutorialsView(),
+              binding: BindingsBuilder(() {
+                Get.put(VideoTutorialsController());
+              }),
+              transition: Transition.rightToLeftWithFade,
             ),
           ],
         ),

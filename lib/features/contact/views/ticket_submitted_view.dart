@@ -113,7 +113,7 @@ class TicketSubmittedView extends StatelessWidget {
                           icon: Icons.history_rounded,
                           label: 'My Tickets',
                           onTap: () {
-                            Get.snackbar('My Tickets', 'Showing all submitted tickets...');
+                            Get.offNamed(AppRoutes.mySupportRequests);
                           },
                           isDark: isDark,
                         ),
@@ -358,8 +358,6 @@ class TicketSubmittedView extends StatelessWidget {
   }
 
   Widget _buildTrackButton(TicketModel ticket, BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return SizedBox(
       width: double.infinity,
       height: 52,
@@ -379,22 +377,7 @@ class TicketSubmittedView extends StatelessWidget {
         ),
         child: ElevatedButton(
           onPressed: () {
-            Get.defaultDialog(
-              title: 'Ticket Description',
-              backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
-              titleStyle: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.bold),
-              content: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  ticket.description,
-                  style: TextStyle(color: isDark ? Colors.white70 : Colors.black87, fontSize: 14),
-                ),
-              ),
-              confirm: TextButton(
-                onPressed: () => Get.back(),
-                child: const Text('Close', style: TextStyle(color: AppColors.primary)),
-              ),
-            );
+            Get.offNamed(AppRoutes.ticketTracker, arguments: ticket);
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.transparent,

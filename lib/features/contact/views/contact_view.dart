@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:extrememedicaluserapp/features/auth/services/auth_service.dart';
 import '../controllers/contact_controller.dart';
@@ -324,14 +325,31 @@ class ContactView extends GetView<ContactController> {
                   child: Stack(
                     children: [
                       Center(
-                        child: url.startsWith('http') && url.contains('picsum')
+                        child: _isImageUrl(url)
                             ? ClipRRect(
                                 borderRadius: BorderRadius.circular(11),
-                                child: Image.network(url, width: 80, height: 80, fit: BoxFit.cover),
+                                child: CachedNetworkImage(
+                                  imageUrl: url,
+                                  width: 80,
+                                  height: 80,
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) => const Center(
+                                    child: SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                                    ),
+                                  ),
+                                  errorWidget: (context, url, error) => const Icon(Icons.image_not_supported_outlined, color: Colors.red),
+                                ),
                               )
                             : Icon(
-                                url.endsWith('.mp4') ? Icons.play_circle_outline_rounded : Icons.insert_drive_file_outlined,
-                                color: isDark ? Colors.white54 : Colors.black54,
+                                _isVideoUrl(url)
+                                    ? Icons.play_circle_outline_rounded
+                                    : (_isPdfUrl(url) ? Icons.picture_as_pdf_rounded : Icons.insert_drive_file_outlined),
+                                color: _isPdfUrl(url)
+                                    ? Colors.redAccent
+                                    : (isDark ? Colors.white54 : Colors.black54),
                                 size: 28,
                               ),
                       ),
@@ -500,5 +518,31 @@ class ContactView extends GetView<ContactController> {
         ),
       );
     });
+  }
+
+  bool _isImageUrl(String url) {
+    if (url.startsWith('data:image/')) return true;
+    final cleanUrl = url.split('?').first.split('#').first.toLowerCase();
+    return cleanUrl.endsWith('.jpg') ||
+        cleanUrl.endsWith('.jpeg') ||
+        cleanUrl.endsWith('.png') ||
+        cleanUrl.endsWith('.gif') ||
+        cleanUrl.endsWith('.webp') ||
+        cleanUrl.contains('picsum');
+  }
+
+  bool _isVideoUrl(String url) {
+    if (url.startsWith('data:video/')) return true;
+    final cleanUrl = url.split('?').first.split('#').first.toLowerCase();
+    return cleanUrl.endsWith('.mp4') ||
+        cleanUrl.endsWith('.mov') ||
+        cleanUrl.endsWith('.avi') ||
+        cleanUrl.endsWith('.mkv') ||
+        cleanUrl.endsWith('.webm');
+  }
+
+  bool _isPdfUrl(String url) {
+    final cleanUrl = url.split('?').first.split('#').first.toLowerCase();
+    return cleanUrl.endsWith('.pdf');
   }
 }

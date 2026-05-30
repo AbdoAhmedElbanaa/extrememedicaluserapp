@@ -216,9 +216,19 @@ function renderTicketsTable() {
         else if (ticket.priority === 'Medium') prioBadge = 'bg-primary/15 text-primary border border-primary/30';
         
         // Status badge
-        const isResolved = ticket.status === 'RESOLVED';
-        const statusBadgeClass = isResolved ? 'status-badge success' : 'status-badge warning';
-        const statusIcon = isResolved ? 'fa-check' : 'fa-circle-notch fa-spin';
+        let statusBadgeClass = 'bg-warning/15 text-warning border border-warning/30';
+        let statusIcon = 'fa-circle-notch fa-spin';
+        
+        if (ticket.status === 'RESOLVED' || ticket.status === 'CLOSED') {
+            statusBadgeClass = 'bg-success/15 text-success border border-success/30';
+            statusIcon = 'fa-check';
+        } else if (ticket.status === 'RESPONSE SENT') {
+            statusBadgeClass = 'bg-primary/15 text-primary border border-primary/30';
+            statusIcon = 'fa-paper-plane';
+        } else if (ticket.status === 'AWAITING REPLY') {
+            statusBadgeClass = 'bg-secondary/15 text-secondary border border-secondary/30';
+            statusIcon = 'fa-hourglass-half';
+        }
 
         tr.innerHTML = `
             <td class="p-5 font-bold text-white text-xs">${ticket.id}</td>
@@ -238,7 +248,7 @@ function renderTicketsTable() {
                 <span class="text-[10px] font-bold px-2 py-0.5 rounded ${prioBadge}">${ticket.priority}</span>
             </td>
             <td class="p-5">
-                <span class="${statusBadgeClass}">
+                <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold inline-flex items-center gap-1.5 ${statusBadgeClass}">
                     <i class="fa-solid ${statusIcon}"></i> ${ticket.status}
                 </span>
             </td>
@@ -273,7 +283,25 @@ function openInspectTicketModal(id) {
     attachmentsContainer.innerHTML = '';
     if (ticket.attachments && Array.isArray(ticket.attachments) && ticket.attachments.length > 0) {
         ticket.attachments.forEach((url, i) => {
-            const isImage = url.match(/\.(jpeg|jpg|gif|png)$/i) || url.startsWith('data:image/');
+            let isImage = false;
+            let isVideo = false;
+            let isPdf = false;
+            
+            if (url.startsWith('data:image/')) {
+                isImage = true;
+            } else if (url.startsWith('data:video/')) {
+                isVideo = true;
+            } else {
+                const path = url.split('?')[0].split('#')[0].toLowerCase();
+                if (path.match(/\.(jpeg|jpg|gif|png|webp|svg)$/i)) {
+                    isImage = true;
+                } else if (path.match(/\.(mp4|mov|avi|mkv|webm|3gp)$/i)) {
+                    isVideo = true;
+                } else if (path.match(/\.pdf$/i)) {
+                    isPdf = true;
+                }
+            }
+
             const card = document.createElement('a');
             card.href = url;
             card.target = '_blank';
@@ -281,8 +309,11 @@ function openInspectTicketModal(id) {
             
             if (isImage) {
                 card.innerHTML = `<img src="${url}" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-eye text-white text-xs"></i></div>`;
+            } else if (isVideo) {
+                card.innerHTML = `<video src="${url}" class="w-full h-full object-cover" muted></video><div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center transition group-hover:bg-black/30 text-white"><i class="fa-solid fa-play text-xs mb-0.5"></i><span class="text-[8px] text-white/80">Play</span></div>`;
             } else {
-                card.innerHTML = `<i class="fa-solid fa-file-arrow-down text-textsecondary text-xl"></i><span class="absolute bottom-1 text-[8px] text-textmuted">File ${i+1}</span>`;
+                const icon = isPdf ? 'fa-file-pdf text-danger' : 'fa-file-arrow-down text-textsecondary';
+                card.innerHTML = `<i class="fa-solid ${icon} text-xl"></i><span class="absolute bottom-1 text-[8px] text-textmuted truncate max-w-[90%] px-1">File ${i+1}</span>`;
             }
             attachmentsContainer.appendChild(card);
         });
@@ -291,45 +322,46 @@ function openInspectTicketModal(id) {
     }
 
     // Input Note Section & Resolution Button Handling
-    const noteArea = document.getElementById('ticketResponse');
-    const resolveBtn = document.getElementById('resolveTicketBtn');
+    document.getElementById('modalTicketStatus').value = ticket.status || 'IN REVIEW';
     
-    if (ticket.status === 'RESOLVED') {
-        noteArea.value = ticket.resolutionText || 'Resolved by Administrator.';
-        noteArea.disabled = true;
-        resolveBtn.classList.add('hidden');
-    } else {
-        noteArea.value = '';
-        noteArea.disabled = false;
-        resolveBtn.classList.remove('hidden');
-    }
+    const noteArea = document.getElementById('ticketResponse');
+    noteArea.value = ticket.resolutionText || '';
+    noteArea.disabled = false;
 
     openModal('ticketModal');
 }
 
 /**
- * Handle Ticket Resolution
+ * Handle Ticket Updates (Status & Resolution text)
  */
-async function resolveTicket() {
+async function saveTicketUpdates() {
     if (!selectedTicketId) return;
 
+    const newStatus = document.getElementById('modalTicketStatus').value;
     const resolutionText = document.getElementById('ticketResponse').value.trim();
-    if (!resolutionText) {
-        showToast("Please provide a resolution note.", "error");
+
+    if ((newStatus === 'RESOLVED' || newStatus === 'RESPONSE SENT') && !resolutionText) {
+        showToast("Please provide a note/response before setting status to " + newStatus + ".", "error");
         return;
     }
 
     try {
-        await rtdb.ref(`contact_support/tickets/${selectedTicketId}`).update({
-            status: 'RESOLVED',
-            resolutionText,
-            resolvedAt: Date.now()
-        });
-        showToast("Ticket resolved and clinic notified! 🎉");
+        const updates = {
+            status: newStatus,
+            resolutionText: resolutionText || null
+        };
+
+        // If status changes to RESOLVED, set resolvedAt timestamp
+        if (newStatus === 'RESOLVED') {
+            updates.resolvedAt = Date.now();
+        }
+
+        await rtdb.ref(`contact_support/tickets/${selectedTicketId}`).update(updates);
+        showToast("Ticket updated successfully! 🛠️");
         closeModal('ticketModal');
         selectedTicketId = '';
     } catch (err) {
-        showToast("Failed to resolve ticket: " + err.message, "error");
+        showToast("Failed to update ticket: " + err.message, "error");
     }
 }
 

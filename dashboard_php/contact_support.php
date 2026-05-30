@@ -187,6 +187,17 @@ require_once __DIR__ . '/includes/sidebar.php';
                 </div>
             </div>
 
+            <!-- Status Transition Selector -->
+            <div class="flex flex-col gap-1.5">
+                <label for="modalTicketStatus" class="text-[9px] font-bold text-textsecondary uppercase tracking-wider">Ticket Current Stage (Timeline Status)</label>
+                <select id="modalTicketStatus" class="bg-white/5 border border-bordercolor rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-primary transition">
+                    <option value="IN REVIEW">IN REVIEW (Under Review)</option>
+                    <option value="RESPONSE SENT">RESPONSE SENT (Agent Replied / Sent Note)</option>
+                    <option value="AWAITING REPLY">AWAITING REPLY (Awaiting Clinic Response)</option>
+                    <option value="RESOLVED">RESOLVED (Issue Resolved & Closed)</option>
+                </select>
+            </div>
+
             <!-- Response Admin Input -->
             <div class="flex flex-col gap-1.5" id="responseContainer">
                 <label for="ticketResponse" class="text-[9px] font-bold text-textsecondary uppercase tracking-wider">Investigation Resolution Note</label>
@@ -195,8 +206,8 @@ require_once __DIR__ . '/includes/sidebar.php';
         </div>
         <div class="p-6 border-t border-bordercolor flex justify-end gap-3 bg-white/[0.01]">
             <button type="button" onclick="closeModal('ticketModal')" class="bg-transparent border border-bordercolor text-textsecondary px-4 py-2.5 rounded-xl text-xs font-semibold hover:bg-white/5 transition">Close</button>
-            <button type="button" id="resolveTicketBtn" onclick="resolveTicket()" class="bg-gradient-to-tr from-success to-primary text-white font-bold text-xs px-5 py-2.5 rounded-xl hover:-translate-y-0.5 hover:shadow-primaryglow transition duration-200 cursor-pointer">
-                Resolve Support Ticket
+            <button type="button" id="updateTicketBtn" onclick="saveTicketUpdates()" class="bg-gradient-to-tr from-primary to-secondary text-white font-bold text-xs px-5 py-2.5 rounded-xl hover:-translate-y-0.5 hover:shadow-primaryglow transition duration-200 cursor-pointer">
+                Save Ticket Updates
             </button>
         </div>
     </div>

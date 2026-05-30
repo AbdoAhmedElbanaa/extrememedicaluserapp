@@ -1,11 +1,16 @@
+import 'dart:io' show File;
 import 'dart:math';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:extrememedicaluserapp/features/auth/services/auth_service.dart';
 import 'package:extrememedicaluserapp/features/contact/models/ticket_model.dart';
 import 'package:extrememedicaluserapp/features/contact/models/contact_config_model.dart';
 import 'package:extrememedicaluserapp/features/contact/services/contact_service.dart';
 import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
+import 'package:extrememedicaluserapp/theme/app_colors.dart';
 
 class ContactController extends GetxController {
   final ContactService _service = ContactService();
@@ -17,6 +22,26 @@ class ContactController extends GetxController {
   // Subscriptions & Tickets
   final RxList<TicketModel> userTickets = <TicketModel>[].obs;
   final Rxn<TicketModel> activeTicket = Rxn<TicketModel>();
+
+  // Active Filter state
+  final RxString activeFilter = 'All'.obs;
+
+  // Filtered User Tickets Getter
+  List<TicketModel> get filteredTickets {
+    if (activeFilter.value == 'Open') {
+      return userTickets.where((t) => t.status != 'RESOLVED' && t.status != 'CLOSED').toList();
+    } else if (activeFilter.value == 'Closed') {
+      return userTickets.where((t) => t.status == 'RESOLVED' || t.status == 'CLOSED').toList();
+    }
+    return userTickets;
+  }
+
+  // Active tickets counts
+  int get openTicketsCount => userTickets.where((t) => t.status != 'RESOLVED' && t.status != 'CLOSED').length;
+  int get closedTicketsCount => userTickets.where((t) => t.status == 'RESOLVED' || t.status == 'CLOSED').length;
+
+  // Checks if user has an active ticket to prevent creating a new one
+  bool get hasActiveTicket => openTicketsCount > 0;
 
   // Form Fields State
   final RxString selectedSubject = ''.obs;
@@ -82,37 +107,210 @@ class ContactController extends GetxController {
     selectedPriority.value = value;
   }
 
-  // Simulate File Attachment with progress dialog
+  final ImagePicker _picker = ImagePicker();
+
+  // Actual File Attachment
   void addAttachment(String type) async {
-    isUploading.value = true;
-    uploadProgress.value = 0.0;
-
-    // Simulate progress upload
-    for (int i = 0; i <= 10; i++) {
-      await Future.delayed(const Duration(milliseconds: 150));
-      uploadProgress.value = i * 10.0;
-    }
-
-    // Generate simulated file URL
-    final randomVal = Random().nextInt(100000);
-    String fileName;
     if (type == 'Photo') {
-      fileName = 'https://picsum.photos/seed/$randomVal/600/400';
+      _showImageSourceDialog(isVideo: false);
     } else if (type == 'Video') {
-      fileName = 'https://www.w3schools.com/html/mov_bbb.mp4';
+      _showImageSourceDialog(isVideo: true);
     } else {
-      fileName = 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
+      _pickGeneralFile();
     }
+  }
 
-    attachments.add(fileName);
-    isUploading.value = false;
-    Get.snackbar(
-      'Attachment Added',
-      'Simulated $type upload completed successfully.',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.green.withValues(alpha: 0.15),
-      colorText: Colors.green,
+  Future<void> _showImageSourceDialog({required bool isVideo}) async {
+    final isDark = Get.isDarkMode;
+    
+    await Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.cinematicSurface : Colors.white,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
+          ),
+          border: Border(
+            top: BorderSide(
+              color: isDark ? AppColors.distinctBorderDark : AppColors.distinctBorderLight,
+              width: 1.5,
+            ),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: isDark ? Colors.white24 : Colors.black12,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              isVideo ? 'Choose Video Source' : 'Choose Photo Source',
+              style: TextStyle(
+                color: isDark ? Colors.white : Colors.black87,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildSourceOption(
+                  icon: isVideo ? Icons.videocam_rounded : Icons.camera_alt_rounded,
+                  label: isVideo ? 'Record Video' : 'Take Photo',
+                  onTap: () {
+                    Get.back();
+                    _pickMedia(isVideo: isVideo, fromCamera: true);
+                  },
+                  isDark: isDark,
+                ),
+                _buildSourceOption(
+                  icon: Icons.photo_library_rounded,
+                  label: 'Gallery',
+                  onTap: () {
+                    Get.back();
+                    _pickMedia(isVideo: isVideo, fromCamera: false);
+                  },
+                  isDark: isDark,
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
     );
+  }
+
+  Widget _buildSourceOption({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    required bool isDark,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: AppColors.primary.withValues(alpha: 0.2),
+                width: 1.5,
+              ),
+            ),
+            child: Icon(icon, color: AppColors.primary, size: 28),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            label,
+            style: TextStyle(
+              color: isDark ? Colors.white70 : Colors.black54,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _pickMedia({required bool isVideo, required bool fromCamera}) async {
+    try {
+      XFile? pickedFile;
+      if (isVideo) {
+        pickedFile = await _picker.pickVideo(
+          source: fromCamera ? ImageSource.camera : ImageSource.gallery,
+          maxDuration: const Duration(minutes: 5),
+        );
+      } else {
+        pickedFile = await _picker.pickImage(
+          source: fromCamera ? ImageSource.camera : ImageSource.gallery,
+          imageQuality: 85,
+        );
+      }
+
+      if (pickedFile != null) {
+        final fileName = pickedFile.name;
+        final fileBytes = await pickedFile.readAsBytes();
+        await _uploadAndAddAttachment(fileName: fileName, filePath: pickedFile.path, fileBytes: fileBytes);
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to pick media: $e');
+    }
+  }
+
+  Future<void> _pickGeneralFile() async {
+    try {
+      final result = await FilePicker.pickFiles(
+        type: FileType.any,
+        withData: true,
+      );
+
+      if (result != null && result.files.isNotEmpty) {
+        final file = result.files.first;
+        final fileName = file.name;
+        final filePath = file.path;
+        
+        Uint8List? fileBytes = file.bytes;
+        if (fileBytes == null && filePath != null) {
+          fileBytes = await File(filePath).readAsBytes();
+        }
+
+        if (fileBytes != null) {
+          await _uploadAndAddAttachment(fileName: fileName, filePath: filePath, fileBytes: fileBytes);
+        } else {
+          Get.snackbar('Error', 'Could not read file data.');
+        }
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to pick file: $e');
+    }
+  }
+
+  Future<void> _uploadAndAddAttachment({
+    required String fileName,
+    required String? filePath,
+    required Uint8List fileBytes,
+  }) async {
+    try {
+      isUploading.value = true;
+      uploadProgress.value = 0.0;
+
+      final url = await _service.uploadAttachment(
+        fileName: fileName,
+        filePath: filePath,
+        fileBytes: fileBytes,
+        onProgress: (progress) {
+          uploadProgress.value = progress;
+        },
+      );
+
+      attachments.add(url);
+      Get.snackbar(
+        'Attachment Uploaded',
+        'File uploaded successfully.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green.withValues(alpha: 0.15),
+        colorText: Colors.green,
+      );
+    } catch (e) {
+      Get.snackbar('Upload Failed', 'Failed to upload attachment: $e');
+    } finally {
+      isUploading.value = false;
+    }
   }
 
   void removeAttachment(int index) {

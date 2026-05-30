@@ -72,6 +72,8 @@
 	<string>This app needs camera access to scan medical equipment barcodes and capture diagnostic images.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app needs access to your photo library to save and upload medical reports and guides.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app needs microphone access to record video notes for support requests.</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>This app needs Bluetooth access to discover and connect to your smart medical devices.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
