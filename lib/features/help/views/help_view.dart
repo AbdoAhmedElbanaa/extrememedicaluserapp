@@ -125,7 +125,7 @@ class HelpView extends GetView<HelpController> {
   }
 
   Widget _buildContent(BuildContext context, {required bool isMobile}) {
-    final horizontalPadding = isMobile ? 16.0 : 32.0;
+    final horizontalPadding = isMobile ? 24.0 : 32.0;
     final topPadding = MediaQuery.of(context).padding.top;
 
     return Obx(() {

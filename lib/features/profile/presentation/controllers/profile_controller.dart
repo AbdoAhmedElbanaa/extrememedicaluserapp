@@ -71,8 +71,10 @@ class ProfileController extends GetxController {
 
   Future<void> onRefresh() async {
     try {
-      // Simulate API call to fetch latest user profile data
-      await Future.delayed(const Duration(seconds: 1));
+      final user = _authService.currentUser;
+      if (user != null) {
+        await _authService.loadUserModel(user.uid);
+      }
       if (refreshController.isRefresh) refreshController.refreshCompleted();
       if (refreshControllerWide.isRefresh) refreshControllerWide.refreshCompleted();
     } catch (e) {

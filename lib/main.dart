@@ -26,6 +26,9 @@ import 'package:extrememedicaluserapp/core/services/theme_service.dart';
 import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:toastification/toastification.dart';
+import 'package:extrememedicaluserapp/features/help/views/knowledge_center_view.dart';
+import 'package:extrememedicaluserapp/features/help/views/error_details_view.dart';
+import 'package:extrememedicaluserapp/features/help/controllers/knowledge_center_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -139,6 +142,19 @@ class MyApp extends StatelessWidget {
                 Get.put(SettingsController());
               }),
               transition: Transition.rightToLeftWithFade,
+            ),
+            GetPage(
+              name: AppRoutes.knowledgeCenter,
+              page: () => const KnowledgeCenterView(),
+              binding: BindingsBuilder(() {
+                Get.put(KnowledgeCenterController());
+              }),
+              transition: Transition.rightToLeftWithFade,
+            ),
+            GetPage(
+              name: AppRoutes.errorDetails,
+              page: () => const ErrorDetailsView(),
+              transition: Transition.cupertino,
             ),
           ],
         ),

@@ -32,43 +32,32 @@ class DevicesView extends GetView<DevicesController> {
   }
 
   Widget _buildMobileLayout(BuildContext context, bool isDark) {
-    final topPadding = MediaQuery
-        .of(context)
-        .padding
-        .top;
-    final double headerHeight = topPadding + 225;
-    const double cinematicGap = 20.0;
-
-    return Stack(
+    return Column(
       children: [
-        SmartRefresher(
-          controller: controller.refreshController,
-          onRefresh: controller.onRefresh,
-          header: WaterDropMaterialHeader(
-            backgroundColor: AppColors.primary,
-            color: Colors.white,
-            offset: headerHeight,
-          ),
-          child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(
-              parent: BouncingScrollPhysics(),
+        const DevicesHeader(),
+        Expanded(
+          child: SmartRefresher(
+            controller: controller.refreshController,
+            onRefresh: controller.onRefresh,
+            header: const WaterDropMaterialHeader(
+              backgroundColor: AppColors.primary,
+              color: Colors.white,
             ),
-            slivers: [
-              SliverToBoxAdapter(
-                child: SizedBox(height: headerHeight + cinematicGap),
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics(),
               ),
-              _buildDeviceGrid(context),
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 120),
-              ),
-            ],
+              slivers: [
+                const SliverToBoxAdapter(
+                  child: SizedBox(height: 15),
+                ),
+                _buildDeviceGrid(context),
+                const SliverToBoxAdapter(
+                  child: SizedBox(height: 120),
+                ),
+              ],
+            ),
           ),
-        ),
-        Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          child: const DevicesHeader(),
         ),
       ],
     );

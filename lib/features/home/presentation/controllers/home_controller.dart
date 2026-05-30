@@ -12,6 +12,7 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:extrememedicaluserapp/core/services/toast_service.dart';
+import 'package:extrememedicaluserapp/features/auth/services/auth_service.dart';
 
 class HomeController extends GetxController {
   var selectedIndex = 0.obs;
@@ -99,17 +100,29 @@ class HomeController extends GetxController {
   }
 
   Future<void> onRefresh() async {
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 2));
-    _initializeRecentActivities();
-    update();
-    refreshController.refreshCompleted();
-    
-    ToastService.show(
-      title: 'Success',
-      message: 'Data refreshed successfully',
-      type: ToastType.success,
-    );
+    try {
+      final authService = Get.find<AuthService>();
+      final user = authService.currentUser;
+      if (user != null) {
+        await authService.loadUserModel(user.uid);
+      }
+      _initializeRecentActivities();
+      update();
+      refreshController.refreshCompleted();
+      
+      ToastService.show(
+        title: 'Success',
+        message: 'Data refreshed successfully',
+        type: ToastType.success,
+      );
+    } catch (e) {
+      refreshController.refreshFailed();
+      ToastService.show(
+        title: 'Error',
+        message: 'Failed to refresh data: ${e.toString()}',
+        type: ToastType.error,
+      );
+    }
   }
 
   void changeIndex(int index) {

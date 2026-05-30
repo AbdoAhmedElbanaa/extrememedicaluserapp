@@ -116,7 +116,7 @@ class DevicesHeader extends GetView<DevicesController> {
                     ],
                   ),
                   GestureDetector(
-                    onTap: () => controller.onRefresh(),
+                    onTap: () => controller.refreshController.requestRefresh(),
                     child: const _HeaderCircularButton(
                       icon: Icons.refresh_rounded,
                     ),

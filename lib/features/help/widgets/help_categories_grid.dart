@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
+import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
+import 'package:extrememedicaluserapp/features/manual/presentation/views/manual_view.dart';
+import 'package:extrememedicaluserapp/features/manual/presentation/controllers/manual_controller.dart';
 
 class HelpCategoryItem {
   final String title;
@@ -110,8 +113,25 @@ class _CategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
 
-    return Container(
-      padding: const EdgeInsets.all(16),
+    return GestureDetector(
+      onTap: () {
+        if (item.title == 'Knowledge Hub') {
+          Get.toNamed(AppRoutes.knowledgeCenter, arguments: 0);
+        } else if (item.title == 'Error Codes') {
+          Get.toNamed(AppRoutes.knowledgeCenter, arguments: 2);
+        } else if (item.title == 'Troubleshoot') {
+          Get.toNamed(AppRoutes.knowledgeCenter, arguments: 3);
+        } else if (item.title == 'User Manual') {
+          Get.put(ManualController());
+          Get.to(() => const ManualView(), transition: Transition.rightToLeftWithFade);
+        } else if (item.title == 'Video Guides') {
+          Get.snackbar('Video Guides', 'Opening video tutorials gallery...');
+        } else if (item.title == 'Contact Us') {
+          Get.snackbar('Support', 'Opening support chat...');
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isDark
             ? item.color.withValues(alpha: 0.08)
@@ -160,6 +180,7 @@ class _CategoryCard extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }

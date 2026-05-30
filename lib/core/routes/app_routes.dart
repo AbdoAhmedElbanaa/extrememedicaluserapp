@@ -9,4 +9,6 @@ class AppRoutes {
   static const String deviceDetails = '/device-details';
   static const String help = '/help';
   static const String settings = '/settings';
+  static const String knowledgeCenter = '/knowledge-center';
+  static const String errorDetails = '/error-details';
 }
