@@ -4,6 +4,22 @@
  */
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
+<style>
+/* Custom scrollbar for sidebar navigation */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+</style>
 <aside class="w-[290px] bg-darksec border-r border-bordercolor flex flex-col p-6 sticky top-0 h-screen z-[100] shrink-0">
     <!-- Sidebar Branding Section -->
     <div class="pb-6">
@@ -25,7 +41,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <div class="h-[1px] bg-bordercolor mb-6"></div>
 
     <!-- Navigation Menu Items -->
-    <nav class="flex flex-col gap-2 flex-1">
+    <nav class="flex flex-col gap-2 flex-1 overflow-y-auto pr-1 custom-scrollbar">
         <a href="index.php" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-sm font-medium transition duration-300 relative <?php echo ($current_page == 'index.php' || $current_page == '') ? 'text-white bg-gradient-to-tr from-primary to-secondary shadow-primaryglow' : 'text-textsecondary hover:text-white hover:bg-white/5'; ?>">
             <i class="fa-solid fa-chart-pie text-lg"></i>
             <span>Dashboard</span>
@@ -72,6 +88,28 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <i class="fa-solid fa-headset text-lg"></i>
             <span>Contact Support</span>
             <?php if ($current_page == 'contact_support.php'): ?>
+                <span class="w-1.5 h-1.5 bg-white rounded-full absolute right-4"></span>
+            <?php endif; ?>
+        </a>
+        <a href="chat_console.php" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-sm font-medium transition duration-300 relative <?php echo $current_page == 'chat_console.php' ? 'text-white bg-gradient-to-tr from-primary to-secondary shadow-primaryglow' : 'text-textsecondary hover:text-white hover:bg-white/5'; ?>">
+            <i class="fa-solid fa-comments text-lg"></i>
+            <span>Live Chat</span>
+            <?php if ($current_page == 'chat_console.php'): ?>
+                <span class="w-1.5 h-1.5 bg-white rounded-full absolute right-4"></span>
+            <?php endif; ?>
+        </a>
+        <a href="notifications.php" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-sm font-medium transition duration-300 relative <?php echo $current_page == 'notifications.php' ? 'text-white bg-gradient-to-tr from-primary to-secondary shadow-primaryglow' : 'text-textsecondary hover:text-white hover:bg-white/5'; ?>">
+            <i class="fa-solid fa-bell text-lg"></i>
+            <span>Notifications</span>
+            <span class="bg-danger text-white text-[10px] font-bold px-2 py-0.5 rounded-full absolute right-4 hidden animate-pulse" id="sidebarNotificationBadge">0</span>
+            <?php if ($current_page == 'notifications.php'): ?>
+                <span class="w-1.5 h-1.5 bg-white rounded-full absolute right-4"></span>
+            <?php endif; ?>
+        </a>
+        <a href="onesignal_settings.php" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-sm font-medium transition duration-300 relative <?php echo $current_page == 'onesignal_settings.php' ? 'text-white bg-gradient-to-tr from-primary to-secondary shadow-primaryglow' : 'text-textsecondary hover:text-white hover:bg-white/5'; ?>">
+            <i class="fa-solid fa-tower-broadcast text-lg"></i>
+            <span>OneSignal Settings</span>
+            <?php if ($current_page == 'onesignal_settings.php'): ?>
                 <span class="w-1.5 h-1.5 bg-white rounded-full absolute right-4"></span>
             <?php endif; ?>
         </a>

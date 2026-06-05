@@ -6,6 +6,8 @@ import 'package:extrememedicaluserapp/core/services/theme_service.dart';
 import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
 import 'package:extrememedicaluserapp/features/home/presentation/widgets/user_profile_popup.dart';
 import 'package:extrememedicaluserapp/features/auth/services/auth_service.dart';
+import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
+import 'package:extrememedicaluserapp/features/notifications/services/notifications_service.dart';
 
 class HomeHeader extends StatelessWidget {
   final bool isDark;
@@ -106,12 +108,19 @@ class HomeHeader extends StatelessWidget {
                         },
                       ),
                       const SizedBox(width: 12),
-                      _buildIconButton(
-                        icon: Icons.notifications_none_rounded,
-                        isDark: isDark,
-                        hasBadge: true,
-                        onTap: () {},
-                      ),
+                      Obx(() {
+                        final count = Get.isRegistered<NotificationsService>()
+                            ? NotificationsService.to.unreadCount.value
+                            : 0;
+                        return _buildIconButton(
+                          icon: Icons.notifications_none_rounded,
+                          isDark: isDark,
+                          hasBadge: count > 0,
+                          onTap: () {
+                            Get.toNamed(AppRoutes.notifications);
+                          },
+                        );
+                      }),
                       const SizedBox(width: 12),
                       _buildUserAvatar(),
                     ],

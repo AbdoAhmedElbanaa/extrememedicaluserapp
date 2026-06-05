@@ -36,7 +36,6 @@ function syncSupportConfig() {
             document.getElementById('configStatus').value = config.status || 'online';
             document.getElementById('configResponseTimeText').value = config.responseTimeText || 'We typically reply in 2–4 hours';
             document.getElementById('configResponseTime').value = config.responseTime || '2-4 business hours';
-            
             // Sync subjects
             configuredSubjects = config.subjects || [
                 'Device Not Working',
@@ -119,7 +118,7 @@ async function saveConfig() {
     const responseTime = document.getElementById('configResponseTime').value.trim();
 
     try {
-        await rtdb.ref('contact_support/config').set({
+        await rtdb.ref('contact_support/config').update({
             status,
             responseTimeText,
             responseTime,

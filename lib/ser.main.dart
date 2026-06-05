@@ -38,6 +38,12 @@ import 'package:extrememedicaluserapp/features/contact/views/ticket_tracker_view
 import 'package:extrememedicaluserapp/features/contact/controllers/contact_controller.dart';
 import 'package:extrememedicaluserapp/features/video_tutorials/views/video_tutorials_view.dart';
 import 'package:extrememedicaluserapp/features/video_tutorials/controllers/video_tutorials_controller.dart';
+import 'package:extrememedicaluserapp/features/contact/views/chat_support_view.dart';
+import 'package:extrememedicaluserapp/features/contact/controllers/chat_controller.dart';
+import 'package:extrememedicaluserapp/features/contact/services/onesignal_service.dart';
+import 'package:extrememedicaluserapp/features/notifications/services/notifications_service.dart';
+import 'package:extrememedicaluserapp/features/notifications/controllers/notifications_controller.dart';
+import 'package:extrememedicaluserapp/features/notifications/views/notifications_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,6 +59,8 @@ void main() async {
   await Get.putAsync(() => FirebaseService().init());
   Get.put(UserRepository(), permanent: true);
   Get.put(AuthService(), permanent: true);
+  await Get.putAsync(() => NotificationsService().init());
+  await OneSignalService.initializeDynamic();
   
   runApp(
     DevicePreview(
@@ -210,6 +218,22 @@ class MyApp extends StatelessWidget {
               page: () => const VideoTutorialsView(),
               binding: BindingsBuilder(() {
                 Get.put(VideoTutorialsController());
+              }),
+              transition: Transition.rightToLeftWithFade,
+            ),
+            GetPage(
+              name: AppRoutes.chatSupport,
+              page: () => const ChatSupportView(),
+              binding: BindingsBuilder(() {
+                Get.put(ChatController());
+              }),
+              transition: Transition.rightToLeftWithFade,
+            ),
+            GetPage(
+              name: AppRoutes.notifications,
+              page: () => const NotificationsView(),
+              binding: BindingsBuilder(() {
+                Get.put(NotificationsController());
               }),
               transition: Transition.rightToLeftWithFade,
             ),

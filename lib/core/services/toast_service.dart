@@ -104,7 +104,7 @@ class ToastService {
         ),
       ],
       showProgressBar: false,
-      closeButtonShowType: CloseButtonShowType.onHover,
+      closeButton: const ToastCloseButton(showType: CloseButtonShowType.onHover),
       closeOnClick: false,
       pauseOnHover: true,
       dragToClose: true,

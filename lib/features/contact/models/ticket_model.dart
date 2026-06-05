@@ -13,6 +13,7 @@ class TicketModel {
   final List<String> attachments;
   final String? resolutionText;
   final int? resolvedAt;
+  final bool isChat;
 
   TicketModel({
     required this.id,
@@ -29,6 +30,7 @@ class TicketModel {
     required this.attachments,
     this.resolutionText,
     this.resolvedAt,
+    this.isChat = false,
   });
 
   Map<String, dynamic> toMap() {
@@ -47,6 +49,7 @@ class TicketModel {
       'attachments': attachments,
       'resolutionText': resolutionText,
       'resolvedAt': resolvedAt,
+      'isChat': isChat,
     };
   }
 
@@ -66,6 +69,7 @@ class TicketModel {
       attachments: map['attachments'] != null ? List<String>.from(map['attachments'] as List) : [],
       resolutionText: map['resolutionText'],
       resolvedAt: map['resolvedAt'],
+      isChat: map['isChat'] ?? false,
     );
   }
 }

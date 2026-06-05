@@ -128,7 +128,6 @@ class DeviceInfoListCard extends StatelessWidget {
     required String value,
     required bool isDark,
     required Color iconColor,
-    bool showDivider = true,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

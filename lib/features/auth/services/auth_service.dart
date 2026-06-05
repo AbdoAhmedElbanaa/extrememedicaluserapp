@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:extrememedicaluserapp/features/auth/data/models/user_model.dart';
 import 'package:extrememedicaluserapp/features/auth/data/user_repository.dart';
 import 'google_sign_in_button.dart' as google_btn;
+import 'package:extrememedicaluserapp/features/contact/services/onesignal_service.dart';
 
 class AuthService extends GetxService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -24,7 +25,9 @@ class AuthService extends GetxService {
     _auth.authStateChanges().listen((User? user) async {
       if (user != null) {
         await loadUserModel(user.uid);
+        OneSignalService.loginUser(user.uid);
       } else {
+        OneSignalService.logoutUser();
         currentUserModel.value = null;
       }
     });

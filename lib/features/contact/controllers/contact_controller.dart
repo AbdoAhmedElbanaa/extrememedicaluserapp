@@ -49,6 +49,7 @@ class ContactController extends GetxController {
   final TextEditingController errorCodeController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final RxList<String> attachments = <String>[].obs;
+  final RxBool isChatRequest = false.obs;
 
   // Upload/Submit State
   final RxBool isUploading = false.obs;
@@ -321,6 +322,17 @@ class ContactController extends GetxController {
 
   // Submit support ticket to RTDB
   Future<void> submitSupportRequest() async {
+    if (hasActiveTicket) {
+      Get.snackbar(
+        'Submission Blocked',
+        'You already have an active support request. Please resolve it or wait for support before opening another.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.orange.withValues(alpha: 0.15),
+        colorText: Colors.orange,
+      );
+      return;
+    }
+
     if (descriptionController.text.trim().isEmpty) {
       Get.snackbar('Error', 'Please describe your support request in detail.');
       return;
@@ -353,9 +365,11 @@ class ContactController extends GetxController {
         clinicName: clinicName,
         attachments: List<String>.from(attachments),
         status: 'IN REVIEW',
+        isChat: isChatRequest.value,
       );
 
       await _service.submitTicket(newTicket);
+      await _service.createTicketNotification(newTicket);
 
       // Reset form
       resetForm();
@@ -375,5 +389,6 @@ class ContactController extends GetxController {
     errorCodeController.clear();
     descriptionController.clear();
     attachments.clear();
+    isChatRequest.value = false;
   }
 }

@@ -32,7 +32,7 @@ class QuickActionsSection extends GetView<HomeController> {
           children: controller.quickActions
               .map(
                 (action) =>
-                _buildActionButton(action as QuickActionModel, isDark),
+                _buildActionButton(action, isDark),
           )
               .toList(),
         ),

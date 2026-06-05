@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:extrememedicaluserapp/core/services/theme_service.dart';
+import 'package:extrememedicaluserapp/features/contact/services/onesignal_service.dart';
 
 class SettingsController extends GetxController {
   final currentThemeMode = ThemeMode.system.obs;
+  final GetStorage _storage = GetStorage();
 
   // Selected category for tablet/desktop view
   final RxInt selectedCategoryIndex = 0.obs;
@@ -17,7 +20,13 @@ class SettingsController extends GetxController {
   // Notifications
   final pushEnabled = true.obs;
   final emailEnabled = true.obs;
+  final chatAlertsEnabled = true.obs;
+  final ticketAlertsEnabled = true.obs;
   final errorAlertsEnabled = true.obs;
+
+  // OneSignal Status
+  final onesignalPlayerId = ''.obs;
+  final onesignalSubscribed = false.obs;
 
   // Devices & Sync
   final autoSyncEnabled = true.obs;
@@ -31,6 +40,64 @@ class SettingsController extends GetxController {
   void onInit() {
     super.onInit();
     currentThemeMode.value = ThemeService().theme;
+
+    // Load from local storage
+    pushEnabled.value = _storage.read('push_enabled') ?? true;
+    emailEnabled.value = _storage.read('email_enabled') ?? true;
+    chatAlertsEnabled.value = _storage.read('chat_alerts_enabled') ?? true;
+    ticketAlertsEnabled.value = _storage.read('ticket_alerts_enabled') ?? true;
+    errorAlertsEnabled.value = _storage.read('error_alerts_enabled') ?? true;
+
+    // Sync settings with OneSignal
+    syncOneSignalSettings();
+  }
+
+  Future<void> syncOneSignalSettings() async {
+    await OneSignalService.setPushEnabled(pushEnabled.value);
+    await OneSignalService.setNotificationTag('notify_chat', chatAlertsEnabled.value);
+    await OneSignalService.setNotificationTag('notify_tickets', ticketAlertsEnabled.value);
+    await OneSignalService.setNotificationTag('notify_errors', errorAlertsEnabled.value);
+
+    // Load details
+    onesignalPlayerId.value = await OneSignalService.getPlayerId() ?? '';
+    onesignalSubscribed.value = await OneSignalService.isSubscribed();
+  }
+
+  void togglePushNotifications(bool val) {
+    pushEnabled.value = val;
+    _storage.write('push_enabled', val);
+    OneSignalService.setPushEnabled(val);
+    if (val) {
+      Future.delayed(const Duration(seconds: 1), () async {
+        onesignalPlayerId.value = await OneSignalService.getPlayerId() ?? '';
+        onesignalSubscribed.value = await OneSignalService.isSubscribed();
+      });
+    } else {
+      onesignalSubscribed.value = false;
+    }
+  }
+
+  void toggleEmailNotifications(bool val) {
+    emailEnabled.value = val;
+    _storage.write('email_enabled', val);
+  }
+
+  void toggleChatAlerts(bool val) {
+    chatAlertsEnabled.value = val;
+    _storage.write('chat_alerts_enabled', val);
+    OneSignalService.setNotificationTag('notify_chat', val);
+  }
+
+  void toggleTicketAlerts(bool val) {
+    ticketAlertsEnabled.value = val;
+    _storage.write('ticket_alerts_enabled', val);
+    OneSignalService.setNotificationTag('notify_tickets', val);
+  }
+
+  void toggleErrorAlerts(bool val) {
+    errorAlertsEnabled.value = val;
+    _storage.write('error_alerts_enabled', val);
+    OneSignalService.setNotificationTag('notify_errors', val);
   }
 
   void updateThemeMode(ThemeMode mode) {
@@ -39,13 +106,16 @@ class SettingsController extends GetxController {
   }
 
   void resetAllSettings() {
-    // Logic to reset all observables to default
     twoFactorEnabled.value = false;
     biometricEnabled.value = false;
     loginAlertsEnabled.value = true;
-    pushEnabled.value = true;
-    emailEnabled.value = true;
-    errorAlertsEnabled.value = true;
+    
+    togglePushNotifications(true);
+    toggleEmailNotifications(true);
+    toggleChatAlerts(true);
+    toggleTicketAlerts(true);
+    toggleErrorAlerts(true);
+    
     autoSyncEnabled.value = true;
     cloudBackupEnabled.value = true;
     dynamicAccentEnabled.value = false;

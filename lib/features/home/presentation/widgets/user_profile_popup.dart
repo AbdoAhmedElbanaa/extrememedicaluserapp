@@ -5,6 +5,7 @@ import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:extrememedicaluserapp/features/notifications/services/notifications_service.dart';
 
 import '../controllers/home_controller.dart';
 
@@ -106,12 +107,21 @@ class UserProfilePopup extends StatelessWidget {
                               ); // Switch to Devices tab
                             },
                           ),
-                          _buildMenuItem(
-                            Icons.notifications_none_rounded,
-                            'Notifications',
-                            isDark,
-                            hasUpdate: true,
-                          ),
+                          Obx(() {
+                            final count = Get.isRegistered<NotificationsService>()
+                                ? NotificationsService.to.unreadCount.value
+                                : 0;
+                            return _buildMenuItem(
+                              Icons.notifications_none_rounded,
+                              'Notifications',
+                              isDark,
+                              hasUpdate: count > 0,
+                              onTap: () {
+                                Get.back(); // Close popup
+                                Get.toNamed(AppRoutes.notifications);
+                              },
+                            );
+                          }),
                           _buildMenuItem(
                             Icons.security_outlined,
                             'Security',

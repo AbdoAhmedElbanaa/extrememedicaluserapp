@@ -262,3 +262,91 @@ window.hideOverlay = function(overlayId) {
     overlay.classList.add('opacity-0', 'pointer-events-none');
     overlay.classList.remove('opacity-100', 'pointer-events-auto');
 };
+
+/**
+ * Web Audio API synthesizer for premium toast chime sound (C5 -> E5)
+ */
+function playNotificationChime() {
+    try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const playNote = (frequency, startTime, duration) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(frequency, startTime);
+            
+            gain.gain.setValueAtTime(0.15, startTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.start(startTime);
+            osc.stop(startTime + duration);
+        };
+        
+        const now = audioCtx.currentTime;
+        playNote(523.25, now, 0.3); // C5
+        playNote(659.25, now + 0.15, 0.4); // E5
+    } catch (e) {
+        console.warn("Failed to play notification chime sound:", e);
+    }
+}
+
+// Listen to notifications in Firebase RTDB
+document.addEventListener('DOMContentLoaded', () => {
+    let initialLoad = true;
+    
+    rtdb.ref('contact_support/notifications').on('value', (snapshot) => {
+        const data = snapshot.val();
+        let unreadCount = 0;
+        const allNotifications = [];
+        
+        if (data) {
+            Object.keys(data).forEach(key => {
+                const notif = data[key];
+                allNotifications.push({ id: key, ...notif });
+                if (!notif.isRead) {
+                    unreadCount++;
+                }
+            });
+        }
+        
+        // Update sidebar count badge
+        const badge = document.getElementById('sidebarNotificationBadge');
+        if (badge) {
+            if (unreadCount > 0) {
+                badge.textContent = unreadCount;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+        
+        // If we have a local function on the notifications.php page to re-render, call it
+        if (window.onNotificationsSync) {
+            window.onNotificationsSync(allNotifications);
+        }
+    });
+
+    // Listen for new notifications to trigger sound and toast
+    rtdb.ref('contact_support/notifications').limitToLast(1).on('child_added', (snapshot) => {
+        // Skip child_added trigger during initial load of historical data
+        if (initialLoad) return;
+        
+        const notif = snapshot.val();
+        if (notif && !notif.isRead) {
+            // Play chime sound
+            playNotificationChime();
+            
+            // Show toast message
+            showToast(`${notif.title}: ${notif.body}`, 'warning');
+        }
+    });
+    
+    // Set initial load to false after a tiny delay so historical nodes don't trigger alerts
+    setTimeout(() => {
+        initialLoad = false;
+    }, 2000);
+});

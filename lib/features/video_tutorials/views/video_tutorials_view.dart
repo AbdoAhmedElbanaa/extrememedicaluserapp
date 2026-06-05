@@ -2,6 +2,8 @@ import 'dart:ui' show ImageFilter;
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
 import '../controllers/video_tutorials_controller.dart';
@@ -367,6 +369,7 @@ class VideoTutorialsView extends GetView<VideoTutorialsController> {
     // Get category name
     final categoryName = controller.categories
         .firstWhereOrNull((c) => c.id == video.categoryId)?.name ?? 'SETUP';
+    final thumbnailUrl = _getYoutubeThumbnail(video.url);
 
     return GestureDetector(
       onTap: () => _playVideo(context, video),
@@ -390,6 +393,39 @@ class VideoTutorialsView extends GetView<VideoTutorialsController> {
           borderRadius: BorderRadius.circular(24),
           child: Stack(
             children: [
+              // YouTube Thumbnail Background
+              if (thumbnailUrl != null) ...[
+                Positioned.fill(
+                  child: CachedNetworkImage(
+                    imageUrl: thumbnailUrl,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      color: isDark ? const Color(0xFF0F0E24) : Colors.grey.shade100,
+                      child: const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                      ),
+                    ),
+                    errorWidget: (context, url, error) => const SizedBox(),
+                  ),
+                ),
+                // Premium Dark Gradient Overlay to ensure readability
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.black.withValues(alpha: 0.5),
+                          Colors.black.withValues(alpha: 0.2),
+                          Colors.black.withValues(alpha: 0.75),
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+
               // Center Play button overlay
               Center(
                 child: Container(
@@ -415,28 +451,29 @@ class VideoTutorialsView extends GetView<VideoTutorialsController> {
                 ),
               ),
 
-              // Rocket Mock icon to mimic the screenshot
-              Positioned(
-                top: 40,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: Image.asset(
-                    'assets/images/rocket_illustration.png', // Fallback or transparent container if asset does not exist
-                    height: 50,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.rocket_launch_rounded, color: AppColors.primary, size: 28),
-                      );
-                    },
+              // Rocket Mock icon (only for local videos / non-YouTube videos to keep layout clean)
+              if (thumbnailUrl == null)
+                Positioned(
+                  top: 40,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: Image.asset(
+                      'assets/images/rocket_illustration.png', // Fallback or transparent container if asset does not exist
+                      height: 50,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.rocket_launch_rounded, color: AppColors.primary, size: 28),
+                        );
+                      },
+                    ),
                   ),
                 ),
-              ),
 
               // Category tag (Top-Left)
               Positioned(
@@ -675,6 +712,29 @@ class VideoTutorialsView extends GetView<VideoTutorialsController> {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
+                    // YouTube Thumbnail Background
+                    if (_getYoutubeThumbnail(video.url) != null) ...[
+                      Positioned.fill(
+                        child: CachedNetworkImage(
+                          imageUrl: _getYoutubeThumbnail(video.url)!,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Container(
+                            color: isDark ? const Color(0xFF0F0E24) : Colors.grey.shade100,
+                            child: const Center(
+                              child: CircularProgressIndicator(strokeWidth: 1.5, color: AppColors.primary),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => const SizedBox(),
+                        ),
+                      ),
+                      // Dark Overlay for readability
+                      Positioned.fill(
+                        child: Container(
+                          color: Colors.black.withValues(alpha: 0.35),
+                        ),
+                      ),
+                    ],
+
                     // Play icon overlay
                     Center(
                       child: Container(
@@ -737,21 +797,22 @@ class VideoTutorialsView extends GetView<VideoTutorialsController> {
                       ),
                     ),
 
-                    // Centered category mock graphic
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Icon(
-                          categoryName.toLowerCase().contains('maintenance')
-                              ? Icons.build_outlined
-                              : (categoryName.toLowerCase().contains('error')
-                                  ? Icons.warning_amber_rounded
-                                  : Icons.rocket_launch_outlined),
-                          color: themeColor.withValues(alpha: 0.3),
-                          size: 32,
+                    // Centered category mock graphic (only for local/non-YouTube videos to keep layout clean)
+                    if (_getYoutubeThumbnail(video.url) == null)
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Icon(
+                            categoryName.toLowerCase().contains('maintenance')
+                                ? Icons.build_outlined
+                                : (categoryName.toLowerCase().contains('error')
+                                    ? Icons.warning_amber_rounded
+                                    : Icons.rocket_launch_outlined),
+                            color: themeColor.withValues(alpha: 0.3),
+                            size: 32,
+                          ),
                         ),
-                      ),
-                    )
+                      )
                   ],
                 ),
               ),
@@ -830,5 +891,13 @@ class VideoTutorialsView extends GetView<VideoTutorialsController> {
       return '${kViews.toStringAsFixed(1)}K';
     }
     return views.toString();
+  }
+
+  String? _getYoutubeThumbnail(String url) {
+    final videoId = YoutubePlayer.convertUrlToId(url);
+    if (videoId != null) {
+      return 'https://img.youtube.com/vi/$videoId/hqdefault.jpg';
+    }
+    return null;
   }
 }

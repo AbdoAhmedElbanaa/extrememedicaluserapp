@@ -16,4 +16,6 @@ class AppRoutes {
   static const String mySupportRequests = '/my-support-requests';
   static const String ticketTracker = '/ticket-tracker';
   static const String videoTutorials = '/video-tutorials';
+  static const String chatSupport = '/chat-support';
+  static const String notifications = '/notifications';
 }

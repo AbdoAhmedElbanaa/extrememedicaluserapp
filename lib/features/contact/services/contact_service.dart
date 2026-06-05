@@ -43,6 +43,22 @@ class ContactService {
     await ref.set(ticket.toMap());
   }
 
+  Future<void> createTicketNotification(TicketModel ticket) async {
+    final notifId = 'NOTIF-${DateTime.now().millisecondsSinceEpoch}';
+    final ref = _db.ref('contact_support/notifications').child(notifId);
+    await ref.set({
+      'id': notifId,
+      'ticketId': ticket.id,
+      'title': ticket.isChat ? 'New Live Chat Support Requested' : 'New Support Ticket Submitted',
+      'body': 'Clinic: ${ticket.clinicName} has requested support for ${ticket.deviceName} (Priority: ${ticket.priority})',
+      'type': ticket.isChat ? 'new_chat' : 'new_ticket',
+      'timestamp': DateTime.now().millisecondsSinceEpoch,
+      'isRead': false,
+      'userId': ticket.userId,
+      'clinicName': ticket.clinicName,
+    });
+  }
+
   Future<ContactConfigModel> getContactConfig() async {
     final ref = _db.ref('contact_support/config');
     final snapshot = await ref.get();
@@ -88,5 +104,18 @@ class ContactService {
       list.sort((a, b) => b.timestamp.compareTo(a.timestamp));
       return list;
     });
+  }
+
+  Future<TicketModel?> getTicket(String ticketId) async {
+    try {
+      final ref = _db.ref('contact_support/tickets').child(ticketId);
+      final snapshot = await ref.get();
+      if (snapshot.exists && snapshot.value != null) {
+        return TicketModel.fromMap(Map<String, dynamic>.from(snapshot.value as Map));
+      }
+    } catch (e) {
+      print('Error fetching ticket $ticketId: $e');
+    }
+    return null;
   }
 }

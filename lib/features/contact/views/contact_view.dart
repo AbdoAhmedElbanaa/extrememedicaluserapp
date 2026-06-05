@@ -63,6 +63,10 @@ class ContactView extends GetView<ContactController> {
                         _buildAttachmentsSection(isDark, context),
                         const SizedBox(height: 24),
 
+                        // Chat Support Request Card
+                        _buildChatSupportToggle(isDark),
+                        const SizedBox(height: 24),
+
                         // Device Auto-Attached
                         _buildDeviceAttachedInfo(isDark),
                         const SizedBox(height: 32),
@@ -472,26 +476,32 @@ class ContactView extends GetView<ContactController> {
   Widget _buildSubmitButton() {
     return Obx(() {
       final isSubmitting = controller.isSubmitting.value;
+      final hasActive = controller.hasActiveTicket;
 
       return SizedBox(
         width: double.infinity,
         height: 52,
         child: Container(
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppColors.primary, AppColors.indigoPrimaryDark],
-            ),
+            gradient: hasActive
+                ? null
+                : const LinearGradient(
+                    colors: [AppColors.primary, AppColors.indigoPrimaryDark],
+                  ),
+            color: hasActive ? Colors.grey.withValues(alpha: 0.3) : null,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.4),
-                blurRadius: 12,
-                offset: const Offset(0, 6),
-              ),
-            ],
+            boxShadow: hasActive
+                ? null
+                : [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.4),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
           ),
           child: ElevatedButton(
-            onPressed: isSubmitting ? null : () => controller.submitSupportRequest(),
+            onPressed: (isSubmitting || hasActive) ? null : () => controller.submitSupportRequest(),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.transparent,
               shadowColor: Colors.transparent,
@@ -503,17 +513,103 @@ class ContactView extends GetView<ContactController> {
                     height: 20,
                     child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                   )
-                : const Row(
+                : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.send_rounded, color: Colors.white, size: 18),
+                      Icon(
+                        hasActive ? Icons.lock_outline_rounded : Icons.send_rounded,
+                        color: hasActive ? Colors.white30 : Colors.white,
+                        size: 18,
+                      ),
                       const SizedBox(width: 8),
                       Text(
-                        'Submit Support Request',
-                        style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+                        hasActive ? 'Active Ticket Pending' : 'Submit Support Request',
+                        style: TextStyle(
+                          color: hasActive ? Colors.white30 : Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
+          ),
+        ),
+      );
+    });
+  }
+
+  Widget _buildChatSupportToggle(bool isDark) {
+    return Obx(() {
+      final isChat = controller.isChatRequest.value;
+      return GestureDetector(
+        onTap: () => controller.isChatRequest.value = !isChat,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: isChat 
+                ? AppColors.primary.withValues(alpha: 0.08) 
+                : (isDark ? AppColors.cinematicSurface : Colors.white),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: isChat 
+                  ? AppColors.primary 
+                  : (isDark ? AppColors.distinctBorderDark : AppColors.distinctBorderLight),
+              width: 1.5,
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: isChat 
+                      ? AppColors.primary 
+                      : (isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.05)),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.chat_bubble_outline_rounded,
+                  color: isChat ? Colors.white : AppColors.primary,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Request Live Chat Support',
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black87,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Connect directly with our team in real-time.',
+                      style: TextStyle(
+                        color: isDark ? Colors.white38 : Colors.black45,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Switch.adaptive(
+                value: isChat,
+                activeThumbColor: AppColors.primary,
+                activeTrackColor: AppColors.primary.withValues(alpha: 0.3),
+                inactiveThumbColor: isDark ? Colors.white24 : Colors.grey,
+                inactiveTrackColor: isDark ? Colors.white10 : Colors.black12,
+                onChanged: (val) {
+                  controller.isChatRequest.value = val;
+                },
+              ),
+            ],
           ),
         ),
       );

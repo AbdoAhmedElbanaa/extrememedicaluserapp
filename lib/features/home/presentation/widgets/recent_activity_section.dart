@@ -73,7 +73,7 @@ class RecentActivitySection extends GetView<HomeController> {
             itemBuilder: (context, index) {
               final activity = controller.recentActivities[index];
               return _buildActivityItem(
-                activity as RecentActivityModel,
+                activity,
                 isDark,
               );
             },

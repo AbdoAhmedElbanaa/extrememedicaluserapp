@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
 
 class VideoPlayerView extends StatefulWidget {
@@ -21,6 +22,8 @@ class VideoPlayerView extends StatefulWidget {
 
 class _VideoPlayerViewState extends State<VideoPlayerView> {
   late VideoPlayerController _controller;
+  YoutubePlayerController? _ytController;
+  bool _isYoutube = false;
   bool _initialized = false;
   bool _showControls = true;
   bool _hasError = false;
@@ -29,7 +32,25 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
   @override
   void initState() {
     super.initState();
-    _initializePlayer();
+    final videoId = YoutubePlayer.convertUrlToId(widget.videoUrl);
+    if (videoId != null) {
+      _isYoutube = true;
+      _ytController = YoutubePlayerController(
+        initialVideoId: videoId,
+        flags: const YoutubePlayerFlags(
+          autoPlay: true,
+          mute: false,
+          disableDragSeek: false,
+          loop: false,
+          isLive: false,
+          forceHD: false,
+          enableCaption: true,
+        ),
+      );
+      _initialized = true;
+    } else {
+      _initializePlayer();
+    }
   }
 
   Future<void> _initializePlayer() async {
@@ -53,7 +74,7 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
   void _startHideTimer() {
     _hideTimer?.cancel();
     _hideTimer = Timer(const Duration(seconds: 3), () {
-      if (mounted && _controller.value.isPlaying) {
+      if (mounted && !_isYoutube && _controller.value.isPlaying) {
         setState(() {
           _showControls = false;
         });
@@ -73,7 +94,11 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
   @override
   void dispose() {
     _hideTimer?.cancel();
-    _controller.dispose();
+    if (_isYoutube) {
+      _ytController?.dispose();
+    } else {
+      _controller.dispose();
+    }
     super.dispose();
   }
 
@@ -86,6 +111,67 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isYoutube && _ytController != null) {
+      return YoutubePlayerBuilder(
+        player: YoutubePlayer(
+          controller: _ytController!,
+          showVideoProgressIndicator: true,
+          progressIndicatorColor: AppColors.primary,
+          progressColors: const ProgressBarColors(
+            playedColor: AppColors.primary,
+            handleColor: AppColors.primary,
+            bufferedColor: Colors.white24,
+            backgroundColor: Colors.white10,
+          ),
+        ),
+        builder: (context, player) {
+          return Scaffold(
+            backgroundColor: Colors.black,
+            body: SafeArea(
+              child: Column(
+                children: [
+                  // Top Custom Navigation Bar
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            widget.title,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Video Box
+                  Expanded(
+                    child: Center(
+                      child: player,
+                    ),
+                  ),
+
+                  // Description Pane
+                  _buildDescriptionPane(),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -277,52 +363,56 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
             ),
 
             // Description Pane
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(24),
-              decoration: const BoxDecoration(
-                color: Color(0xFF0D0C21), // AppColors.surfaceDark
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(28),
-                  topRight: Radius.circular(28),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    'About this tutorial',
-                    style: TextStyle(
-                      color: Colors.white30,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    widget.title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    widget.description,
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 13,
-                      height: 1.5,
-                    ),
-                  ),
-                ],
-              ),
-            )
+            _buildDescriptionPane(),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildDescriptionPane() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: const BoxDecoration(
+        color: Color(0xFF0D0C21), // AppColors.surfaceDark
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(28),
+          topRight: Radius.circular(28),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'About this tutorial',
+            style: TextStyle(
+              color: Colors.white30,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            widget.title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            widget.description,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 13,
+              height: 1.5,
+            ),
+          ),
+        ],
       ),
     );
   }

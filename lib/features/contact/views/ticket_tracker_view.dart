@@ -346,6 +346,10 @@ class TicketTrackerView extends GetView<ContactController> {
               _buildCardTag('2-4 business hours', Colors.grey, isDark),
             ],
           ),
+          if (ticket.isChat) ...[
+            const SizedBox(height: 20),
+            _buildChatButton(ticket, isDark),
+          ],
         ],
       ),
     );
@@ -652,6 +656,54 @@ class TicketTrackerView extends GetView<ContactController> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildChatButton(TicketModel ticket, bool isDark) {
+    final isClosed = ticket.status == 'RESOLVED' || ticket.status == 'CLOSED';
+    return SizedBox(
+      width: double.infinity,
+      height: 48,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: isClosed 
+                ? [Colors.grey.shade700, Colors.grey.shade800]
+                : [AppColors.primary, AppColors.indigoPrimaryDark],
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: isClosed ? null : [
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.35),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: ElevatedButton.icon(
+          onPressed: () {
+            Get.toNamed(AppRoutes.chatSupport, arguments: ticket);
+          },
+          icon: Icon(
+            isClosed ? Icons.chat_bubble_outline_rounded : Icons.chat_bubble_rounded,
+            color: Colors.white,
+            size: 18,
+          ),
+          label: Text(
+            isClosed ? 'View Chat History' : 'Enter Support Live Chat',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          ),
+        ),
+      ),
     );
   }
 
