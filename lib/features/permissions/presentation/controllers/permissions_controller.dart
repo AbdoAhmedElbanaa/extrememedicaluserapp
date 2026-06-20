@@ -4,6 +4,7 @@ import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:extrememedicaluserapp/features/permissions/data/models/permission_model.dart';
+import 'package:extrememedicaluserapp/features/contact/services/onesignal_service.dart';
 
 class PermissionsController extends GetxController {
   final storage = GetStorage();
@@ -87,6 +88,9 @@ class PermissionsController extends GetxController {
           status = PermissionStatus.granted;
         }
       }
+    } else if (permission == Permission.notification) {
+      await OneSignalService.requestNotificationPermission();
+      status = await Permission.notification.status;
     } else {
       status = await permission.request();
     }
@@ -113,8 +117,18 @@ class PermissionsController extends GetxController {
       return;
     }
 
-    Map<Permission, PermissionStatus> statuses = await toRequest.request();
-    permissionStatuses.addAll(statuses);
+    if (toRequest.contains(Permission.notification)) {
+      await OneSignalService.requestNotificationPermission();
+      toRequest.remove(Permission.notification);
+    }
+
+    if (toRequest.isNotEmpty) {
+      Map<Permission, PermissionStatus> statuses = await toRequest.request();
+      permissionStatuses.addAll(statuses);
+    }
+
+    // Refresh all statuses to ensure UI update
+    await refreshPermissions();
 
     // After requesting, check if everything important is granted
     if (permissionStatuses.values.every((s) => s.isGranted)) {

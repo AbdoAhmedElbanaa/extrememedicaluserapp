@@ -36,12 +36,6 @@ class OneSignalService {
       debugPrint('Initializing OneSignal with App ID: $appId');
       OneSignal.Debug.setLogLevel(OSLogLevel.none);
       OneSignal.initialize(appId);
-      
-      // Request notification permissions
-      await OneSignal.Notifications.requestPermission(true);
-      
-      // Ensure push subscription is enabled to stay active
-      OneSignal.User.pushSubscription.optIn();
 
       // Foreground notification listener
       OneSignal.Notifications.addForegroundWillDisplayListener((event) {
@@ -79,6 +73,11 @@ class OneSignalService {
         NotificationsService.to.handleNotificationNavigation(notif);
       });
       
+      // Observer for push subscription state
+      OneSignal.User.pushSubscription.addObserver((state) {
+        debugPrint('OneSignal Subscription Observer: token: ${state.current.token}, id: ${state.current.id}, optedIn: ${state.current.optedIn}');
+      });
+
       _isInitialized = true;
 
       // Handle login for already logged-in or pending users
@@ -161,6 +160,30 @@ class OneSignalService {
     } catch (e) {
       debugPrint('Failed to check subscription: $e');
       return false;
+    }
+  }
+
+  static Future<void> requestNotificationPermission() async {
+    try {
+      if (!_isInitialized) await initializeDynamic();
+      debugPrint('Requesting OneSignal notification permission...');
+      final granted = await OneSignal.Notifications.requestPermission(true);
+      debugPrint('OneSignal notification permission result: $granted');
+      if (granted) {
+        OneSignal.User.pushSubscription.optIn();
+      }
+    } catch (e) {
+      debugPrint('Failed to request OneSignal notification permission: $e');
+    }
+  }
+
+  static void addSubscriptionObserver(void Function(String? id, bool optedIn) callback) {
+    try {
+      OneSignal.User.pushSubscription.addObserver((state) {
+        callback(state.current.id, state.current.optedIn);
+      });
+    } catch (e) {
+      debugPrint('Failed to add OneSignal subscription observer: $e');
     }
   }
 }

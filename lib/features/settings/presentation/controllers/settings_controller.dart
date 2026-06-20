@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:extrememedicaluserapp/core/services/theme_service.dart';
 import 'package:extrememedicaluserapp/features/contact/services/onesignal_service.dart';
@@ -48,12 +49,31 @@ class SettingsController extends GetxController {
     ticketAlertsEnabled.value = _storage.read('ticket_alerts_enabled') ?? true;
     errorAlertsEnabled.value = _storage.read('error_alerts_enabled') ?? true;
 
+    // Register observer for real-time OneSignal updates
+    OneSignalService.addSubscriptionObserver((id, optedIn) {
+      onesignalPlayerId.value = id ?? '';
+      onesignalSubscribed.value = optedIn;
+      if (optedIn) {
+        pushEnabled.value = true;
+        _storage.write('push_enabled', true);
+      }
+    });
+
     // Sync settings with OneSignal
     syncOneSignalSettings();
   }
 
   Future<void> syncOneSignalSettings() async {
-    await OneSignalService.setPushEnabled(pushEnabled.value);
+    // Check if permission is granted first
+    final hasPermission = await Permission.notification.isGranted;
+    if (!hasPermission) {
+      pushEnabled.value = false;
+      _storage.write('push_enabled', false);
+      await OneSignalService.setPushEnabled(false);
+    } else {
+      await OneSignalService.setPushEnabled(pushEnabled.value);
+    }
+
     await OneSignalService.setNotificationTag('notify_chat', chatAlertsEnabled.value);
     await OneSignalService.setNotificationTag('notify_tickets', ticketAlertsEnabled.value);
     await OneSignalService.setNotificationTag('notify_errors', errorAlertsEnabled.value);
@@ -63,16 +83,42 @@ class SettingsController extends GetxController {
     onesignalSubscribed.value = await OneSignalService.isSubscribed();
   }
 
-  void togglePushNotifications(bool val) {
-    pushEnabled.value = val;
-    _storage.write('push_enabled', val);
-    OneSignalService.setPushEnabled(val);
+  void togglePushNotifications(bool val) async {
     if (val) {
-      Future.delayed(const Duration(seconds: 1), () async {
-        onesignalPlayerId.value = await OneSignalService.getPlayerId() ?? '';
-        onesignalSubscribed.value = await OneSignalService.isSubscribed();
-      });
+      // Check if notification permission is granted
+      final status = await Permission.notification.status;
+      if (!status.isGranted) {
+        // Request notification permission and subscribe
+        await OneSignalService.requestNotificationPermission();
+        final newStatus = await Permission.notification.status;
+        if (!newStatus.isGranted) {
+          // If the user denied, revert toggle and show message
+          pushEnabled.value = false;
+          _storage.write('push_enabled', false);
+          onesignalSubscribed.value = false;
+          Get.snackbar(
+            'Permission Denied',
+            'Notifications permission is required to enable Push Notifications.',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: AppColors.errorRed.withValues(alpha: 0.1),
+            colorText: AppColors.errorRed,
+          );
+          return;
+        }
+      }
+
+      pushEnabled.value = true;
+      _storage.write('push_enabled', true);
+      await OneSignalService.setPushEnabled(true);
+
+      // Verify subscription status after opting in
+      await Future.delayed(const Duration(milliseconds: 500));
+      onesignalPlayerId.value = await OneSignalService.getPlayerId() ?? '';
+      onesignalSubscribed.value = await OneSignalService.isSubscribed();
     } else {
+      pushEnabled.value = false;
+      _storage.write('push_enabled', false);
+      await OneSignalService.setPushEnabled(false);
       onesignalSubscribed.value = false;
     }
   }
