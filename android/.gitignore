@@ -1,14 +1,85 @@
-gradle-wrapper.jar
-/.gradle
-/captures/
-/gradlew
-/gradlew.bat
-/local.properties
-GeneratedPluginRegistrant.java
-.cxx/
+# =========================================================================
+# 1. Your Existing Flutter/Dart & IDE Defaults (الملف الأصلي الخاص بك)
+# =========================================================================
 
-# Remember to never publicly share your keystore.
-# See https://flutter.dev/to/reference-keystore
-key.properties
-**/*.keystore
-**/*.jks
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# VS Code (Uncomment if you want to ignore VS Code settings)
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+
+# =========================================================================
+# 2. Crucial Security Additions (إضافات الأمان الضرورية لحماية تطبيقك)
+# =========================================================================
+
+# [CRITICAL] Android Key Store & Signing Properties
+# تمنع رفع ملف كود التوقيع أو ملف الخصائص السرية إلى جيت هاب نهائياً
+*.jks
+*.keystore
+*.p12
+android/key.properties
+
+
+# =========================================================================
+# 3. Modern Android & Native Caches (إضافات الكاش لمنع ملفات أندرويد المكسورة)
+# =========================================================================
+
+# Android build and global caches
+android/**/.gradle
+android/local.properties
+android/project.properties
+android/flutter-plugins-dependencies
+.flutter-plugins
+
+# Firebase & Crashlytics temporary files (إذا كنت تستخدمهم في مشروعك)
+android/.firebase/
+ios/.firebase/
+
+
+# =========================================================================
+# 4. iOS & macOS Dependencies (للحفاظ على نظافة الـ Repo لو اشتغلت على ماك لاحقاً)
+# =========================================================================
+ios/.symlinks/
+ios/Pods/
+ios/Flutter/GeneratedPluginRegistrant.h
+ios/Flutter/GeneratedPluginRegistrant.m
+.xcworkspace/
