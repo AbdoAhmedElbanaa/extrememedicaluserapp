@@ -63,21 +63,30 @@ require_once __DIR__ . '/includes/sidebar.php';
             </div>
 
             <!-- Header Controls -->
-            <div class="flex items-center gap-3">
-                <!-- Status Picker -->
-                <div class="flex items-center gap-1.5">
-                    <label for="activeTicketStatus" class="text-[9px] font-bold text-textsecondary uppercase tracking-wider">Status:</label>
-                    <select id="activeTicketStatus" onchange="updateActiveTicketStatus()" class="bg-white/5 border border-bordercolor rounded-lg px-2.5 py-1.5 text-white text-[10px] font-bold outline-none focus:border-primary transition">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div class="grid grid-cols-3 gap-2 w-full sm:w-auto">
+                    <button onclick="focusChatInput()" class="flex items-center justify-center gap-2 rounded-2xl border border-bordercolor bg-primary/10 text-primary px-3 py-2 text-[10px] font-bold transition hover:bg-primary/15">
+                        <i class="fa-solid fa-reply"></i>
+                        Reply
+                    </button>
+                    <button onclick="setTicketStatus('AWAITING REPLY')" class="flex items-center justify-center gap-2 rounded-2xl border border-bordercolor bg-warning/10 text-warning px-3 py-2 text-[10px] font-bold transition hover:bg-warning/15">
+                        <i class="fa-solid fa-clock"></i>
+                        Awaiting Reply
+                    </button>
+                    <button onclick="resolveActiveChat()" class="flex items-center justify-center gap-2 rounded-2xl border border-bordercolor bg-success/10 text-success px-3 py-2 text-[10px] font-bold transition hover:bg-success/15">
+                        <i class="fa-solid fa-check-circle"></i>
+                        Resolve
+                    </button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label for="activeTicketStatus" class="text-[9px] font-bold text-textsecondary uppercase tracking-wider">Current Status</label>
+                    <select id="activeTicketStatus" onchange="updateActiveTicketStatus()" class="bg-white/5 border border-bordercolor rounded-xl px-3 py-2 text-white text-[10px] font-bold outline-none focus:border-primary transition">
                         <option value="IN REVIEW">IN REVIEW</option>
                         <option value="RESPONSE SENT">RESPONSE SENT</option>
                         <option value="AWAITING REPLY">AWAITING REPLY</option>
                         <option value="RESOLVED">RESOLVED</option>
                     </select>
                 </div>
-                <!-- Close Session button -->
-                <button onclick="resolveActiveChat()" class="bg-success/15 hover:bg-success text-success hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
-                    <i class="fa-solid fa-circle-check"></i> Close Chat
-                </button>
             </div>
         </header>
 
@@ -164,6 +173,84 @@ require_once __DIR__ . '/includes/sidebar.php';
                 <span class="text-[9px] font-bold text-textsecondary uppercase tracking-wider">Submitted Attachments</span>
                 <div id="sideAttachmentsContainer" class="flex flex-wrap gap-2.5">
                     <span class="text-xs text-textmuted">No attachments.</span>
+                </div>
+            </div>
+
+            <!-- Fixed Case Action Hub -->
+            <div class="sticky bottom-0 left-0 z-10 mt-3 rounded-t-3xl border-t-2 border-bordercolor bg-gradient-to-b from-darkbg/95 to-darksec/80 p-4 md:p-5 shadow-[0_-20px_60px_rgba(0,0,0,0.5)] backdrop-blur-xl">
+                <!-- Header with Icon -->
+                <div class="mb-4 flex items-center justify-between gap-3 pb-3 border-b border-bordercolor/50">
+                    <div class="flex-1">
+                        <h4 class="text-xs md:text-sm font-extrabold text-white uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-bolt text-warning"></i> Case Action Hub
+                        </h4>
+                        <p class="text-[9px] md:text-[10px] text-textsecondary mt-1">Unified control center and activity summary</p>
+                    </div>
+                    <div class="hidden sm:block text-primary/40 text-3xl">
+                        <i class="fa-solid fa-briefcase-medical"></i>
+                    </div>
+                </div>
+
+                <!-- Stats Grid (Responsive) -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+                    <div class="rounded-2xl border border-bordercolor/60 bg-gradient-to-br from-white/5 to-white/[0.02] p-3 text-xs hover:border-bordercolor transition">
+                        <span class="text-textsecondary block text-[9px] font-semibold">Total Messages</span>
+                        <div class="text-white font-extrabold text-xl md:text-2xl mt-1" id="overviewTotalMessages">0</div>
+                    </div>
+                    <div class="rounded-2xl border border-bordercolor/60 bg-gradient-to-br from-white/5 to-white/[0.02] p-3 text-xs hover:border-bordercolor transition">
+                        <span class="text-textsecondary block text-[9px] font-semibold">Clinic Replies</span>
+                        <div class="text-warning font-extrabold text-xl md:text-2xl mt-1" id="overviewUserReplies">0</div>
+                    </div>
+                    <div class="rounded-2xl border border-bordercolor/60 bg-gradient-to-br from-white/5 to-white/[0.02] p-3 text-xs hover:border-bordercolor transition">
+                        <span class="text-textsecondary block text-[9px] font-semibold">Admin Replies</span>
+                        <div class="text-primary font-extrabold text-xl md:text-2xl mt-1" id="overviewAdminReplies">0</div>
+                    </div>
+                    <div class="rounded-2xl border border-bordercolor/60 bg-gradient-to-br from-white/5 to-white/[0.02] p-3 text-xs hover:border-bordercolor transition">
+                        <span class="text-textsecondary block text-[9px] font-semibold">Last Update</span>
+                        <div class="text-secondary font-extrabold text-sm md:text-base mt-1" id="overviewLastUpdate">No activity</div>
+                    </div>
+                </div>
+
+                <!-- Status Management Section -->
+                <div class="mb-4 pb-4 border-b border-bordercolor/50">
+                    <p class="text-[9px] md:text-xs font-bold text-textsecondary uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-primary"></i> Ticket Status Control
+                    </p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <!-- IN REVIEW Button -->
+                        <button onclick="setTicketStatus('IN REVIEW')" class="group flex flex-col items-center justify-center gap-1 rounded-2xl border-2 border-secondary/40 bg-secondary/5 px-2 py-2 md:px-3 md:py-3 text-secondary text-[8px] md:text-[9px] font-bold transition hover:border-secondary/60 hover:bg-secondary/10">
+                            <i class="fa-solid fa-eye text-lg md:text-xl"></i>
+                            <span>In Review</span>
+                        </button>
+                        <!-- RESPONSE SENT Button -->
+                        <button onclick="setTicketStatus('RESPONSE SENT')" class="group flex flex-col items-center justify-center gap-1 rounded-2xl border-2 border-primary/40 bg-primary/5 px-2 py-2 md:px-3 md:py-3 text-primary text-[8px] md:text-[9px] font-bold transition hover:border-primary/60 hover:bg-primary/10">
+                            <i class="fa-solid fa-paper-plane text-lg md:text-xl"></i>
+                            <span>Response Sent</span>
+                        </button>
+                        <!-- AWAITING REPLY Button -->
+                        <button onclick="setTicketStatus('AWAITING REPLY')" class="group flex flex-col items-center justify-center gap-1 rounded-2xl border-2 border-warning/40 bg-warning/5 px-2 py-2 md:px-3 md:py-3 text-warning text-[8px] md:text-[9px] font-bold transition hover:border-warning/60 hover:bg-warning/10">
+                            <i class="fa-solid fa-hourglass-end text-lg md:text-xl"></i>
+                            <span>Awaiting</span>
+                        </button>
+                        <!-- RESOLVED Button -->
+                        <button onclick="setTicketStatus('RESOLVED')" class="group flex flex-col items-center justify-center gap-1 rounded-2xl border-2 border-success/40 bg-success/5 px-2 py-2 md:px-3 md:py-3 text-success text-[8px] md:text-[9px] font-bold transition hover:border-success/60 hover:bg-success/10">
+                            <i class="fa-solid fa-circle-check text-lg md:text-xl"></i>
+                            <span>Resolved</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Action Buttons Section -->
+                <p class="text-[9px] md:text-xs font-bold text-textsecondary uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-magic text-primary"></i> Quick Actions
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <button onclick="focusChatInput()" class="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-primary/20 to-primary/10 border border-primary/40 px-3 md:px-4 py-2.5 md:py-3 text-primary text-[9px] md:text-[10px] font-bold transition hover:from-primary/30 hover:to-primary/20 hover:border-primary/60">
+                        <i class="fa-solid fa-pen-to-square"></i> <span>Compose Reply</span>
+                    </button>
+                    <button onclick="resolveActiveChat()" class="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-success/20 to-success/10 border border-success/40 px-3 md:px-4 py-2.5 md:py-3 text-success text-[9px] md:text-[10px] font-bold transition hover:from-success/30 hover:to-success/20 hover:border-success/60">
+                        <i class="fa-solid fa-check-double"></i> <span>Close Ticket</span>
+                    </button>
                 </div>
             </div>
         </div>

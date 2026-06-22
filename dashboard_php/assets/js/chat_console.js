@@ -361,6 +361,7 @@ function renderMessages(messages) {
 
     // Auto-scroll to bottom
     box.scrollTop = box.scrollHeight;
+    updateCaseOverviewStats(messages);
 }
 
 /**
@@ -372,6 +373,45 @@ function useQuickTemplate(text) {
         input.value = text;
         input.focus();
     }
+}
+
+function focusChatInput() {
+    const input = document.getElementById('chatMessageInput');
+    if (input) {
+        input.focus();
+        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}
+
+function setTicketStatus(status) {
+    const statusInput = document.getElementById('activeTicketStatus');
+    if (statusInput) {
+        statusInput.value = status;
+    }
+    updateActiveTicketStatus();
+}
+
+function notifyAppOfTicketUpdate(ticket, title, message) {
+    if (!ticket || !ticket.userId) return;
+    sendOneSignalPushNotification(ticket.userId, title, message, ticket.id);
+}
+
+function updateCaseOverviewStats(messages = []) {
+    const totalMessages = messages.length;
+    const adminMessages = messages.filter(msg => !msg.isSystem && msg.senderId === 'admin').length;
+    const clinicMessages = messages.filter(msg => !msg.isSystem && msg.senderId !== 'admin').length;
+    const lastTimestamp = messages.length ? messages[messages.length - 1].timestamp : null;
+    const lastUpdate = lastTimestamp ? new Date(lastTimestamp).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'No activity yet';
+
+    const totalEl = document.getElementById('overviewTotalMessages');
+    const adminEl = document.getElementById('overviewAdminReplies');
+    const clinicEl = document.getElementById('overviewUserReplies');
+    const lastUpdateEl = document.getElementById('overviewLastUpdate');
+
+    if (totalEl) totalEl.textContent = totalMessages;
+    if (adminEl) adminEl.textContent = adminMessages;
+    if (clinicEl) clinicEl.textContent = clinicMessages;
+    if (lastUpdateEl) lastUpdateEl.textContent = lastUpdate;
 }
 
 /**
@@ -425,9 +465,7 @@ async function sendChatMessage() {
         input.focus();
 
         // Dispatch OneSignal push alert
-        if (ticket && ticket.userId) {
-            sendOneSignalPushNotification(ticket.userId, `Response to Case ${ticket.id}`, text, ticket.id);
-        }
+        notifyAppOfTicketUpdate(ticket, `Response to Case ${ticket.id}`, text);
 
     } catch (err) {
         showToast("Failed to send: " + err.message, "error");
@@ -467,11 +505,7 @@ async function updateActiveTicketStatus() {
         });
 
         showToast(`Ticket status updated to ${newStatus} successfully.`);
-
-        // Dispatch OneSignal push alert
-        if (ticket.userId) {
-            sendOneSignalPushNotification(ticket.userId, `Ticket ${ticket.id} Updated`, `Status changed to: ${newStatus}`, ticket.id);
-        }
+        notifyAppOfTicketUpdate(ticket, `Ticket ${ticket.id} Updated`, `Status changed to: ${newStatus}`);
     } catch (err) {
         showToast("Failed to update status: " + err.message, "error");
     }
@@ -510,11 +544,7 @@ async function resolveActiveChat() {
         });
 
         showToast("Ticket resolved and locked. 🛠️");
-
-        // Dispatch OneSignal push alert
-        if (ticket && ticket.userId) {
-            sendOneSignalPushNotification(ticket.userId, "Ticket Resolved", `Your support ticket ${ticket.id} has been marked as RESOLVED.`, ticket.id);
-        }
+        notifyAppOfTicketUpdate(ticket, "Ticket Resolved", `Your support ticket ${ticket.id} has been marked as RESOLVED.`);
     } catch (err) {
         showToast("Failed to close chat: " + err.message, "error");
     }
