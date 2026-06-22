@@ -174,7 +174,7 @@ class SupportLegalSection extends GetView<ProfileController> {
         ),
       ),
       child: InkWell(
-        onTap: () {},
+        onTap: () => controller.handleLogout(),
         borderRadius: BorderRadius.circular(28),
         child: Padding(
           padding: const EdgeInsets.all(16),

@@ -1,5 +1,8 @@
 import 'package:extrememedicaluserapp/features/auth/services/auth_service.dart';
 import 'package:extrememedicaluserapp/features/auth/data/models/user_model.dart';
+import 'package:extrememedicaluserapp/features/contact/services/onesignal_service.dart';
+import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -89,5 +92,64 @@ class ProfileController extends GetxController {
 
   void updateName(String name) {
     userName.value = name;
+  }
+
+  // Handle user logout with confirmation
+  Future<void> handleLogout() async {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Confirm Logout'),
+        content: const Text('Are you sure you want to logout? You will need to login again to access your account.'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Get.back(); // Close dialog
+              
+              try {
+                // Show loading indicator
+                Get.dialog(
+                  const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                  barrierDismissible: false,
+                );
+
+                // Sign out from Firebase and OneSignal
+                await _authService.signOut();
+                OneSignalService.logoutUser();
+
+                // Close loading dialog
+                Get.back();
+
+                // Navigate to login page and clear navigation stack
+                Get.offAllNamed(AppRoutes.login);
+
+                // Show success message
+                Get.snackbar(
+                  'Success',
+                  'You have been logged out successfully',
+                  snackPosition: SnackPosition.BOTTOM,
+                  duration: const Duration(seconds: 2),
+                );
+              } catch (e) {
+                Get.back(); // Close loading dialog if still open
+                Get.snackbar(
+                  'Error',
+                  'Failed to logout: $e',
+                  snackPosition: SnackPosition.BOTTOM,
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
+              }
+            },
+            child: const Text('Logout', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
   }
 }

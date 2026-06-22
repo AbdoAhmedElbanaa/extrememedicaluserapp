@@ -6,6 +6,22 @@
 let chatTickets = [];
 let selectedTicketId = '';
 let activeMessagesRef = null;
+let existingChatTicketIds = new Set();
+let activeMessagesInitialLoad = true;
+
+function _notifyNewChatRequest(ticket) {
+    if (!ticket || !ticket.isChat) return;
+    const clinicName = ticket.clinicName || 'Clinic user';
+    showToast(`New live chat request from ${clinicName}`, 'warning');
+    playNotificationChime();
+}
+
+function _notifyIncomingMessage(message) {
+    if (!message || message.senderId === 'admin') return;
+    const senderName = message.senderName || 'Support user';
+    showToast(`New message from ${senderName}: ${message.message}`, 'info');
+    playNotificationChime();
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     // Check for ticketId in URL parameters
@@ -38,15 +54,22 @@ function syncChatTickets() {
     rtdb.ref('contact_support/tickets').on('value', (snapshot) => {
         const data = snapshot.val();
         chatTickets = [];
+        const newChatTicketIds = new Set();
         if (data) {
             Object.keys(data).forEach(key => {
                 const ticket = data[key];
                 // Only include chat tickets
                 if (ticket.isChat) {
+                    if (!existingChatTicketIds.has(key) && !firstLoad) {
+                        _notifyNewChatRequest(ticket);
+                    }
+                    newChatTicketIds.add(key);
                     chatTickets.push({ id: key, ...ticket });
                 }
             });
         }
+
+        existingChatTicketIds = newChatTicketIds;
 
         // Sort by timestamp descending (newest first)
         chatTickets.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
@@ -64,11 +87,12 @@ function syncChatTickets() {
                 toggleChatInputLock(activeTicket.status === 'RESOLVED' || activeTicket.status === 'CLOSED');
 
                 if (firstLoad) {
-                    firstLoad = false;
                     selectChatSession(selectedTicketId);
                 }
             }
         }
+
+        firstLoad = false;
     }, (error) => {
         console.error("Failed to sync chat rooms:", error);
         document.getElementById('chatListContainer').innerHTML = `
@@ -197,6 +221,14 @@ function selectChatSession(ticketId) {
     `;
 
     activeMessagesRef = rtdb.ref(`contact_support/chats/${ticketId}/messages`);
+    activeMessagesInitialLoad = true;
+
+    activeMessagesRef.on('child_added', (snapshot) => {
+        if (activeMessagesInitialLoad) return;
+        const msg = snapshot.val();
+        _notifyIncomingMessage(msg);
+    });
+
     activeMessagesRef.on('value', (snapshot) => {
         const msgs = [];
         const raw = snapshot.val();
@@ -207,6 +239,9 @@ function selectChatSession(ticketId) {
         }
         msgs.sort((a, b) => a.timestamp - b.timestamp);
         renderMessages(msgs);
+        if (activeMessagesInitialLoad) {
+            activeMessagesInitialLoad = false;
+        }
     });
 
     // Mark active card selected in DOM list
@@ -391,7 +426,7 @@ async function sendChatMessage() {
 
         // Dispatch OneSignal push alert
         if (ticket && ticket.userId) {
-            sendOneSignalPushNotification(ticket.userId, `Response to Case ${ticket.id}`, text);
+            sendOneSignalPushNotification(ticket.userId, `Response to Case ${ticket.id}`, text, ticket.id);
         }
 
     } catch (err) {
@@ -435,7 +470,7 @@ async function updateActiveTicketStatus() {
 
         // Dispatch OneSignal push alert
         if (ticket.userId) {
-            sendOneSignalPushNotification(ticket.userId, `Ticket ${ticket.id} Updated`, `Status changed to: ${newStatus}`);
+            sendOneSignalPushNotification(ticket.userId, `Ticket ${ticket.id} Updated`, `Status changed to: ${newStatus}`, ticket.id);
         }
     } catch (err) {
         showToast("Failed to update status: " + err.message, "error");
@@ -478,7 +513,7 @@ async function resolveActiveChat() {
 
         // Dispatch OneSignal push alert
         if (ticket && ticket.userId) {
-            sendOneSignalPushNotification(ticket.userId, "Ticket Resolved", `Your support ticket ${ticket.id} has been marked as RESOLVED.`);
+            sendOneSignalPushNotification(ticket.userId, "Ticket Resolved", `Your support ticket ${ticket.id} has been marked as RESOLVED.`, ticket.id);
         }
     } catch (err) {
         showToast("Failed to close chat: " + err.message, "error");
@@ -488,7 +523,7 @@ async function resolveActiveChat() {
 /**
  * Dispatch Push notification to OneSignal target user
  */
-async function sendOneSignalPushNotification(userId, title, message) {
+async function sendOneSignalPushNotification(userId, title, message, ticketId = null) {
     try {
         const snapshot = await rtdb.ref('contact_support/config/onesignal').once('value');
         const keys = snapshot.val();
@@ -507,10 +542,13 @@ async function sendOneSignalPushNotification(userId, title, message) {
                 app_id: keys.appId,
                 headings: { en: title },
                 contents: { en: message },
-                target_channel: "push",
-                include_aliases: {
-                    external_id: [userId]
-                }
+                include_external_user_ids: [userId],
+                data: {
+                    route: 'chat_support',
+                    ticketId: ticketId,
+                },
+                ios_badgeType: 'Increase',
+                ios_badgeCount: 1
             })
         });
         console.log("OneSignal push alert sent to UID:", userId);

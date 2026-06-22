@@ -26,9 +26,9 @@ require_once __DIR__ . '/../config.php';
     <!-- Chart.js (For dashboard charts) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Theme CSS (Removed local style.css link and using Tailwind CSS) -->
+    <!-- Theme CSS (Using Tailwind CSS CDN) -->
     <!-- Tailwind CSS CDN -->
-    <script src="/assets/css/tailwandcss.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {

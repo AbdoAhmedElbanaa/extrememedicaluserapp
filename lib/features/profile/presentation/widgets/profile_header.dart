@@ -105,7 +105,7 @@ class ProfileHeader extends GetView<ProfileController> {
 
   Widget _buildLogoutButton(bool isDark) {
     return ListTile(
-      onTap: () {},
+      onTap: () => controller.handleLogout(),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       leading: const Icon(Icons.logout_rounded, color: AppColors.errorRed),
       title: const Text(
