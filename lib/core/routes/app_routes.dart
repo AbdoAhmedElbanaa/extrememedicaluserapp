@@ -18,4 +18,10 @@ class AppRoutes {
   static const String videoTutorials = '/video-tutorials';
   static const String chatSupport = '/chat-support';
   static const String notifications = '/notifications';
+  static const String quickStartGuide = '/quick-start-guide';
+  static const String changePassword = '/change-password';
+  static const String privacyPolicy = '/privacy-policy';
+  static const String termsOfService = '/terms-of-service';
+  static const String twoFactorVerification = '/two-factor-verification';
+  static const String editProfile = '/edit-profile';
 }

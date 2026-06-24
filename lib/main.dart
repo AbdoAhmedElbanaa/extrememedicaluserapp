@@ -1,3 +1,4 @@
+import 'package:extrememedicaluserapp/core/localization/app_translations.dart';
 import 'package:extrememedicaluserapp/features/devices/presentation/views/device_details_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -42,6 +43,11 @@ import 'package:extrememedicaluserapp/features/contact/services/onesignal_servic
 import 'package:extrememedicaluserapp/features/notifications/services/notifications_service.dart';
 import 'package:extrememedicaluserapp/features/notifications/controllers/notifications_controller.dart';
 import 'package:extrememedicaluserapp/features/notifications/views/notifications_view.dart';
+import 'package:extrememedicaluserapp/features/help/views/quick_start_guide_view.dart';
+import 'package:extrememedicaluserapp/features/help/views/legal_document_view.dart';
+import 'package:extrememedicaluserapp/features/settings/presentation/views/change_password_view.dart';
+import 'package:extrememedicaluserapp/features/auth/presentation/views/two_factor_verification_view.dart';
+import 'package:extrememedicaluserapp/features/profile/presentation/views/edit_profile_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -88,6 +94,12 @@ class MyApp extends StatelessWidget {
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: ThemeService().theme,
+          translations: AppTranslations(),
+          locale: Locale(
+            GetStorage().read('locale_lang') ?? 'en',
+            GetStorage().read('locale_country') ?? 'US',
+          ),
+          fallbackLocale: const Locale('en', 'US'),
           initialRoute: AppRoutes.splash,
           getPages: [
             GetPage(
@@ -223,6 +235,42 @@ class MyApp extends StatelessWidget {
                 Get.put(NotificationsController());
               }),
               transition: Transition.rightToLeftWithFade,
+            ),
+            GetPage(
+              name: AppRoutes.quickStartGuide,
+              page: () => const QuickStartGuideView(),
+              transition: Transition.cupertino,
+            ),
+            GetPage(
+              name: AppRoutes.changePassword,
+              page: () => const ChangePasswordView(),
+              transition: Transition.cupertino,
+            ),
+            GetPage(
+              name: AppRoutes.privacyPolicy,
+              page: () => const LegalDocumentView(
+                title: 'privacy_policy',
+                isPrivacy: true,
+              ),
+              transition: Transition.cupertino,
+            ),
+            GetPage(
+              name: AppRoutes.termsOfService,
+              page: () => const LegalDocumentView(
+                title: 'terms_of_service',
+                isPrivacy: false,
+              ),
+              transition: Transition.cupertino,
+            ),
+            GetPage(
+              name: AppRoutes.twoFactorVerification,
+              page: () => const TwoFactorVerificationView(),
+              transition: Transition.cupertino,
+            ),
+            GetPage(
+              name: AppRoutes.editProfile,
+              page: () => const EditProfileView(),
+              transition: Transition.cupertino,
             ),
           ],
         ),

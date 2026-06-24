@@ -73,6 +73,8 @@ class UserModel {
   final double? latitude;
   final double? longitude;
   final UserDeviceModel? device;
+  final bool twoFactorEnabled;
+  final String? photoUrl;
 
   UserModel({
     required this.uid,
@@ -85,6 +87,8 @@ class UserModel {
     this.latitude,
     this.longitude,
     this.device,
+    this.twoFactorEnabled = false,
+    this.photoUrl,
   });
 
   Map<String, dynamic> toMap() {
@@ -99,6 +103,8 @@ class UserModel {
       'latitude': latitude,
       'longitude': longitude,
       'device': device?.toMap(),
+      'twoFactorEnabled': twoFactorEnabled,
+      'photoUrl': photoUrl,
     };
   }
 
@@ -114,6 +120,8 @@ class UserModel {
       latitude: map['latitude'] != null ? (map['latitude'] as num).toDouble() : null,
       longitude: map['longitude'] != null ? (map['longitude'] as num).toDouble() : null,
       device: map['device'] != null ? UserDeviceModel.fromMap(Map<String, dynamic>.from(map['device'] as Map)) : null,
+      twoFactorEnabled: map['twoFactorEnabled'] ?? false,
+      photoUrl: map['photoUrl'],
     );
   }
 }

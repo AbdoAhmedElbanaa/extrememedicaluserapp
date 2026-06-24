@@ -5,10 +5,14 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:extrememedicaluserapp/core/services/theme_service.dart';
 import 'package:extrememedicaluserapp/features/contact/services/onesignal_service.dart';
+import 'package:extrememedicaluserapp/features/auth/services/auth_service.dart';
+import 'package:extrememedicaluserapp/features/auth/data/models/user_model.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class SettingsController extends GetxController {
   final currentThemeMode = ThemeMode.system.obs;
   final GetStorage _storage = GetStorage();
+  final _authService = Get.find<AuthService>();
 
   // Selected category for tablet/desktop view
   final RxInt selectedCategoryIndex = 0.obs;
@@ -17,6 +21,9 @@ class SettingsController extends GetxController {
   final twoFactorEnabled = false.obs;
   final biometricEnabled = false.obs;
   final loginAlertsEnabled = true.obs;
+
+  // Language
+  final activeLanguage = 'English'.obs;
 
   // Notifications
   final pushEnabled = true.obs;
@@ -41,6 +48,7 @@ class SettingsController extends GetxController {
   void onInit() {
     super.onInit();
     currentThemeMode.value = ThemeService().theme;
+    twoFactorEnabled.value = _authService.currentUserModel.value?.twoFactorEnabled ?? false;
 
     // Load from local storage
     pushEnabled.value = _storage.read('push_enabled') ?? true;
@@ -48,6 +56,7 @@ class SettingsController extends GetxController {
     chatAlertsEnabled.value = _storage.read('chat_alerts_enabled') ?? true;
     ticketAlertsEnabled.value = _storage.read('ticket_alerts_enabled') ?? true;
     errorAlertsEnabled.value = _storage.read('error_alerts_enabled') ?? true;
+    activeLanguage.value = _storage.read('locale_lang') == 'ar' ? 'العربية' : 'English';
 
     // Register observer for real-time OneSignal updates
     OneSignalService.addSubscriptionObserver((id, optedIn) {
@@ -175,5 +184,89 @@ class SettingsController extends GetxController {
       backgroundColor: AppColors.primary.withValues(alpha: 0.1),
       colorText: AppColors.primary,
     );
+  }
+
+  void showLanguageDialog() {
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: Get.isDarkMode ? AppColors.cinematicSurface : Colors.white,
+        title: Text(
+          'Select Language / اختر اللغة',
+          style: TextStyle(
+            color: Get.isDarkMode ? Colors.white : AppColors.foregroundLight,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Obx(() => ListTile(
+              title: Text('English', style: TextStyle(color: Get.isDarkMode ? Colors.white70 : Colors.black87)),
+              trailing: activeLanguage.value == 'English' ? const Icon(Icons.check, color: AppColors.primary) : null,
+              onTap: () {
+                activeLanguage.value = 'English';
+                _storage.write('locale_lang', 'en');
+                _storage.write('locale_country', 'US');
+                Get.updateLocale(const Locale('en', 'US'));
+                Get.back();
+              },
+            )),
+            Obx(() => ListTile(
+              title: Text('العربية', style: TextStyle(color: Get.isDarkMode ? Colors.white70 : Colors.black87)),
+              trailing: activeLanguage.value == 'العربية' ? const Icon(Icons.check, color: AppColors.primary) : null,
+              onTap: () {
+                activeLanguage.value = 'العربية';
+                _storage.write('locale_lang', 'ar');
+                _storage.write('locale_country', 'AE');
+                Get.updateLocale(const Locale('ar', 'AE'));
+                Get.back();
+              },
+            )),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> toggleTwoFactor(bool val) async {
+    twoFactorEnabled.value = val;
+    final uid = _authService.currentUser?.uid;
+    if (uid != null) {
+      try {
+        await FirebaseDatabase.instance.ref('users').child(uid).update({
+          'twoFactorEnabled': val,
+        });
+        
+        // Update local user model
+        final currentModel = _authService.currentUserModel.value;
+        if (currentModel != null) {
+          _authService.currentUserModel.value = UserModel(
+            uid: currentModel.uid,
+            email: currentModel.email,
+            phoneNumber: currentModel.phoneNumber,
+            clinicName: currentModel.clinicName,
+            firstName: currentModel.firstName,
+            lastName: currentModel.lastName,
+            address: currentModel.address,
+            latitude: currentModel.latitude,
+            longitude: currentModel.longitude,
+            device: currentModel.device,
+            twoFactorEnabled: val,
+            photoUrl: currentModel.photoUrl,
+          );
+        }
+        
+        Get.snackbar(
+          'Success',
+          'Two-Factor Authentication has been ${val ? 'enabled' : 'disabled'}.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: AppColors.emeraldSoft.withValues(alpha: 0.1),
+          colorText: Colors.green,
+        );
+      } catch (e) {
+        Get.snackbar('Error', 'Failed to update Two-Factor status: $e');
+        twoFactorEnabled.value = !val; // revert
+      }
+    }
   }
 }

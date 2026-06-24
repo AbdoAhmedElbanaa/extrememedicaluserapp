@@ -16,19 +16,53 @@ let createdUid = "";
 let selectedLat = 30.0444;
 let selectedLng = 31.2357;
 
+// Font Cache
+let arabicFontBase64 = null;
+
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Hook user table stream
+    // 1. Load Arabic Font for PDF export
+    loadArabicFont();
+
+    // 2. Hook user table stream
     initializeRealtimeTable();
     
-    // 2. Setup Dialog Actions
+    // 3. Setup Dialog Actions
     setupModalActions();
     
-    // 3. Search Bar Listener
+    // 4. Search Bar Listener
     document.getElementById('clinicSearchInput').addEventListener('input', filterClinicsTable);
 
-    // 4. Hook device catalog stream
+    // 5. Hook device catalog stream
     initializeDevicesSync();
 });
+
+/**
+ * Fetch Amiri font dynamically from CDN, convert to Base64, and register to pdfMake
+ */
+async function loadArabicFont() {
+    try {
+        const fontUrl = 'https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/amiri/Amiri-Regular.ttf';
+        console.log("Loading Arabic Amiri font from CDN...");
+        const response = await fetch(fontUrl);
+        const arrayBuffer = await response.arrayBuffer();
+        
+        let binary = '';
+        const bytes = new Uint8Array(arrayBuffer);
+        const len = bytes.byteLength;
+        for (let i = 0; i < len; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+        arabicFontBase64 = window.btoa(binary);
+        console.log("Arabic Amiri font loaded successfully!");
+        
+        // Re-render the DataTable with the loaded font configuration
+        if ($.fn.DataTable.isDataTable('#clinicsTable') && allClinics.length > 0) {
+            renderClinicsTable(allClinics);
+        }
+    } catch (err) {
+        console.error("Failed to load Arabic font for PDF export:", err);
+    }
+}
 
 /**
  * Sync clinics table in real-time
@@ -85,6 +119,17 @@ function initializeRealtimeTable() {
 }
 
 function renderClinicsTable(list) {
+    // 1. Save DataTable state if initialized
+    let currentSearch = '';
+    let currentPage = 0;
+    let hasDataTable = $.fn.DataTable.isDataTable('#clinicsTable');
+    if (hasDataTable) {
+        const api = $('#clinicsTable').DataTable();
+        currentSearch = api.search();
+        currentPage = api.page();
+        api.destroy();
+    }
+
     const tableBody = document.getElementById('clinicsTableBody');
     tableBody.innerHTML = '';
     
@@ -136,25 +181,138 @@ function renderClinicsTable(list) {
         `;
         tableBody.appendChild(row);
     });
+
+    // 2. Setup pdfMake fonts if Arabic font base64 is available
+    if (arabicFontBase64) {
+        pdfMake.vfs = pdfMake.vfs || {};
+        pdfMake.vfs['Amiri-Regular.ttf'] = arabicFontBase64;
+        pdfMake.fonts = {
+            Amiri: {
+                normal: 'Amiri-Regular.ttf',
+                bold: 'Amiri-Regular.ttf',
+                italics: 'Amiri-Regular.ttf',
+                bolditalics: 'Amiri-Regular.ttf'
+            }
+        };
+    }
+
+    // 3. Re-initialize DataTable with responsive and buttons extensions
+    const dtInstance = $('#clinicsTable').DataTable({
+        responsive: true,
+        searching: true,
+        info: true,
+        paging: true,
+        pageLength: 10,
+        order: [], // Keep firebase ordering
+        dom: 'Brtip', // Hide default filter box
+        buttons: [
+            {
+                extend: 'copyHtml5',
+                text: '<i class="fa-solid fa-copy"></i> Copy',
+                titleAttr: 'Copy to Clipboard',
+                className: 'bg-gradient-to-tr from-primary/80 to-secondary/80 text-white font-bold text-xs px-4 py-2.5 rounded-xl hover:-translate-y-0.5 hover:shadow-primaryglow transition duration-200 cursor-pointer flex items-center gap-1.5 border-none',
+                exportOptions: {
+                    columns: [1, 2, 3, 4, 5],
+                    format: {
+                        body: function(data, row, column, node) {
+                            if (column === 4) { // Address column (index 5 in table, 4 in exported columns [1,2,3,4,5])
+                                return data.replace(/Mapped|Unmapped/g, '').trim();
+                            }
+                            return data;
+                        }
+                    }
+                }
+            },
+            {
+                extend: 'excelHtml5',
+                text: '<i class="fa-solid fa-file-excel"></i> Excel',
+                titleAttr: 'Export to Excel (.xlsx)',
+                className: 'bg-gradient-to-tr from-green-600/80 to-emerald-600/80 text-white font-bold text-xs px-4 py-2.5 rounded-xl hover:-translate-y-0.5 hover:shadow-primaryglow transition duration-200 cursor-pointer flex items-center gap-1.5 border-none',
+                filename: 'clinics_report_' + new Date().toISOString().slice(0, 10),
+                exportOptions: {
+                    columns: [1, 2, 3, 4, 5],
+                    format: {
+                        body: function(data, row, column, node) {
+                            if (column === 4) {
+                                return data.replace(/Mapped|Unmapped/g, '').trim();
+                            }
+                            return data;
+                        }
+                    }
+                }
+            },
+            {
+                extend: 'pdfHtml5',
+                text: '<i class="fa-solid fa-file-pdf"></i> PDF',
+                titleAttr: 'Export to PDF (.pdf)',
+                className: 'bg-gradient-to-tr from-red-600/80 to-pink-600/80 text-white font-bold text-xs px-4 py-2.5 rounded-xl hover:-translate-y-0.5 hover:shadow-primaryglow transition duration-200 cursor-pointer flex items-center gap-1.5 border-none',
+                filename: 'clinics_report_' + new Date().toISOString().slice(0, 10),
+                exportOptions: {
+                    columns: [1, 2, 3, 4, 5],
+                    format: {
+                        body: function(data, row, column, node) {
+                            if (column === 4) {
+                                return data.replace(/Mapped|Unmapped/g, '').trim();
+                            }
+                            return data;
+                        }
+                    }
+                },
+                customize: function(doc) {
+                    if (arabicFontBase64) {
+                        doc.defaultStyle.font = 'Amiri';
+                        // Align Arabic table cells to the right
+                        if (doc.content && doc.content.length > 1) {
+                            const tableBody = doc.content[1].table.body;
+                            tableBody.forEach(row => {
+                                row.forEach(cell => {
+                                    cell.alignment = 'right';
+                                });
+                            });
+                        }
+                    }
+                }
+            },
+            {
+                extend: 'print',
+                text: '<i class="fa-solid fa-print"></i> Print',
+                titleAttr: 'Print Table',
+                className: 'bg-gradient-to-tr from-blue-600/80 to-cyan-600/80 text-white font-bold text-xs px-4 py-2.5 rounded-xl hover:-translate-y-0.5 hover:shadow-primaryglow transition duration-200 cursor-pointer flex items-center gap-1.5 border-none',
+                exportOptions: {
+                    columns: [1, 2, 3, 4, 5],
+                    format: {
+                        body: function(data, row, column, node) {
+                            if (column === 4) {
+                                return data.replace(/Mapped|Unmapped/g, '').trim();
+                            }
+                            return data;
+                        }
+                    }
+                }
+            }
+        ]
+    });
+
+    // 4. Append buttons to our custom container
+    document.getElementById('buttonsContainer').innerHTML = '';
+    dtInstance.buttons().container().appendTo('#buttonsContainer');
+
+    // 5. Restore search & page state if they existed
+    if (hasDataTable) {
+        if (currentSearch) {
+            dtInstance.search(currentSearch).draw(false);
+        }
+        if (currentPage) {
+            dtInstance.page(currentPage).draw(false);
+        }
+    }
 }
 
 function filterClinicsTable() {
-    const query = document.getElementById('clinicSearchInput').value.toLowerCase().trim();
-    if (!query) {
-        renderClinicsTable(allClinics);
-        return;
+    const query = document.getElementById('clinicSearchInput').value.trim();
+    if ($.fn.DataTable.isDataTable('#clinicsTable')) {
+        $('#clinicsTable').DataTable().search(query).draw();
     }
-    
-    const filtered = allClinics.filter(c => {
-        return c.clinicName.toLowerCase().includes(query) ||
-               c.firstName.toLowerCase().includes(query) ||
-               c.lastName.toLowerCase().includes(query) ||
-               c.email.toLowerCase().includes(query) ||
-               c.phoneNumber.toLowerCase().includes(query) ||
-               c.address.toLowerCase().includes(query);
-    });
-    
-    renderClinicsTable(filtered);
 }
 
 /**

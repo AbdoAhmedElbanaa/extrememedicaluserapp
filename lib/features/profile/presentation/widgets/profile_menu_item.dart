@@ -37,43 +37,46 @@ class ProfileMenuItem extends StatelessWidget {
           width: 1,
         ),
       ),
-      child: ListTile(
-        onTap: onTap,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-        leading: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: (iconColor ?? AppColors.primary).withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(icon, color: iconColor ?? AppColors.primary, size: 22),
-        ),
-        title: Text(
-          title,
-          style: TextStyle(
-            color: isDark ? Colors.white : AppColors.foregroundLight,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        subtitle: subtitle != null
-            ? Text(
-                subtitle!,
-                style: TextStyle(
-                  color: isDark
-                      ? AppColors.textMutedDark
-                      : AppColors.textMutedLight,
-                  fontSize: 12,
-                ),
-              )
-            : null,
-        trailing:
-            trailing ??
-            Icon(
-              Icons.arrow_forward_ios_rounded,
-              color: isDark ? Colors.white24 : Colors.black26,
-              size: 16,
+      child: Material(
+        color: Colors.transparent,
+        child: ListTile(
+          onTap: onTap,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+          leading: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: (iconColor ?? AppColors.primary).withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
             ),
+            child: Icon(icon, color: iconColor ?? AppColors.primary, size: 22),
+          ),
+          title: Text(
+            title,
+            style: TextStyle(
+              color: isDark ? Colors.white : AppColors.foregroundLight,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          subtitle: subtitle != null
+              ? Text(
+                  subtitle!,
+                  style: TextStyle(
+                    color: isDark
+                        ? AppColors.textMutedDark
+                        : AppColors.textMutedLight,
+                    fontSize: 12,
+                  ),
+                )
+              : null,
+          trailing:
+              trailing ??
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                color: isDark ? Colors.white24 : Colors.black26,
+                size: 16,
+              ),
+        ),
       ),
     );
   }

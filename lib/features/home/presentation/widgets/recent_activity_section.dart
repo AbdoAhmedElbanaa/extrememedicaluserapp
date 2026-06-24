@@ -88,51 +88,54 @@ class RecentActivitySection extends GetView<HomeController> {
   }
 
   Widget _buildActivityItem(RecentActivityModel activity, bool isDark) {
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      leading: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: activity.getStatusColor().withValues(alpha: 0.1),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(activity.icon, color: activity.getStatusColor(), size: 20),
-      ),
-      title: Text(
-        activity.title,
-        style: TextStyle(
-          color: isDark ? Colors.white : Colors.black,
-          fontSize: 15,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      subtitle: Row(
-        children: [
-          Text(
-            activity.subtitle,
-            style: TextStyle(
-              color: (isDark ? Colors.white : Colors.black).withValues(
-                  alpha: 0.4),
-              fontSize: 12,
-            ),
+    return Material(
+      color: Colors.transparent,
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        leading: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: activity.getStatusColor().withValues(alpha: 0.1),
+            shape: BoxShape.circle,
           ),
-          const SizedBox(width: 6),
-          Text(
-            '• ${activity.time}',
-            style: TextStyle(
-              color: (isDark ? Colors.white : Colors.black).withValues(
-                  alpha: 0.3),
-              fontSize: 11,
-            ),
+          child: Icon(activity.icon, color: activity.getStatusColor(), size: 20),
+        ),
+        title: Text(
+          activity.title,
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.black,
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
           ),
-        ],
+        ),
+        subtitle: Row(
+          children: [
+            Text(
+              activity.subtitle,
+              style: TextStyle(
+                color: (isDark ? Colors.white : Colors.black).withValues(
+                    alpha: 0.4),
+                fontSize: 12,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              '• ${activity.time}',
+              style: TextStyle(
+                color: (isDark ? Colors.white : Colors.black).withValues(
+                    alpha: 0.3),
+                fontSize: 11,
+              ),
+            ),
+          ],
+        ),
+        trailing: Icon(
+          Icons.arrow_forward_ios_rounded,
+          color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.1),
+          size: 14,
+        ),
+        onTap: () {},
       ),
-      trailing: Icon(
-        Icons.arrow_forward_ios_rounded,
-        color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.1),
-        size: 14,
-      ),
-      onTap: () {},
     );
   }
 

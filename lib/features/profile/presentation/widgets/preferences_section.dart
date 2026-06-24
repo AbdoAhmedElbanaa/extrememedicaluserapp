@@ -2,6 +2,7 @@ import 'package:extrememedicaluserapp/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../settings/presentation/controllers/settings_controller.dart';
 import '../controllers/profile_controller.dart';
 
 class PreferencesSection extends GetView<ProfileController> {
@@ -50,14 +51,17 @@ class PreferencesSection extends GetView<ProfileController> {
                 isDark: isDark,
                 showDivider: true,
               ),
-              _buildInfoTile(
-                icon: Icons.language_rounded,
-                iconColor: AppColors.blueSoft,
-                title: 'Language',
-                value: 'English',
-                isDark: isDark,
-                onTap: () {},
-              ),
+              Obx(() {
+                final settingsController = Get.put(SettingsController());
+                return _buildInfoTile(
+                  icon: Icons.language_rounded,
+                  iconColor: AppColors.blueSoft,
+                  title: 'Language',
+                  value: settingsController.activeLanguage.value,
+                  isDark: isDark,
+                  onTap: () => settingsController.showLanguageDialog(),
+                );
+              }),
             ],
           ),
         ),

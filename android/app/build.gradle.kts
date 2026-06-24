@@ -45,12 +45,21 @@ android {
 
     buildTypes {
         getByName("release") {
-            signingConfig = signingConfigs.getByName("release")
+            val hasSigning = keystoreProperties.containsKey("storeFile") &&
+                             keystoreProperties.containsKey("keyAlias") &&
+                             keystoreProperties.containsKey("storePassword") &&
+                             keystoreProperties.containsKey("keyPassword")
+            if (hasSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            } else {
+                signingConfig = signingConfigs.getByName("debug")
+            }
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
+
 }
 
 flutter {

@@ -83,7 +83,7 @@ class ProfileHeader extends GetView<ProfileController> {
                   icon: Icons.edit_outlined,
                   label: 'Edit Profile',
                   isDark: isDark,
-                  onTap: () {},
+                  onTap: () => Get.toNamed(AppRoutes.editProfile),
                 ),
                 _buildHeaderButton(
                   icon: Icons.settings_outlined,
@@ -104,15 +104,18 @@ class ProfileHeader extends GetView<ProfileController> {
   }
 
   Widget _buildLogoutButton(bool isDark) {
-    return ListTile(
-      onTap: () => controller.handleLogout(),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      leading: const Icon(Icons.logout_rounded, color: AppColors.errorRed),
-      title: const Text(
-        'Logout',
-        style: TextStyle(
-          color: AppColors.errorRed,
-          fontWeight: FontWeight.bold,
+    return Material(
+      color: Colors.transparent,
+      child: ListTile(
+        onTap: () => controller.handleLogout(),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        leading: const Icon(Icons.logout_rounded, color: AppColors.errorRed),
+        title: const Text(
+          'Logout',
+          style: TextStyle(
+            color: AppColors.errorRed,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
@@ -167,50 +170,61 @@ class ProfileHeader extends GetView<ProfileController> {
 
   Widget _buildAvatar(bool isDark, bool isWide) {
     final size = isWide ? 120.0 : 100.0;
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AppColors.primary, AppColors.secondary],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.4),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+    return Obx(() {
+      final photoUrl = controller.userData.value?.photoUrl;
+      final hasPhoto = photoUrl != null && photoUrl.isNotEmpty;
+
+      return Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: hasPhoto ? null : const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [AppColors.primary, AppColors.secondary],
           ),
-        ],
-        border: Border.all(
-          color: isDark ? AppColors.distinctBorderDark : Colors.white,
-          width: 3,
-        ),
-      ),
-      child: Center(
-        child: Obx(() {
-          final name = controller.userName.value.trim();
-          String initials = 'U';
-          if (name.isNotEmpty) {
-            final parts = name.split(' ');
-            if (parts.isNotEmpty) {
-              final first = parts.first[0].toUpperCase();
-              final last = parts.length > 1 ? parts.last[0].toUpperCase() : '';
-              initials = first + last;
-            }
-          }
-          return Text(
-            initials,
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: isWide ? 40 : 32,
+          image: hasPhoto ? DecorationImage(
+            image: NetworkImage(photoUrl),
+            fit: BoxFit.cover,
+          ) : null,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.4),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
             ),
-          );
-        }),
-      ),
-    );
+          ],
+          border: Border.all(
+            color: isDark ? AppColors.distinctBorderDark : Colors.white,
+            width: 3,
+          ),
+        ),
+        child: hasPhoto ? null : Center(
+          child: Builder(
+            builder: (context) {
+              final name = controller.userName.value.trim();
+              String initials = 'U';
+              if (name.isNotEmpty) {
+                final parts = name.split(' ');
+                if (parts.isNotEmpty) {
+                  final first = parts.first[0].toUpperCase();
+                  final last = parts.length > 1 ? parts.last[0].toUpperCase() : '';
+                  initials = first + last;
+                }
+              }
+              return Text(
+                initials,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: isWide ? 40 : 32,
+                ),
+              );
+            }
+          ),
+        ),
+      );
+    });
   }
 }

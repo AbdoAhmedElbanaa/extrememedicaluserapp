@@ -22,13 +22,6 @@ class PopularArticlesWidget extends StatelessWidget {
         iconBgColor: AppColors.indigoMuted,
       ),
       _ArticleData(
-        title: 'Device Won\'t Turn On?',
-        subtitle: 'Most common fix',
-        icon: Icons.bolt_rounded,
-        iconColor: AppColors.amberSoft,
-        iconBgColor: AppColors.amberMuted,
-      ),
-      _ArticleData(
         title: 'Live Chat Support',
         subtitle: 'Online - Avg. response 2 min',
         icon: Icons.chat_bubble_outline_rounded,
@@ -138,7 +131,9 @@ class _ArticleItem extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: () {
-            if (data.title == 'My Support Requests') {
+            if (data.title == 'Quick Start Guide') {
+              Get.toNamed(AppRoutes.quickStartGuide);
+            } else if (data.title == 'My Support Requests') {
               Get.toNamed(AppRoutes.mySupportRequests);
             } else if (data.isLiveChat) {
               Get.toNamed(AppRoutes.contactSupport);

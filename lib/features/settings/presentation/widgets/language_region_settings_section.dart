@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
+import '../controllers/settings_controller.dart';
 import 'settings_expandable_tile.dart';
 import 'settings_sub_tile.dart';
 
-class LanguageRegionSettingsSection extends StatelessWidget {
+class LanguageRegionSettingsSection extends GetView<SettingsController> {
   const LanguageRegionSettingsSection({super.key});
 
   @override
@@ -18,13 +20,13 @@ class LanguageRegionSettingsSection extends StatelessWidget {
       initiallyExpanded: !isMobile,
       showHeader: isMobile,
       children: [
-        SettingsSubTile(
+        Obx(() => SettingsSubTile(
           icon: Icons.language_rounded,
           iconColor: AppColors.blueSoft,
           title: 'Language',
-          subtitle: 'English (US)',
-          onTap: () {},
-        ),
+          subtitle: controller.activeLanguage.value,
+          onTap: () => controller.showLanguageDialog(),
+        )),
         SettingsSubTile(
           icon: Icons.calendar_today_rounded,
           iconColor: AppColors.indigoSoft,

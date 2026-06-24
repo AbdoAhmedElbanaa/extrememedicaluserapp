@@ -2,6 +2,7 @@ import 'package:extrememedicaluserapp/features/auth/data/user_repository.dart';
 import 'package:extrememedicaluserapp/features/auth/data/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:extrememedicaluserapp/features/auth/services/auth_service.dart';
 import 'package:extrememedicaluserapp/core/services/toast_service.dart';
 import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
@@ -41,6 +42,19 @@ class LoginController extends GetxController {
       
       if (userCredential.user != null) {
         await _authService.loadUserModel(userCredential.user!.uid);
+        final uid = userCredential.user!.uid;
+        GetStorage().write('2fa_verified_$uid', false);
+        
+        final userModel = _authService.currentUserModel.value;
+        if (userModel != null && userModel.twoFactorEnabled) {
+          ToastService.show(
+            title: '2FA Required',
+            message: 'Please verify the security code to proceed',
+            type: ToastType.info,
+          );
+          Get.offAllNamed(AppRoutes.twoFactorVerification);
+          return;
+        }
       }
       
       ToastService.show(
@@ -92,6 +106,20 @@ class LoginController extends GetxController {
           _authService.currentUserModel.value = newUser;
         } else {
           _authService.currentUserModel.value = existingUser;
+        }
+
+        final uid = user.uid;
+        GetStorage().write('2fa_verified_$uid', false);
+        
+        final userModel = _authService.currentUserModel.value;
+        if (userModel != null && userModel.twoFactorEnabled) {
+          ToastService.show(
+            title: '2FA Required',
+            message: 'Please verify the security code to proceed',
+            type: ToastType.info,
+          );
+          Get.offAllNamed(AppRoutes.twoFactorVerification);
+          return;
         }
 
         ToastService.show(

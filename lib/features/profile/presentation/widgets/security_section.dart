@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
+import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
 
 class SecuritySection extends StatelessWidget {
   const SecuritySection({super.key});
@@ -41,7 +43,7 @@ class SecuritySection extends StatelessWidget {
             iconColor: AppColors.amberSoft, // Orange/Gold color for security
             title: 'Change Password',
             isDark: isDark,
-            onTap: () {},
+            onTap: () => Get.toNamed(AppRoutes.changePassword),
           ),
         ),
       ],

@@ -1,11 +1,129 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:extrememedicaluserapp/theme/app_colors.dart';
+import 'package:extrememedicaluserapp/core/routes/app_routes.dart';
 import 'package:extrememedicaluserapp/core/utils/responsive_layout.dart';
 import '../controllers/profile_controller.dart';
 
 class SupportLegalSection extends GetView<ProfileController> {
   const SupportLegalSection({super.key});
+
+  void _showRateAppDialog(BuildContext context) {
+    int selectedRating = 5;
+    final commentController = TextEditingController();
+
+    Get.dialog(
+      StatefulBuilder(
+        builder: (context, setState) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          return AlertDialog(
+            backgroundColor: isDark ? AppColors.cinematicSurface : Colors.white,
+            title: Text(
+              'rate_dialog_title'.tr,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'rate_dialog_msg'.tr,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(5, (index) {
+                    final starIndex = index + 1;
+                    return IconButton(
+                      icon: Icon(
+                        selectedRating >= starIndex
+                            ? Icons.star_rounded
+                            : Icons.star_outline_rounded,
+                        color: Colors.amber,
+                        size: 32,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          selectedRating = starIndex;
+                        });
+                      },
+                    );
+                  }),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: commentController,
+                  maxLines: 3,
+                  style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                  decoration: InputDecoration(
+                    hintText: 'write_feedback'.tr,
+                    hintStyle: TextStyle(color: isDark ? Colors.white30 : Colors.black38),
+                    filled: true,
+                    fillColor: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[100],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: isDark ? AppColors.distinctBorderDark : AppColors.distinctBorderLight,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Get.back(),
+                child: Text('cancel'.tr),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Get.back(); // close dialog
+                  Get.dialog(
+                    const Center(child: CircularProgressIndicator()),
+                    barrierDismissible: false,
+                  );
+                  try {
+                    final ref = FirebaseDatabase.instance.ref('feedbacks').push();
+                    await ref.set({
+                      'id': ref.key,
+                      'userId': controller.userData.value?.uid ?? 'unknown_user',
+                      'userName': controller.userName.value,
+                      'userEmail': controller.userEmail.value,
+                      'rating': selectedRating,
+                      'comment': commentController.text.trim(),
+                      'timestamp': DateTime.now().millisecondsSinceEpoch,
+                    });
+                    Get.back(); // close loader
+                    Get.snackbar(
+                      'success'.tr,
+                      'feedback_success'.tr,
+                      snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: AppColors.success.withValues(alpha: 0.15),
+                      colorText: AppColors.success,
+                    );
+                  } catch (e) {
+                    Get.back(); // close loader
+                    Get.snackbar(
+                      'error'.tr,
+                      e.toString(),
+                      snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: AppColors.errorRed.withValues(alpha: 0.1),
+                      colorText: AppColors.errorRed,
+                    );
+                  }
+                },
+                child: Text('submit'.tr, style: const TextStyle(fontWeight: FontWeight.bold)),
+              ),
+            ],
+          );
+        }
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +167,7 @@ class SupportLegalSection extends GetView<ProfileController> {
                 title: 'Help Center',
                 isDark: isDark,
                 showDivider: true,
-                onTap: () {},
+                onTap: () => Get.toNamed(AppRoutes.help),
               ),
               _buildSupportTile(
                 icon: Icons.description_outlined,
@@ -57,7 +175,7 @@ class SupportLegalSection extends GetView<ProfileController> {
                 title: 'Privacy Policy',
                 isDark: isDark,
                 showDivider: true,
-                onTap: () {},
+                onTap: () => Get.toNamed(AppRoutes.privacyPolicy),
               ),
               _buildSupportTile(
                 icon: Icons.assignment_outlined,
@@ -65,7 +183,7 @@ class SupportLegalSection extends GetView<ProfileController> {
                 title: 'Terms of Service',
                 isDark: isDark,
                 showDivider: true,
-                onTap: () {},
+                onTap: () => Get.toNamed(AppRoutes.termsOfService),
               ),
               _buildSupportTile(
                 icon: Icons.star_outline_rounded,
@@ -73,7 +191,7 @@ class SupportLegalSection extends GetView<ProfileController> {
                 title: 'Rate the App',
                 isDark: isDark,
                 showDivider: false,
-                onTap: () {},
+                onTap: () => _showRateAppDialog(context),
               ),
             ],
           ),

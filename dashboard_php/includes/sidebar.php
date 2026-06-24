@@ -56,6 +56,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <span class="w-1.5 h-1.5 bg-white rounded-full absolute right-4"></span>
             <?php endif; ?>
         </a>
+        <a href="feedbacks.php" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-sm font-medium transition duration-300 relative <?php echo $current_page == 'feedbacks.php' ? 'text-white bg-gradient-to-tr from-primary to-secondary shadow-primaryglow' : 'text-textsecondary hover:text-white hover:bg-white/5'; ?>">
+            <i class="fa-solid fa-star text-lg"></i>
+            <span>Feedbacks</span>
+            <?php if ($current_page == 'feedbacks.php'): ?>
+                <span class="w-1.5 h-1.5 bg-white rounded-full absolute right-4"></span>
+            <?php endif; ?>
+        </a>
         <a href="devices.php" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-sm font-medium transition duration-300 relative <?php echo $current_page == 'devices.php' ? 'text-white bg-gradient-to-tr from-primary to-secondary shadow-primaryglow' : 'text-textsecondary hover:text-white hover:bg-white/5'; ?>">
             <i class="fa-solid fa-microchip text-lg"></i>
             <span>Devices</span>
@@ -110,6 +117,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <i class="fa-solid fa-tower-broadcast text-lg"></i>
             <span>OneSignal Settings</span>
             <?php if ($current_page == 'onesignal_settings.php'): ?>
+                <span class="w-1.5 h-1.5 bg-white rounded-full absolute right-4"></span>
+            <?php endif; ?>
+        </a>
+        <a href="app_settings.php" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-sm font-medium transition duration-300 relative <?php echo $current_page == 'app_settings.php' ? 'text-white bg-gradient-to-tr from-primary to-secondary shadow-primaryglow' : 'text-textsecondary hover:text-white hover:bg-white/5'; ?>">
+            <i class="fa-solid fa-gears text-lg"></i>
+            <span>App Settings</span>
+            <?php if ($current_page == 'app_settings.php'): ?>
                 <span class="w-1.5 h-1.5 bg-white rounded-full absolute right-4"></span>
             <?php endif; ?>
         </a>

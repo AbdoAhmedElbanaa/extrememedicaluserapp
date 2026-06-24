@@ -66,6 +66,14 @@ class SplashController extends GetxController {
 
     if (isLoggedIn) {
       await _authService.loadUserModel(_authService.currentUser!.uid);
+      final userModel = _authService.currentUserModel.value;
+      if (userModel != null && userModel.twoFactorEnabled) {
+        bool isVerified = storage.read('2fa_verified_${userModel.uid}') ?? false;
+        if (!isVerified) {
+          Get.offAllNamed(AppRoutes.twoFactorVerification);
+          return;
+        }
+      }
       Get.offAllNamed(AppRoutes.home);
     } else {
       Get.offAllNamed(AppRoutes.login);

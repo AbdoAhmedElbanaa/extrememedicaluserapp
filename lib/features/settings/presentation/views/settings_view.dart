@@ -9,10 +9,7 @@ import '../widgets/settings_list.dart';
 import '../widgets/account_settings_section.dart';
 import '../widgets/security_settings_section.dart';
 import '../widgets/notifications_settings_section.dart';
-import '../widgets/devices_sync_settings_section.dart';
-import '../widgets/appearance_settings_section.dart';
 import '../widgets/language_region_settings_section.dart';
-import '../widgets/subscription_billing_settings_section.dart';
 import '../widgets/about_settings_section.dart';
 import '../widgets/reset_settings_section.dart';
 
@@ -129,12 +126,9 @@ class SettingsView extends StatelessWidget {
       case 0: return 'Account';
       case 1: return 'Security';
       case 2: return 'Notifications';
-      case 3: return 'Devices & Sync';
-      case 4: return 'Appearance';
-      case 5: return 'Language & Region';
-      case 6: return 'Subscription & Billing';
-      case 7: return 'About';
-      case 8: return 'Reset Settings';
+      case 3: return 'Language & Region';
+      case 4: return 'About';
+      case 5: return 'Reset Settings';
       default: return 'Settings';
     }
   }
@@ -144,10 +138,7 @@ class SettingsView extends StatelessWidget {
       {'title': 'Account', 'icon': Icons.person_outline_rounded},
       {'title': 'Security', 'icon': Icons.security_outlined},
       {'title': 'Notifications', 'icon': Icons.notifications_none_rounded},
-      {'title': 'Devices & Sync', 'icon': Icons.sync_rounded},
-      {'title': 'Appearance', 'icon': Icons.palette_outlined},
       {'title': 'Language & Region', 'icon': Icons.language_rounded},
-      {'title': 'Subscription & Billing', 'icon': Icons.account_balance_wallet_outlined},
       {'title': 'About', 'icon': Icons.info_outline_rounded},
       {'title': 'Reset Settings', 'icon': Icons.restore_rounded},
     ];
@@ -232,12 +223,9 @@ class SettingsView extends StatelessWidget {
       case 0: return const AccountSettingsSection();
       case 1: return const SecuritySettingsSection();
       case 2: return const NotificationsSettingsSection();
-      case 3: return const DevicesSyncSettingsSection();
-      case 4: return const AppearanceSettingsSection();
-      case 5: return const LanguageRegionSettingsSection();
-      case 6: return const SubscriptionBillingSettingsSection();
-      case 7: return const AboutSettingsSection();
-      case 8: return const ResetSettingsSection();
+      case 3: return const LanguageRegionSettingsSection();
+      case 4: return const AboutSettingsSection();
+      case 5: return const ResetSettingsSection();
       default: return const SizedBox.shrink();
     }
   }
