@@ -1,45 +1,114 @@
-# Miscellaneous
-*.class
-*.log
-*.pyc
-*.swp
-.DS_Store
-.atom/
-.build/
-.buildlog/
-.history
-.svn/
-.swiftpm/
-migrate_working_dir/
+# ==============================================================================
+# Extreme Medical - Comprehensive and Professional Git Ignore Config
+# ==============================================================================
 
-# IntelliJ related
+# ------------------------------------------------------------------------------
+# System Files
+# ------------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# ------------------------------------------------------------------------------
+# IDEs and Text Editors
+# ------------------------------------------------------------------------------
+# JetBrains (IntelliJ IDEA, Android Studio, etc.)
+.idea/
 *.iml
 *.ipr
 *.iws
-.idea/
+out/
+# VS Code
+.vscode/
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+!.vscode/tasks.json
+.history/
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
-
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
+# ------------------------------------------------------------------------------
+# Flutter & Dart Exclusions
+# ------------------------------------------------------------------------------
 .dart_tool/
+.flutter-plugins
 .flutter-plugins-dependencies
+.packages
 .pub-cache/
 .pub/
 /build/
 /coverage/
+/doc/api/
+*.symbols
+*.map.json
 
-# Symbolication related
-app.*.symbols
+# ------------------------------------------------------------------------------
+# Android Exclusions
+# ------------------------------------------------------------------------------
+.gradle/
+local.properties
+**/android/local.properties
+**/android/key.properties
+**/android/app/src/main/assets/
+**/android/app/debug/
+**/android/app/profile/
+**/android/app/release/
+*.apk
+*.aab
+*.ap_
+*.jks
+*.keystore
+/android/app/debug/
+/android/app/profile/
+/android/app/release/
 
-# Obfuscation related
-app.*.map.json
+# ------------------------------------------------------------------------------
+# iOS/macOS Exclusions
+# ------------------------------------------------------------------------------
+**/ios/Flutter/.last_build_id
+**/ios/Flutter/ephemeral/
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/Pods/
+**/ios/.symlinks/
+**/.xcworkspace/
+**/*.xcworkspace/
+**/*.xcuserstate
+**/xcuserdata/
+**/DerivedData/
+*.mode1v3
+*.mode2v3
+*.perspectivev3
 
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
+# ------------------------------------------------------------------------------
+# Web Exclusions
+# ------------------------------------------------------------------------------
+**/web/flutter_bootstrap.js
+
+# ------------------------------------------------------------------------------
+# Local Configs, Logs & Temp Files
+# ------------------------------------------------------------------------------
+*.log
+/tmp/
+/temp/
+.env
+.env.*
+!.env.example
+
+# ------------------------------------------------------------------------------
+# PHP Dashboard & Uploads Exclusions
+# ------------------------------------------------------------------------------
+# Ignore all custom uploads but keep placeholder directory structures
+/dashboard_php/uploads/*
+!/dashboard_php/uploads/.gitkeep
+/dashboard_php/config.local.php
+/dashboard_php/.env
